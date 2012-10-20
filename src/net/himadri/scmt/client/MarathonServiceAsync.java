@@ -1,0 +1,74 @@
+package net.himadri.scmt.client;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import net.himadri.scmt.client.entity.PageProfile;
+import net.himadri.scmt.client.entity.PersonLap;
+import net.himadri.scmt.client.entity.Verseny;
+import net.himadri.scmt.client.entity.Versenyzo;
+import net.himadri.scmt.client.serializable.PollingRequest;
+import net.himadri.scmt.client.serializable.PollingResult;
+
+import java.util.List;
+
+/**
+ * The async counterpart of <code>GreetingService</code>.
+ */
+public interface MarathonServiceAsync {
+
+
+    void startRace(Long versenyId, AsyncCallback<Void> async);
+
+    void stopRace(Long versenyId, AsyncCallback<Void> async);
+
+    void restartRace(Long versenyId, AsyncCallback<Void> async);
+
+    void getRaceTime(Long versenyId, AsyncCallback<Long> async);
+
+    void addPersonLap(Long versenyId, String raceNumber, AsyncCallback<Void> async);
+
+    void updateRaceNumber(Long personLapId, String raceNumber, AsyncCallback<Void> async);
+
+    void updateLapTime(Long personLapId, long lapTime, AsyncCallback<Void> async);
+
+    void addVersenySzam(Long versenyId, Long tavId, Boolean ferfi, Integer korTol, Integer korIg, AsyncCallback<Void> async);
+
+    void modifyVersenySzam(Long versenySzamId, Long tavId, Boolean ferfi, Integer korTol, Integer korIg, AsyncCallback<Void> async);
+
+    void removeVersenySzam(Long versenySzamId, AsyncCallback<Void> async);
+
+    void addVersenyzo(String raceNumber, String name, Boolean ferfi, Integer szuletesiEv, String egyesulet, Long versenySzamId, Long versenyId, AsyncCallback<Void> async);
+
+    void modifyVersenyzo(Versenyzo versenyzo, AsyncCallback<Void> async);
+
+    void removeVersenyzo(Long versenyzoId, AsyncCallback<Void> async);
+
+    void getPollingResult(Long versenyId, PollingRequest pollingRequest, AsyncCallback<PollingResult> async);
+
+    void createChannelToken(AsyncCallback<String> async);
+
+    void getVersenyek(AsyncCallback<List<Verseny>> async);
+
+    void getAllPersonLapList(Long versenyId, AsyncCallback<List<PersonLap>> async);
+
+    void addVerseny(String versenyMegnevezes, AsyncCallback<Verseny> async);
+
+    void deleteRace(Long versenyId, AsyncCallback<Void> async);
+
+    void removePersonLap(Long personLapId, AsyncCallback<Void> async);
+
+    void addTav(Long versenyId, String megnevezes, Integer korszam, Integer versenySzamtol, Integer versenySzamig, AsyncCallback<Void> async);
+
+    void modifyTav(Long tavId, String megnevezes, Integer korszam, Integer versenySzamtol, Integer versenySzamig, AsyncCallback<Void> async);
+
+    void removeTav(Long tavId, AsyncCallback<Void> async);
+
+    void getAllPageProfiles(AsyncCallback<List<PageProfile>> async);
+
+    void savePageProfile(PageProfile pageProfile, AsyncCallback<Void> async);
+
+    void saveNev(String[] nevek, boolean ferfi, AsyncCallback<Void> async);
+
+    void isFerfiNev(String nev, AsyncCallback<Boolean> async);
+
+    void versenyzoFeladta(Long versenyzoId, boolean feladta, AsyncCallback<Void> async);
+}

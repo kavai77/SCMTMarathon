@@ -1,0 +1,9 @@
+.gwt/
+.idea/
+out/
+war/scmtmarathon/
+war/WEB-INF/appengine-generated/
+war/WEB-INF/classes/
+war/WEB-INF/deploy/
+SCMTMarathon.iml
+SCMTMarathon.war
