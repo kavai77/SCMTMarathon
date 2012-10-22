@@ -1,5 +1,6 @@
 package net.himadri.scmt.client.panel;
 
+import com.google.gwt.cell.client.EditTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.SelectionCell;
 import com.google.gwt.cell.client.TextInputCell;
@@ -61,7 +62,7 @@ public class NyomtatoPanel extends Composite {
             }
         }, "Mező");
 
-        final TextInputCell xTextInputCell = new TextInputCell();
+        final EditTextCell xTextInputCell = new EditTextCell();
         final Column<PageProfile, String> xColumn = new Column<PageProfile, String>(xTextInputCell) {
             @Override
             public String getValue(PageProfile pageProfile) {
@@ -85,7 +86,7 @@ public class NyomtatoPanel extends Composite {
         xColumn.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
         cellTable.addColumn(xColumn, "Bal behúzás (cm)");
 
-        final TextInputCell yTextInputCell = new TextInputCell();
+        final EditTextCell yTextInputCell = new EditTextCell();
         final Column<PageProfile, String> yColumn = new Column<PageProfile, String>(yTextInputCell) {
             @Override
             public String getValue(PageProfile pageProfile) {
@@ -108,7 +109,7 @@ public class NyomtatoPanel extends Composite {
         });
         cellTable.addColumn(yColumn, "Felső behúzás (cm)");
 
-        final List<String> fontFamilyOptions = Arrays.asList("COURIER", "HELVETICA", "TIMES_ROMAN");
+        final List<String> fontFamilyOptions = Arrays.asList("TIMES_ROMAN", "COURIER", "HELVETICA");
         SelectionCell fontFamilyCell = new SelectionCell(fontFamilyOptions);
         final Column<PageProfile, String> fontFamilyColumn = new Column<PageProfile, String>(fontFamilyCell) {
             @Override
@@ -125,7 +126,7 @@ public class NyomtatoPanel extends Composite {
         });
         cellTable.addColumn(fontFamilyColumn, "Betűtípus");
 
-        final TextInputCell sizeInputCell = new TextInputCell();
+        final EditTextCell sizeInputCell = new EditTextCell();
         final Column<PageProfile, String> sizeColumn = new Column<PageProfile, String>(sizeInputCell) {
             @Override
             public String getValue(PageProfile pageProfile) {

@@ -235,6 +235,7 @@ public class VersenyzoEntryDialog extends DialogBox {
 
     }
 
+    @SuppressWarnings("deprecation")
     private int getCurrentYear() {
         return new Date().getYear() + 1900;
     }

@@ -69,6 +69,10 @@ public class Utils {
         return o1Long.compareTo(o2Long);
     }
 
+    public static boolean isEmpty(String str) {
+        return str == null || str.isEmpty();
+    }
+
     public static int compareString(String o1String, String o2String) {
         if (o1String == null) o1String = "";
         if (o2String == null) o2String = "";

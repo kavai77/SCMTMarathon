@@ -130,8 +130,12 @@ public class PDFService extends HttpServlet {
         for (PageProfile pageProfile: pageProfiles) {
             String entry = data.get(PageProfileId.valueOf(pageProfile.getId()));
             if (entry != null && (pageProfile.getxAxis() > 0 || pageProfile.getyAxis() > 0)) {
+                String fontFamily = pageProfile.getFontFamily();
+                Font.FontFamily family = !Utils.isEmpty(fontFamily) ? Font.FontFamily.valueOf(fontFamily) : Font.FontFamily.TIMES_ROMAN;
+                int size = pageProfile.getSize();
+                if (size == 0) size = 10;
                 ColumnText.showTextAligned(canvas, pageProfile.getAlignment(),
-                    new Phrase(entry, new Font(Font.FontFamily.valueOf(pageProfile.getFontFamily()), pageProfile.getSize())),
+                    new Phrase(entry, new Font(family, size)),
                         convertCmToPixel(pageProfile.getxAxis()),
                         (int) PageSize.A4.getHeight() - convertCmToPixel(pageProfile.getyAxis()), 0);
             }
