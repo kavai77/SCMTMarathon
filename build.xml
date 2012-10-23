@@ -11,7 +11,6 @@
     <property name="gwt-gae-channel.jar" location="c:/Utils/gwt-gae-channel-0.4-alpha/gwt-gae-channel-0.4-alpha.jar"/>
     <property name="itext.jar" location="c:/Utils/itext-5.3.3/itextpdf-5.3.3.jar"/>
     <property name="opencsv-2.3.jar" location="c:/Utils/opencsv-2.3/deploy/opencsv-2.3.jar"/>
-    <property name="commons-fileupload-1.2.2.jar" location="c:/Utils/commons-fileupload-1.2.2/lib/commons-fileupload-1.2.2.jar"/>
 
     <path id="project.class.path">
         <pathelement location="war/WEB-INF/classes"/>
@@ -48,7 +47,6 @@
         <copy todir="war/WEB-INF/lib" file="${gwt-gae-channel.jar}"/>
         <copy todir="war/WEB-INF/lib" file="${itext.jar}"/>
         <copy todir="war/WEB-INF/lib" file="${opencsv-2.3.jar}"/>
-        <copy todir="war/WEB-INF/lib" file="${commons-fileupload-1.2.2.jar}"/>
     </target>
 
     <target name="javac" depends="libs" description="Compile java source to bytecode">

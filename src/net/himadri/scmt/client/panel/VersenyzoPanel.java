@@ -17,7 +17,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import net.himadri.scmt.client.*;
-import net.himadri.scmt.client.dialog.VersenyzoCSVUploadDialog;
 import net.himadri.scmt.client.dialog.VersenyzoEntryDialog;
 import net.himadri.scmt.client.entity.RaceStatus;
 import net.himadri.scmt.client.entity.Tav;
@@ -42,11 +41,12 @@ public class VersenyzoPanel extends Composite {
     private Column<Versenyzo, Versenyzo> modositasColumn;
     private Column<Versenyzo, Boolean> feladtaColumn;
     private ListBox versenySzamFilter = new ListBox();
-    private Button btnUjVersenyszm, btnCSVUpload;
+    private Button btnUjVersenyszm;
 
     private TavVersenySzam filter = TavVersenySzam.createAllAcceptance();
     private SCMTMarathon scmtMarathon;
 
+    @SuppressWarnings("unchecked")
     public VersenyzoPanel(final SCMTMarathon scmtMarathon) {
         this.scmtMarathon = scmtMarathon;
         final VersenyzoEntryDialog versenyzoEntryDialog = new VersenyzoEntryDialog(scmtMarathon);
@@ -60,16 +60,6 @@ public class VersenyzoPanel extends Composite {
         });
         btnUjVersenyszm.setWidth("120px");
         versenyzoPanel.add(btnUjVersenyszm, 810, 0);
-
-        final VersenyzoCSVUploadDialog versenyzoCSVUploadDialog = new VersenyzoCSVUploadDialog(scmtMarathon);
-        btnCSVUpload = new ImageButton("up.png", "Import", new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                versenyzoCSVUploadDialog.showDialog();
-            }
-        });
-        btnCSVUpload.setWidth("120px");
-        versenyzoPanel.add(btnCSVUpload, 810, 50);
 
         versenyzoPanel.add(new Label("Szűrés"), 810, 108);
         versenySzamFilter.setSize("150px", "23px");

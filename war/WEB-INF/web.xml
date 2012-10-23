@@ -25,7 +25,7 @@
     </servlet>
     <servlet>
         <servlet-name>VersenyzoCSVUploadService</servlet-name>
-        <servlet-class>net.himadri.scmt.server.VersenyzoCSVUploadService</servlet-class>
+        <servlet-class>net.himadri.scmt.server.VersenyzoCSVUploadServiceImpl</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -52,7 +52,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>VersenyzoCSVUploadService</servlet-name>
-        <url-pattern>/scmtmarathon/VersenyzoCSVUploadService</url-pattern>
+        <url-pattern>/scmtmarathon/import</url-pattern>
     </servlet-mapping>
 
     <!-- Default page to serve -->
@@ -64,8 +64,7 @@
         <web-resource-collection>
             <web-resource-name>admin</web-resource-name>
             <url-pattern>/scmtmarathon/marathon</url-pattern>
-            <url-pattern>/scmtmarathon/PDFService</url-pattern>
-            <url-pattern>/scmtmarathon/VersenyzoCSVUploadService</url-pattern>
+            <url-pattern>/scmtmarathon/import</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>
@@ -81,7 +80,7 @@
         </auth-constraint>
     </security-constraint>
 
-    <filter>
+    <!--filter>
         <filter-name>_ah_DevSocketFilter</filter-name>
         <filter-class>
             com.google.appengine.api.socket.dev.DevSocketFilter
@@ -95,6 +94,6 @@
     <filter-mapping>
         <filter-name>_ah_DevSocketFilter</filter-name>
         <url-pattern>/*</url-pattern>
-    </filter-mapping>
+    </filter-mapping-->
 
 </web-app>
