@@ -80,7 +80,7 @@
         </auth-constraint>
     </security-constraint>
 
-    <!--filter>
+    <filter>
         <filter-name>_ah_DevSocketFilter</filter-name>
         <filter-class>
             com.google.appengine.api.socket.dev.DevSocketFilter
@@ -94,6 +94,6 @@
     <filter-mapping>
         <filter-name>_ah_DevSocketFilter</filter-name>
         <url-pattern>/*</url-pattern>
-    </filter-mapping-->
+    </filter-mapping>
 
 </web-app>

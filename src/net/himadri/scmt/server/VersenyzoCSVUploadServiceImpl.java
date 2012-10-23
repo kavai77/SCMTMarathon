@@ -11,6 +11,7 @@ import net.himadri.scmt.client.VersenyzoCSVUploadService;
 import net.himadri.scmt.client.entity.Tav;
 import net.himadri.scmt.client.entity.VersenySzam;
 import net.himadri.scmt.client.entity.Versenyzo;
+import net.himadri.scmt.client.panel.VersenyzoImportPanel;
 
 import java.io.*;
 import java.util.*;
@@ -23,6 +24,11 @@ public class VersenyzoCSVUploadServiceImpl extends RemoteServiceServlet implemen
     public static final String[] HEADER = {"Rajtszám", "Név", "Született", "Egyesület"};
     public static final Pattern SZULETES_PATTERN = Pattern.compile("(\\d\\d\\d\\d).*");
     public final MarathonService marathonService = new MarathonServiceImpl();
+
+    @Override
+    public String getHeader() {
+        return Arrays.toString(HEADER);
+    }
 
     @Override
     public String importVersenyzok(long versenyId, String fileContent) {

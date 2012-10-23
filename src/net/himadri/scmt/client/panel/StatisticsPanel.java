@@ -1,10 +1,10 @@
 package net.himadri.scmt.client.panel;
 
+import com.google.gwt.cell.client.*;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.AbsolutePanel;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.*;
 import net.himadri.scmt.client.SCMTMarathon;
 import net.himadri.scmt.client.Utils;
 import net.himadri.scmt.client.entity.PersonLap;
@@ -24,6 +24,7 @@ import java.util.*;
 public class StatisticsPanel extends Composite {
     private CellTable<StatisticsTableRow> statisticsCellTable;
     private SCMTMarathon scmtMarathon;
+    private StatisticsOverview statisticsOverview = new StatisticsOverview();
 
     public StatisticsPanel(final SCMTMarathon scmtMarathon) {
         this.scmtMarathon = scmtMarathon;
@@ -39,26 +40,32 @@ public class StatisticsPanel extends Composite {
         }, "Megnevezés");
         statisticsCellTable.addColumn(new RightAlignmentColumn() {
             @Override
-            public String getValue(StatisticsTableRow statisticsTable) {
-                return Integer.toString(statisticsTable.participants);
+            public ArrayList<String> getRaceNumberList(StatisticsTableRow statisticsTable) {
+                return statisticsTable.participants;
             }
         }, "Indulók");
         statisticsCellTable.addColumn(new RightAlignmentColumn() {
             @Override
-            public String getValue(StatisticsTableRow statisticsTable) {
-                return Integer.toString(statisticsTable.participants - statisticsTable.finished - statisticsTable.gaveup);
+            public ArrayList<String> getRaceNumberList(StatisticsTableRow statisticsTable) {
+                return statisticsTable.racing;
             }
         }, "Versenyben");
         statisticsCellTable.addColumn(new RightAlignmentColumn() {
             @Override
-            public String getValue(StatisticsTableRow statisticsTable) {
-                return Integer.toString(statisticsTable.finished);
+            public ArrayList<String> getRaceNumberList(StatisticsTableRow statisticsTable) {
+                return statisticsTable.finished;
             }
         }, "Befejezte");
         statisticsCellTable.addColumn(new RightAlignmentColumn() {
             @Override
-            public String getValue(StatisticsTableRow statisticsTable) {
-                return Integer.toString(statisticsTable.gaveup);
+            public ArrayList<String> getRaceNumberList(StatisticsTableRow statisticsTable) {
+                return statisticsTable.notStarted;
+            }
+        }, "Nem kezdte el");
+        statisticsCellTable.addColumn(new RightAlignmentColumn() {
+            @Override
+            public ArrayList<String> getRaceNumberList(StatisticsTableRow statisticsTable) {
+                return statisticsTable.gaveup;
             }
         }, "Feladta");
         statisticsCellTable.setPageSize(Integer.MAX_VALUE);
@@ -129,19 +136,30 @@ public class StatisticsPanel extends Composite {
         for (RaceStatusRow raceStatusRow: statusRowCacheList) {
             if (raceStatusRow.getTav() != null && raceStatusRow.getVersenySzam() != null) {
                 if (raceStatusRow.getTav().getKorSzam() <= raceStatusRow.getLapTimes().size()) {
-                    tavStatisticsTableRowMap.get(raceStatusRow.getTav().getId()).finished++;
-                    versenySzamStatisticsTableRowMap.get(raceStatusRow.getVersenySzam().getId()).finished++;
+                    tavStatisticsTableRowMap.get(raceStatusRow.getTav().getId()).finished.add(raceStatusRow.getRaceNumber());
+                    versenySzamStatisticsTableRowMap.get(raceStatusRow.getVersenySzam().getId()).finished.add(raceStatusRow.getRaceNumber());
                 } else if (raceStatusRow.getVersenyzo() != null && raceStatusRow.getVersenyzo().isFeladta()) {
-                    tavStatisticsTableRowMap.get(raceStatusRow.getTav().getId()).gaveup++;
-                    versenySzamStatisticsTableRowMap.get(raceStatusRow.getVersenySzam().getId()).gaveup++;
+                    tavStatisticsTableRowMap.get(raceStatusRow.getTav().getId()).gaveup.add(raceStatusRow.getRaceNumber());
+                    versenySzamStatisticsTableRowMap.get(raceStatusRow.getVersenySzam().getId()).gaveup.add(raceStatusRow.getRaceNumber());
+                } else {
+                    tavStatisticsTableRowMap.get(raceStatusRow.getTav().getId()).racing.add(raceStatusRow.getRaceNumber());
+                    versenySzamStatisticsTableRowMap.get(raceStatusRow.getVersenySzam().getId()).racing.add(raceStatusRow.getRaceNumber());
                 }
             }
         }
 
         for (Versenyzo versenyzo: scmtMarathon.getVersenyzoMapCache().getAllVersenyzo()) {
             VersenySzam versenySzam = scmtMarathon.getVersenyszamMapCache().getVersenySzam(versenyzo.getVersenySzamId());
-            tavStatisticsTableRowMap.get(versenySzam.getTavId()).participants++;
-            versenySzamStatisticsTableRowMap.get(versenyzo.getVersenySzamId()).participants++;
+            tavStatisticsTableRowMap.get(versenySzam.getTavId()).participants.add(versenyzo.getRaceNumber());
+            versenySzamStatisticsTableRowMap.get(versenyzo.getVersenySzamId()).participants.add(versenyzo.getRaceNumber());
+        }
+
+        for (StatisticsTableRow statisticsTableRow: statisticsTableRowList) {
+            HashSet<String> notStarted = new HashSet<String>(statisticsTableRow.participants);
+            notStarted.removeAll(statisticsTableRow.racing);
+            notStarted.removeAll(statisticsTableRow.finished);
+            notStarted.removeAll(statisticsTableRow.gaveup);
+            statisticsTableRow.notStarted.addAll(notStarted);
         }
 
         statisticsCellTable.setRowData(statisticsTableRowList);
@@ -150,18 +168,84 @@ public class StatisticsPanel extends Composite {
 
     private class StatisticsTableRow {
         private String description;
-        private int participants;
-        private int finished;
-        private int gaveup;
+        private ArrayList<String> participants = new ArrayList<String>();
+        private ArrayList<String> racing = new ArrayList<String>();
+        private ArrayList<String> finished = new ArrayList<String>();
+        private ArrayList<String> gaveup = new ArrayList<String>();
+        private ArrayList<String> notStarted = new ArrayList<String>();
 
         private StatisticsTableRow(String description) {
             this.description = description;
         }
     }
 
-    private abstract class RightAlignmentColumn extends TextColumn<StatisticsTableRow> {
+    private abstract class RightAlignmentColumn extends Column<StatisticsTableRow, String> {
         protected RightAlignmentColumn() {
+            super(new ClickableTextCell());
             setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
+            setFieldUpdater(new FieldUpdater<StatisticsTableRow, String>() {
+                @Override
+                public void update(int index, StatisticsTableRow object, String value) {
+                    if (!getRaceNumberList(object).isEmpty()) {
+                        int columnIndex = statisticsCellTable.getColumnIndex(RightAlignmentColumn.this);
+                        statisticsOverview.showWidget(getRaceNumberList(object), object.description + " " +
+                                statisticsCellTable.getHeader(columnIndex).getValue());
+                    }
+                }
+            });
+        }
+
+        public abstract ArrayList<String> getRaceNumberList(StatisticsTableRow object);
+
+        @Override
+        public String getValue(StatisticsTableRow object) {
+            return Integer.toString(getRaceNumberList(object).size());
+        }
+    }
+
+    private class StatisticsOverview extends DialogBox {
+        private CellTable<RaceStatusRow> cellTable = new CellTable<RaceStatusRow>(Integer.MAX_VALUE);
+        private StatisticsOverview() {
+            super(true, true);
+            setAnimationEnabled(true);
+            ScrollPanel mainPanel = new ScrollPanel();
+            mainPanel.setWidget(cellTable);
+            mainPanel.setSize("300px", "400px");
+            cellTable.addColumn(new TextColumn<RaceStatusRow>() {
+                @Override
+                public String getValue(RaceStatusRow object) {
+                    return object.getRaceNumber();
+                }
+            }, "Rajtszám");
+            cellTable.addColumn(new TextColumn<RaceStatusRow>() {
+                @Override
+                public String getValue(RaceStatusRow object) {
+                    return object.getVersenyzo().getName();
+                }
+            }, "Név");
+            cellTable.addColumn(new TextColumn<RaceStatusRow>() {
+                @Override
+                public String getValue(RaceStatusRow object) {
+                    return Integer.toString(object.getLapTimes().size());
+                }
+            }, "Körszám");
+            setWidget(mainPanel);
+        }
+
+        public void showWidget(ArrayList<String> raceNumbers, String description) {
+            setHTML(description);
+            ArrayList<RaceStatusRow> raceStatusRows = new ArrayList<RaceStatusRow>(raceNumbers.size());
+            for (String raceNumber: raceNumbers) {
+                RaceStatusRow raceStatusRow = scmtMarathon.getRaceStatusRowCache().getRaceStatusRowByRaceNumber(raceNumber);
+                if (raceStatusRow != null) {
+                    raceStatusRows.add(raceStatusRow);
+                } else {
+                    raceStatusRows.add(new RaceStatusRow(raceNumber, scmtMarathon));
+                }
+            }
+            cellTable.setRowData(raceStatusRows);
+            cellTable.redraw();
+            center();
         }
     }
 }

@@ -6,4 +6,6 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 public interface VersenyzoCSVUploadServiceAsync {
     void importVersenyzok(long versenyId, String fileContent, AsyncCallback<String> async);
+
+    void getHeader(AsyncCallback<String> async);
 }
