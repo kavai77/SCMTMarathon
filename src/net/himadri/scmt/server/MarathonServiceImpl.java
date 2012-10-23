@@ -426,6 +426,7 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         updateVerseny(verseny);
     }
 
+    @SuppressWarnings("unchecked")
     private TreeMap<Long, PersonLap> getPersonLapMap(Long versenyId) {
         TreeMap<Long, PersonLap> personLapTreeMap = (TreeMap<Long, PersonLap>) memcacheService.get(
                 getPersonLapMapKey(versenyId));

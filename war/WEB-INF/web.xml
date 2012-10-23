@@ -23,6 +23,10 @@
         <servlet-name>PDFService</servlet-name>
         <servlet-class>net.himadri.scmt.server.PDFService</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>VersenyzoCSVUploadService</servlet-name>
+        <servlet-class>net.himadri.scmt.server.VersenyzoCSVUploadService</servlet-class>
+    </servlet>
 
     <servlet-mapping>
         <servlet-name>marathonServlet</servlet-name>
@@ -46,6 +50,10 @@
         <servlet-name>PDFService</servlet-name>
         <url-pattern>/scmtmarathon/PDFService</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VersenyzoCSVUploadService</servlet-name>
+        <url-pattern>/scmtmarathon/VersenyzoCSVUploadService</url-pattern>
+    </servlet-mapping>
 
     <!-- Default page to serve -->
     <welcome-file-list>
@@ -54,7 +62,10 @@
 
     <security-constraint>
         <web-resource-collection>
+            <web-resource-name>admin</web-resource-name>
             <url-pattern>/scmtmarathon/marathon</url-pattern>
+            <url-pattern>/scmtmarathon/PDFService</url-pattern>
+            <url-pattern>/scmtmarathon/VersenyzoCSVUploadService</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>
@@ -62,6 +73,7 @@
     </security-constraint>
     <security-constraint>
         <web-resource-collection>
+            <web-resource-name>public</web-resource-name>
             <url-pattern>/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>

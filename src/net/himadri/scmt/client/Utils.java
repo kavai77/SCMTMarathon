@@ -3,6 +3,8 @@ package net.himadri.scmt.client;
 import net.himadri.scmt.client.entity.Tav;
 import net.himadri.scmt.client.entity.VersenySzam;
 
+import java.util.Arrays;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Kavai
@@ -78,6 +80,30 @@ public class Utils {
         if (o2String == null) o2String = "";
 
         return o1String.compareTo(o2String);
+    }
+
+    public static boolean equalsIgnoreCase(String[] a, String[] a2) {
+        if (a==a2)
+            return true;
+        if (a==null || a2==null)
+            return false;
+
+        int length = a.length;
+        if (a2.length != length) {
+            System.out.println("A méret nem stimmel: " + a2.length + ", " + length);
+            return false;
+        }
+
+        for (int i=0; i<length; i++) {
+            String o1 = a[i];
+            String o2 = a2[i];
+            if (!(o1==null ? o2==null : o1.equalsIgnoreCase(o2))) {
+                System.out.println("A nem stimmel: " + Arrays.toString(o1.toCharArray()) + ", " + Arrays.toString(o2.toCharArray()));
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public static String getElapsedTimeString(Long elapsedTime) {
