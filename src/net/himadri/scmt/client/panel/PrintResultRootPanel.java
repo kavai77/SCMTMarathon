@@ -13,7 +13,9 @@ import net.himadri.scmt.client.serializable.MarathonActionListener;
 import net.himadri.scmt.client.serializable.RaceStatusRow;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,7 +24,6 @@ import java.util.List;
  */
 public class PrintResultRootPanel extends Composite {
 
-    public static final int FIXED_COLUMN_NB = 5;
     private TavVersenySzam filter;
     private VerticalPanel verticalPanel = new VerticalPanel();
     private SCMTMarathon scmtMarathon;
@@ -82,48 +83,46 @@ public class PrintResultRootPanel extends Composite {
         flexTable.setBorderWidth(1);
         flexTable.setCellPadding(5);
         flexTable.addStyleName("collapse");
-        flexTable.setText(0, 0, "Helyezés");
+        flexTable.setText(0, 0, "Hely");
         flexTable.setText(0, 1, "Rajtszám");
         flexTable.setText(0, 2, "Versenyző");
-        flexTable.setText(0, 3, "Egyesület");
-        flexTable.setText(0, 4, "Versenyszám");
+        flexTable.setText(0, 3, "Kategória");
+        flexTable.setText(0, 4, "Kat. hely");
+        flexTable.setText(0, 5, "Idő");
         ArrayList<RaceStatusRow> acceptedRows = new ArrayList<RaceStatusRow>();
         for (RaceStatusRow raceStatusRow : scmtMarathon.getRaceStatusRowCache().getAllRaceStatusRows()) {
-            if (TavVersenyszamFilter.isAccepted(filter, raceStatusRow.getVersenySzam())) {
+            if (TavVersenyszamFilter.isAccepted(filter, raceStatusRow.getVersenySzam()) &&
+                    raceStatusRow.getTav() != null && raceStatusRow.getTav().getKorSzam() <= raceStatusRow.getLapTimes().size()) {
                 acceptedRows.add(raceStatusRow);
             }
         }
-        int maxLapTime = 0;
-        for (int i = 0; i < acceptedRows.size(); i++) {
-            RaceStatusRow raceStatusRow = acceptedRows.get(i);
-            int rowIndex = i  + 1;
-            flexTable.setText(rowIndex, 0, rowIndex + ".");
+        Map<Long, Integer> tavHelyCounter = new HashMap<Long, Integer>();
+        Map<Long, Integer> kategoriaHelyCounter = new HashMap<Long, Integer>();
+        int rowIndex = 0;
+        for (RaceStatusRow raceStatusRow: acceptedRows) {
+            rowIndex++;
+            Integer tavHely = getHelyezes(tavHelyCounter, raceStatusRow.getTav().getId());
+            flexTable.setText(rowIndex, 0, tavHely + ".");
             flexTable.setText(rowIndex, 1, raceStatusRow.getRaceNumber());
             if (raceStatusRow.getVersenyzo() != null) {
                 flexTable.setText(rowIndex, 2, raceStatusRow.getVersenyzo().getName());
-                flexTable.setText(rowIndex, 3, raceStatusRow.getVersenyzo().getEgyesulet());
             }
             if (raceStatusRow.getVersenySzam() != null) {
-                flexTable.setText(rowIndex, 4, Utils.getVersenySzamMegnevezes(scmtMarathon, raceStatusRow.getVersenySzam()));
+                flexTable.setText(rowIndex, 3, Utils.getVersenySzamMegnevezes(scmtMarathon, raceStatusRow.getVersenySzam()));
+                Integer katHely = getHelyezes(kategoriaHelyCounter, raceStatusRow.getVersenySzam().getId());
+                flexTable.setText(rowIndex, 4, katHely + ".");
             }
-            if (maxLapTime < raceStatusRow.getLapTimes().size()) {
-                maxLapTime = raceStatusRow.getLapTimes().size();
-            }
-            for (int j = 0; j < raceStatusRow.getLapTimes().size(); j++) {
-                flexTable.setText(rowIndex, j + FIXED_COLUMN_NB, Utils.getElapsedTimeString(raceStatusRow.getLapTimes().get(j)));
-            }
-        }
-        for (int i = 0; i < maxLapTime; i++) {
-            flexTable.setText(0, i + FIXED_COLUMN_NB, (i + 1) + ". kör");
-        }
-        for (int i = 0; i < acceptedRows.size(); i++) {
-            int row = i + 1;
-            Versenyzo versenyzo = acceptedRows.get(i).getVersenyzo();
-            String text = versenyzo != null && versenyzo.isFeladta() ? "Feladta" : "";
-            for (int column = flexTable.getCellCount(row); column < maxLapTime + FIXED_COLUMN_NB; column++) {
-                flexTable.setText(row, column, text);
-            }
+            flexTable.setText(rowIndex, 5, Utils.getElapsedTimeString(raceStatusRow.getLapTimes().get(raceStatusRow.getTav().getKorSzam() - 1)));
         }
         return flexTable;
+    }
+
+    private Integer getHelyezes(Map<Long, Integer> helyCounter, Long id) {
+        Integer hely = helyCounter.get(id);
+        if (hely == null) {
+            hely = 0;
+        }
+        helyCounter.put(id, ++hely);
+        return hely;
     }
 }

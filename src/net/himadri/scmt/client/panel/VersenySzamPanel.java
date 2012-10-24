@@ -52,7 +52,7 @@ public class VersenySzamPanel extends Composite {
         final FormPanel formPanel = new FormPanel();
         final Hidden pdfServiceParam = new Hidden("versenySzam");
         formPanel.setAction("/scmtmarathon/PDFService");
-        formPanel.setMethod("GET");
+        formPanel.setMethod(FormPanel.METHOD_GET);
         formPanel.getElement().<FormElement>cast().setTarget("_blank");
         formPanel.add(pdfServiceParam);
         versenySzamPanel.add(formPanel);

@@ -1,6 +1,7 @@
 package net.himadri.scmt.client.panel;
 
-import com.google.gwt.cell.client.*;
+import com.google.gwt.cell.client.ClickableTextCell;
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -31,7 +32,7 @@ public class StatisticsPanel extends Composite {
         AbsolutePanel racePanel = new AbsolutePanel();
         racePanel.setSize("1001px", "620px");
 
-        statisticsCellTable = new CellTable<StatisticsTableRow>();
+        statisticsCellTable = new CellTable<StatisticsTableRow>(Integer.MAX_VALUE);
         statisticsCellTable.addColumn(new TextColumn<StatisticsTableRow>() {
             @Override
             public String getValue(StatisticsTableRow statisticsTable) {
@@ -68,8 +69,10 @@ public class StatisticsPanel extends Composite {
                 return statisticsTable.gaveup;
             }
         }, "Feladta");
-        statisticsCellTable.setPageSize(Integer.MAX_VALUE);
-        racePanel.add(statisticsCellTable);
+        ScrollPanel tableScroll = new ScrollPanel(statisticsCellTable);
+        tableScroll.setSize("900px", "350px");
+        racePanel.add(tableScroll);
+        racePanel.add(new Label("* Részletekhez kattints a számra!"), 30, 370);
 
         scmtMarathon.getPollingService().getVersenyzoSync().addMarathonActionListener(new TabPanelActionListener<Versenyzo>());
         scmtMarathon.getPollingService().getVersenySzamSync().addMarathonActionListener(new TabPanelActionListener<VersenySzam>());
@@ -132,8 +135,7 @@ public class StatisticsPanel extends Composite {
             statisticsTableRowList.add(statisticsTableRow);
         }
 
-        List<RaceStatusRow> statusRowCacheList = scmtMarathon.getRaceStatusRowCache().getAllRaceStatusRows();
-        for (RaceStatusRow raceStatusRow: statusRowCacheList) {
+        for (RaceStatusRow raceStatusRow: scmtMarathon.getRaceStatusRowCache().getAllRaceStatusRows()) {
             if (raceStatusRow.getTav() != null && raceStatusRow.getVersenySzam() != null) {
                 if (raceStatusRow.getTav().getKorSzam() <= raceStatusRow.getLapTimes().size()) {
                     tavStatisticsTableRowMap.get(raceStatusRow.getTav().getId()).finished.add(raceStatusRow.getRaceNumber());
@@ -161,6 +163,15 @@ public class StatisticsPanel extends Composite {
             notStarted.removeAll(statisticsTableRow.gaveup);
             statisticsTableRow.notStarted.addAll(notStarted);
         }
+
+        StatisticsTableRow versenyzoNelkuliSzamok = new StatisticsTableRow("Ismeretlen rajtszámok, nem rögzített versenyzők");
+        for (RaceStatusRow raceStatusRow: scmtMarathon.getRaceStatusRowCache().getAllRaceStatusRows()) {
+            if (raceStatusRow.getVersenyzo() == null) {
+                versenyzoNelkuliSzamok.participants.add(raceStatusRow.getRaceNumber());
+                versenyzoNelkuliSzamok.racing.add(raceStatusRow.getRaceNumber());
+            }
+        }
+        statisticsTableRowList.add(versenyzoNelkuliSzamok);
 
         statisticsCellTable.setRowData(statisticsTableRowList);
         statisticsCellTable.redraw();
@@ -220,7 +231,8 @@ public class StatisticsPanel extends Composite {
             cellTable.addColumn(new TextColumn<RaceStatusRow>() {
                 @Override
                 public String getValue(RaceStatusRow object) {
-                    return object.getVersenyzo().getName();
+                    Versenyzo versenyzo = object.getVersenyzo();
+                    return versenyzo != null ? versenyzo.getName() : "";
                 }
             }, "Név");
             cellTable.addColumn(new TextColumn<RaceStatusRow>() {

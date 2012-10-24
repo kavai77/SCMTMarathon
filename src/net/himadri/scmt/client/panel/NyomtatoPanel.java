@@ -3,8 +3,8 @@ package net.himadri.scmt.client.panel;
 import com.google.gwt.cell.client.EditTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.SelectionCell;
-import com.google.gwt.cell.client.TextInputCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.FormElement;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -167,16 +167,16 @@ public class NyomtatoPanel extends Composite {
         cellTable.addColumn(igazitasColumn, "Igazítás");
 		
         final FormPanel formPanel = new FormPanel();
-        final Hidden pdfServiceParam = new Hidden("versenySzam");
+        final Hidden pdfServiceParam = new Hidden("versenySzam", "minta");
         formPanel.setAction("/scmtmarathon/PDFService");
-        formPanel.setMethod("GET");
+        formPanel.setMethod(FormPanel.METHOD_GET);
+        formPanel.getElement().<FormElement>cast().setTarget("_blank");
         formPanel.add(pdfServiceParam);
         absolutePanel.add(formPanel);
 
         Button probaNyomtatas = new Button("Próbanyomtatás", new ClickHandler() {
             @Override
             public void onClick(ClickEvent clickEvent) {
-                pdfServiceParam.setValue("minta");
                 formPanel.submit();
             }
         });
