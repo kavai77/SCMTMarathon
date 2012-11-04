@@ -1,0 +1,17 @@
+<!-- Indices written at Wed, 24 Oct 2012 21:17:13 UTC -->
+
+<datastore-indexes>
+
+    <!-- Used 3 times in query history -->
+    <datastore-index kind="Tav" ancestor="false" source="auto">
+        <property name="versenyId" direction="asc"/>
+        <property name="creationTime" direction="asc"/>
+    </datastore-index>
+
+    <!-- Used 1 time in query history -->
+    <datastore-index kind="Tav" ancestor="false" source="auto">
+        <property name="versenyId" direction="asc"/>
+        <property name="creationTime" direction="desc"/>
+    </datastore-index>
+
+</datastore-indexes>
