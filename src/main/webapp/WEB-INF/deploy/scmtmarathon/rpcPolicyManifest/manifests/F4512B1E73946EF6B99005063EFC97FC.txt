@@ -1,2 +1,0 @@
-serviceClass: net.himadri.scmt.client.MarathonService
-path: 221D1E8996EFA45ACF768AD1C13D6AC3.gwt.rpc

@@ -3,4 +3,6 @@
 out/
 gwt-unitCache/
 target/
+src/main/webapp/WEB-INF/deploy
+src/main/webapp/WEB-INF/appengine-generated
 SCMTMarathon.war

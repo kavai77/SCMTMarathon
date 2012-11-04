@@ -1,2 +1,0 @@
-serviceClass: net.himadri.scmt.client.UserService
-path: 8A1B68120782F85725DCFF553B00B6D4.gwt.rpc

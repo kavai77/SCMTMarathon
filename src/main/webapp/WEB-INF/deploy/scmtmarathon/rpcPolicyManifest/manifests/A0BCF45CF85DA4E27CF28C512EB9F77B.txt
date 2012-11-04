@@ -1,2 +1,0 @@
-serviceClass: net.himadri.scmt.client.VersenyzoCSVUploadService
-path: E8FE2D813835BAC184AA2555F65A51E1.gwt.rpc
