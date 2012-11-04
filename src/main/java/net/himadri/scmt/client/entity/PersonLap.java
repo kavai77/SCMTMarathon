@@ -1,5 +1,6 @@
 package net.himadri.scmt.client.entity;
 
+import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.io.Serializable;
 
@@ -8,6 +9,7 @@ import java.io.Serializable;
  * User: Kavai
  * Date: 2012.02.16. 14:41
  */
+@Entity
 public class PersonLap implements Serializable, Comparable<PersonLap> {
     @SuppressWarnings({"UnusedDeclaration"})
     @Id

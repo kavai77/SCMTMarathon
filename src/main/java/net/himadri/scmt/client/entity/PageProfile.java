@@ -1,5 +1,6 @@
 package net.himadri.scmt.client.entity;
 
+import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.io.Serializable;
 
@@ -8,6 +9,7 @@ import java.io.Serializable;
  * User: Kavai
  * Date: 2012.06.02. 14:29
  */
+@Entity
 public class PageProfile implements Serializable {
     @Id
     private String id;

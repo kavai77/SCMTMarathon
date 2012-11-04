@@ -2,6 +2,7 @@ package net.himadri.scmt.client.entity;
 
 import com.googlecode.objectify.annotation.AlsoLoad;
 
+import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.io.Serializable;
 
@@ -10,6 +11,7 @@ import java.io.Serializable;
  * User: Kavai
  * Date: 2012.04.02. 21:09
  */
+@Entity
 public class Versenyzo implements Serializable, HasCreationTime {
     @SuppressWarnings({"UnusedDeclaration"})
     @Id

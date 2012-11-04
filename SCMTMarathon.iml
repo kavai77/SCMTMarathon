@@ -53,13 +53,6 @@
     <orderEntry type="library" name="Maven: net.sf.opencsv:opencsv:2.3" level="project" />
     <orderEntry type="library" name="Maven: com.google.gwt.appengine:gwt-gae-channel:0.4-alpha" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.0.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.google.gwt:gwt-dev:2.5.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.8.1" level="project" />
-    <orderEntry type="library" name="Maven: javax.jdo:jdo-api:3.0" level="project" />
-    <orderEntry type="library" name="Maven: javax.transaction:transaction-api:1.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.datanucleus:datanucleus-core:3.0.11" level="project" />
-    <orderEntry type="library" name="Maven: org.datanucleus:datanucleus-api-jdo:3.0.3" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.datanucleus:datanucleus-rdbms:3.0.10" level="project" />
   </component>
 </module>
 

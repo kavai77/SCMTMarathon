@@ -64,18 +64,6 @@
             <version>1.0.0.Final</version>
         </dependency>
         <dependency>
-            <groupId>com.google.gwt</groupId>
-            <artifactId>gwt-dev</artifactId>
-            <version>${gwtVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
             <version>1.0.0.GA</version>
@@ -88,28 +76,8 @@
             <classifier>sources</classifier>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>javax.jdo</groupId>
-            <artifactId>jdo-api</artifactId>
-            <version>3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.datanucleus</groupId>
-            <artifactId>datanucleus-core</artifactId>
-            <version>[3.0, 3.0.99)</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.datanucleus</groupId>
-            <artifactId>datanucleus-api-jdo</artifactId>
-            <version>3.0.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.datanucleus</groupId>
-            <artifactId>datanucleus-rdbms</artifactId>
-            <version>[3.0, 3.0.99)</version>
-            <scope>runtime</scope>
-        </dependency>
+
+
     </dependencies>
 
     <build>
@@ -160,23 +128,6 @@
                     <appEngineHome>${appEngineSdk}</appEngineHome>
                     <server>com.google.appengine.tools.development.gwt.AppEngineLauncher</server>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.datanucleus</groupId>
-                <artifactId>maven-datanucleus-plugin</artifactId>
-                <version>3.1.0-m3</version>
-                <configuration>
-                    <verbose>true</verbose>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>enhance</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <!-- Add source folders to test classpath in order to run gwt-tests as normal junit-tests -->
@@ -248,6 +199,51 @@
                 </configuration>
             </plugin>
 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <id>datanucleusenhancer</id>
+                        <configuration>
+                            <target>
+                                <path id="tools.class.path">
+                                    <path refid="maven.compile.classpath"/>
+                                    <fileset dir="${appEngineSdk}/lib/tools">
+                                        <include name="**/*.jar"/>
+                                    </fileset>
+                                </path>
+                                <taskdef
+                                        name="datanucleusenhancer"
+                                        classpathref="tools.class.path"
+                                        classname="org.datanucleus.enhancer.tools.EnhancerTask"/>
+                                <datanucleusenhancer verbose="false"
+                                        classpathref="tools.class.path"
+                                        failonerror="true">
+                                    <fileset dir="target/www/WEB-INF/classes" includes="**/*.class"/>
+                                </datanucleusenhancer>
+                            </target>
+                        </configuration>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>commons-net</groupId>
+                        <artifactId>commons-net</artifactId>
+                        <version>1.4.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.ant</groupId>
+                        <artifactId>ant-commons-net</artifactId>
+                        <version>1.8.1</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
         </plugins>
     </build>
     <repositories>
