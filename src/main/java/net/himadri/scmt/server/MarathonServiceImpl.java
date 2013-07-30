@@ -58,6 +58,15 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         broadcastModification();
     }
 
+    public void shiftRaceTime(Long versenyId, long offsetInMillis) {
+        Verseny verseny = getVersenyFromCache(versenyId);
+        if (verseny.getRaceStatus() == RaceStatus.RACING) {
+            verseny.setRaceStartTime(verseny.getRaceStartTime() - offsetInMillis);
+            updateVerseny(verseny);
+            broadcastModification();
+        }
+    }
+
     @Override
     public long getRaceTime(Long versenyId) {
         Verseny verseny = getVersenyFromCache(versenyId);

@@ -1,9 +1,10 @@
 package net.himadri.scmt.server;
 
-import com.google.appengine.api.datastore.QueryResultIterable;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.Query;
 import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -46,27 +47,24 @@ public class PDFService extends HttpServlet {
         }
     }
 
-    private void printVersenySzam(PdfContentByte canvas, Document document, String versenySzamIdStr) {
+    private void printVersenySzam(PdfContentByte canvas, Document document, String versenySzamIdStr) throws IOException, DocumentException {
         long versenySzamId = Long.parseLong(versenySzamIdStr);
         List<PageProfile> pageProfiles = new MarathonServiceImpl().getAllPageProfiles();
         VersenySzam versenySzam = ofy.get(VersenySzam.class, versenySzamId);
         Tav tav = ofy.get(Tav.class, versenySzam.getTavId());
-        List<Versenyzo> versenyzoQueryResultIterable = ofy.query(Versenyzo.class)
+        Query<Versenyzo> versenyzoQuery = ofy.query(Versenyzo.class)
                 .filter("versenySzamId", versenySzamId)
-                .filter("versenyId", versenySzam.getVersenyId())
-                .list();
+                .filter("versenyId", versenySzam.getVersenyId());
         Map<String, Versenyzo> raceNumberVersenyzoMap = new HashMap<String, Versenyzo>();
-        for (Versenyzo versenyzo: versenyzoQueryResultIterable) {
+        for (Versenyzo versenyzo: versenyzoQuery) {
             raceNumberVersenyzoMap.put(versenyzo.getRaceNumber(), versenyzo);
         }
 
-        QueryResultIterable<PersonLap> personLapQueryResultIterable = ofy.query(PersonLap.class)
+        Query<PersonLap> personLapQuery = ofy.query(PersonLap.class)
                 .filter("versenyId", versenySzam.getVersenyId())
-                .filter("raceNumber in", raceNumberVersenyzoMap.keySet())
-                .order("time")
-                .fetch();
+                .order("time");
         Map<String, List<Long>> raceNumberPersonLapListMap = new HashMap<String, List<Long>>();
-        for (PersonLap personLap: personLapQueryResultIterable) {
+        for (PersonLap personLap: personLapQuery) {
             List<Long> personLapList = raceNumberPersonLapListMap.get(personLap.getRaceNumber());
             if (personLapList == null) {
                 personLapList = new ArrayList<Long>();
@@ -77,9 +75,12 @@ public class PDFService extends HttpServlet {
 
         List<VersenyzoResult> versenyzoResults = new ArrayList<VersenyzoResult>();
         for (Map.Entry<String, List<Long>> raceNumberPersonLapEntry: raceNumberPersonLapListMap.entrySet()) {
-            if (raceNumberPersonLapEntry.getValue().size() >= tav.getKorSzam()) {
-                Versenyzo versenyzo = raceNumberVersenyzoMap.get(raceNumberPersonLapEntry.getKey());
-                Long ido = raceNumberPersonLapEntry.getValue().get(tav.getKorSzam() - 1);
+            String raceNumber = raceNumberPersonLapEntry.getKey();
+            List<Long> korIdok = raceNumberPersonLapEntry.getValue();
+            if (raceNumberVersenyzoMap.containsKey(raceNumber) &&
+                    korIdok.size() >= tav.getKorSzam()) {
+                Versenyzo versenyzo = raceNumberVersenyzoMap.get(raceNumber);
+                Long ido = korIdok.get(tav.getKorSzam() - 1);
                 versenyzoResults.add(new VersenyzoResult(versenyzo, ido));
             }
         }
@@ -115,27 +116,32 @@ public class PDFService extends HttpServlet {
         }
     }
 
-    private void printSamplePage(PdfContentByte canvas) {
+    private void printSamplePage(PdfContentByte canvas) throws IOException, DocumentException {
         List<PageProfile> pageProfiles = new MarathonServiceImpl().getAllPageProfiles();
+        Map<PageProfileId, String> data = createSampleText();
+        printSinglePage(canvas, pageProfiles, data);
+    }
+
+    private Map<PageProfileId, String> createSampleText() {
         Map<PageProfileId, String> data = new HashMap<PageProfileId, String>();
-        data.put(PageProfileId.NEV, "Kiss Gergely");
+        data.put(PageProfileId.NEV, "Árvíztűrő tükörfúrógép");
         data.put(PageProfileId.EGYESULET, "Futóbolondok");
         data.put(PageProfileId.VERSENYSZAM, "Maraton férfi 18-30 év");
         data.put(PageProfileId.IDO, "3:57:12");
         data.put(PageProfileId.HELYEZES, "XVII.");
-        printSinglePage(canvas, pageProfiles, data);
+        return data;
     }
 
-    private void printSinglePage(PdfContentByte canvas, List<PageProfile> pageProfiles, Map<PageProfileId, String> data) {
+    private void printSinglePage(PdfContentByte canvas, List<PageProfile> pageProfiles, Map<PageProfileId, String> data) throws IOException, DocumentException {
         for (PageProfile pageProfile: pageProfiles) {
             String entry = data.get(PageProfileId.valueOf(pageProfile.getId()));
             if (entry != null && (pageProfile.getxAxis() > 0 || pageProfile.getyAxis() > 0)) {
                 String fontFamily = pageProfile.getFontFamily();
-                Font.FontFamily family = !Utils.isEmpty(fontFamily) ? Font.FontFamily.valueOf(fontFamily) : Font.FontFamily.TIMES_ROMAN;
+                if (Utils.isEmpty(fontFamily)) fontFamily = BaseFont.TIMES_ROMAN;
                 int size = pageProfile.getSize();
                 if (size == 0) size = 10;
                 ColumnText.showTextAligned(canvas, pageProfile.getAlignment(),
-                    new Phrase(entry, new Font(family, size)),
+                    new Phrase(entry, new Font(BaseFont.createFont(fontFamily, BaseFont.CP1250, BaseFont.EMBEDDED), size)),
                         convertCmToPixel(pageProfile.getxAxis()),
                         (int) PageSize.A4.getHeight() - convertCmToPixel(pageProfile.getyAxis()), 0);
             }
@@ -144,25 +150,17 @@ public class PDFService extends HttpServlet {
 
 //    public static void main(String[] args) throws IOException, DocumentException {
 //        Document document = new Document(PageSize.A4);
-//        int a4Height = (int) PageSize.A4.getHeight();
-//        // step 2
 //        File pdfFile = new File("out.pdf");
-//        PdfWriter writer
-//                = PdfWriter.getInstance(document, new FileOutputStream(pdfFile));
-//        // step 3
+//        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdfFile));
 //        document.open();
-//        // step 4
-//        // we set the compression to 0 so that we can read the PDF syntax
-//        writer.setCompressionLevel(0);
-//        // writes something to the direct content using a convenience method
+//
 //        PdfContentByte canvas = writer.getDirectContentUnder();
-//        PDFService x = new PDFService();
-//        ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
-//                new Phrase("Left align 5, 5"), x.convertCmToPixel(5), a4Height - x.convertCmToPixel(5), 0);
-//        document.newPage();
-//        ColumnText.showTextAligned(canvas, Element.ALIGN_CENTER,
-//                new Phrase("Center align 10, 8"), x.convertCmToPixel(10), a4Height - x.convertCmToPixel(8), 0);
-//        // step 5
+//        PDFService pdfService = new PDFService();
+//        Map<PageProfileId, String> data = pdfService.createSampleText();
+//        List<PageProfile> pageProfiles = Arrays.asList(
+//                new PageProfile(PageProfileId.NEV, 5, 5, 0, BaseFont.COURIER, 14)
+//        );
+//        pdfService.printSinglePage(canvas, pageProfiles, data);
 //        document.close();
 //
 //        Desktop.getDesktop().open(pdfFile);

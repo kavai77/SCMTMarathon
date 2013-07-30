@@ -26,6 +26,15 @@ public class PageProfile implements Serializable {
         id = pageProfileId.name();
     }
 
+    public PageProfile(PageProfileId pageProfileId, float xAxis, float yAxis, int alignment, String fontFamily, int size) {
+        id = pageProfileId.name();
+        this.xAxis = xAxis;
+        this.yAxis = yAxis;
+        this.alignment = alignment;
+        this.fontFamily = fontFamily;
+        this.size = size;
+    }
+
     public String getId() {
         return id;
     }

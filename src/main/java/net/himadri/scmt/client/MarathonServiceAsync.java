@@ -71,4 +71,6 @@ public interface MarathonServiceAsync {
     void isFerfiNev(String nev, AsyncCallback<Boolean> async);
 
     void versenyzoFeladta(Long versenyzoId, boolean feladta, AsyncCallback<Void> async);
+
+    void shiftRaceTime(Long versenyId, long offsetInMillis, AsyncCallback<Void> async);
 }

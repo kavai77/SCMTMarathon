@@ -20,7 +20,7 @@ public class AdminPanel extends Composite {
         tabPanel.add(new VersenySzamPanel(scmtMarathon), "Versenyszámok", false);
         tabPanel.add(new NyomtatoPanel(), "Nyomtatóbeállítások", false);
         tabPanel.add(new VersenyzoImportPanel(scmtMarathon), "Versenyzők feltöltése", false);
-        tabPanel.add(new NevPanel(), "Nevek feltöltése", false);
+//        tabPanel.add(new NevPanel(), "Nevek feltöltése", false);
         tabPanel.selectTab(0);
 
         initWidget(tabPanel);

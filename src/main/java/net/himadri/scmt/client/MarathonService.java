@@ -20,6 +20,8 @@ import java.util.List;
 public interface MarathonService extends RemoteService {
     void startRace(Long versenyId);
 
+    void shiftRaceTime(Long versenyId, long offsetInMillis);
+
     void stopRace(Long versenyId);
 
     void restartRace(Long versenyId);

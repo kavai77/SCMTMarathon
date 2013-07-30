@@ -1,5 +1,6 @@
 package net.himadri.scmt.client.entity;
 
+import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.io.Serializable;
 
@@ -8,6 +9,7 @@ import java.io.Serializable;
  * User: Kavai
  * Date: 2012.04.01. 10:43
  */
+@Entity
 public class VersenySzam implements Serializable, HasCreationTime {
     @SuppressWarnings({"UnusedDeclaration"})
     @Id

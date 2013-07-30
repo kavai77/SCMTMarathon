@@ -8,12 +8,14 @@ import com.google.gwt.dom.client.FormElement;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
+import com.itextpdf.text.pdf.BaseFont;
 import net.himadri.scmt.client.EmptyFailureHandlingAsyncCallback;
 import net.himadri.scmt.client.MarathonService;
 import net.himadri.scmt.client.MarathonServiceAsync;
@@ -27,6 +29,13 @@ import java.util.List;
 public class NyomtatoPanel extends Composite {
 
     private MarathonServiceAsync marathonService = GWT.create(MarathonService.class);
+    private NumberFormat numberFormat = NumberFormat.getFormat("0.00");
+
+    private static final List<String> fontFamilyOptions = Arrays.asList(
+            BaseFont.TIMES_ROMAN, BaseFont.TIMES_BOLD, BaseFont.TIMES_ITALIC, BaseFont.TIMES_BOLDITALIC,
+            BaseFont.HELVETICA, BaseFont.HELVETICA_BOLD, BaseFont.HELVETICA_OBLIQUE, BaseFont.HELVETICA_BOLDOBLIQUE,
+            BaseFont.COURIER, BaseFont.COURIER_BOLD, BaseFont.COURIER_OBLIQUE, BaseFont.COURIER_BOLDOBLIQUE
+    );
 
 	public NyomtatoPanel() {
 		
@@ -66,14 +75,14 @@ public class NyomtatoPanel extends Composite {
         final Column<PageProfile, String> xColumn = new Column<PageProfile, String>(xTextInputCell) {
             @Override
             public String getValue(PageProfile pageProfile) {
-                return Float.toString(pageProfile.getxAxis());
+                return numberFormat.format(pageProfile.getxAxis());
             }
         };
         xColumn.setFieldUpdater(new FieldUpdater<PageProfile, String>() {
             @Override
             public void update(int i, PageProfile pageProfile, String s) {
                 try {
-                    float xAxis = Float.parseFloat(s);
+                    float xAxis = (float) numberFormat.parse(s);
                     if (xAxis < 0) throw new NumberFormatException();
                     pageProfile.setxAxis(xAxis);
                     saveProfile(pageProfile);
@@ -90,14 +99,14 @@ public class NyomtatoPanel extends Composite {
         final Column<PageProfile, String> yColumn = new Column<PageProfile, String>(yTextInputCell) {
             @Override
             public String getValue(PageProfile pageProfile) {
-                return Float.toString(pageProfile.getyAxis());
+                return numberFormat.format(pageProfile.getyAxis());
             }
         };
         yColumn.setFieldUpdater(new FieldUpdater<PageProfile, String>() {
             @Override
             public void update(int i, PageProfile pageProfile, String s) {
                 try {
-                    float yAxis = Float.parseFloat(s);
+                    float yAxis = (float) numberFormat.parse(s);
                     if (yAxis < 0) throw new NumberFormatException();
                     pageProfile.setyAxis(yAxis);
                     saveProfile(pageProfile);
@@ -109,7 +118,7 @@ public class NyomtatoPanel extends Composite {
         });
         cellTable.addColumn(yColumn, "Felső behúzás (cm)");
 
-        final List<String> fontFamilyOptions = Arrays.asList("TIMES_ROMAN", "COURIER", "HELVETICA");
+
         SelectionCell fontFamilyCell = new SelectionCell(fontFamilyOptions);
         final Column<PageProfile, String> fontFamilyColumn = new Column<PageProfile, String>(fontFamilyCell) {
             @Override

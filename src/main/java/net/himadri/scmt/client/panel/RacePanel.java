@@ -148,6 +148,33 @@ public class RacePanel extends Composite {
                 });
         raceInProgressBar.add(btnStopRace, 180, 103);
 
+        Button btnShiftRaceStartTime = new ImageButton("clock.png", "Versenyidő állítása",
+                new ClickHandler() {
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        String miliSecStr = Window.prompt("Add meg a csúsztatás idejét ezredmásodpercben", null);
+                        try {
+                            if (miliSecStr != null) {
+                                long miliSec = Long.parseLong(miliSecStr);
+                                marathonService.shiftRaceTime(scmtMarathon.getVerseny().getId(), miliSec, new AsyncCallback<Void>() {
+                                    @Override
+                                    public void onFailure(Throwable throwable) {
+                                        SCMTMarathon.commonFailureHandling(throwable);
+                                    }
+
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Window.alert("A versenyidő sikeresen megváltozott. Újra kell frissíteni az alkalmazást az összes kliensen!");
+                                    }
+                                });
+                            }
+                        } catch (NumberFormatException e) {
+                            Window.alert("A megadott forma nem megfelelő.");
+                        }
+                    }
+                });
+        raceInProgressBar.add(btnShiftRaceStartTime, 340, 103);
+
         raceInProgressBar.add(new Label("Utoljára rögzített rajtszámok"),  0, 150);
         raceInProgressBar.add(lastRaceNbList,  0, 180);
 

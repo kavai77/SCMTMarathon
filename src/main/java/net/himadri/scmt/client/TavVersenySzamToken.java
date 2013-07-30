@@ -11,7 +11,7 @@ public class TavVersenySzamToken {
     public static final String TAV_ID_HISTORY_TOKEN = "tavid";
 
     public static boolean isHistoryMatches(String historyToken) {
-        return historyToken.startsWith(RESULT_HISTORY_TOKEN);
+        return historyToken!= null && historyToken.startsWith(RESULT_HISTORY_TOKEN);
     }
 
     public static TavVersenySzam decode(String historyToken) {
