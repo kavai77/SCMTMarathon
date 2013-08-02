@@ -12,6 +12,7 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.RowStyles;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
@@ -58,12 +59,21 @@ public class VersenyzoPanel extends Composite {
                 versenyzoEntryDialog.showDialog(null);
             }
         });
-        btnUjVersenyszm.setWidth("120px");
+        btnUjVersenyszm.setWidth("150px");
         versenyzoPanel.add(btnUjVersenyszm, 810, 0);
 
-        versenyzoPanel.add(new Label("Szűrés"), 810, 108);
+        Button rajtlistaButton = new ImageButton("view_text.png", "Rajtlista", new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent clickEvent) {
+                History.newItem(PrintAllRunnersRootPanel.HISTORY_TOKEN);
+            }
+        });
+        rajtlistaButton.setWidth("150px");
+        versenyzoPanel.add(rajtlistaButton, 810, 65);
+
+        versenyzoPanel.add(new Label("Szűrés"), 810, 113);
         versenySzamFilter.setSize("150px", "23px");
-        versenyzoPanel.add(versenySzamFilter, 810, 130);
+        versenyzoPanel.add(versenySzamFilter, 810, 135);
         versenySzamFilter.addItem("Összes versenyző", "");
         versenySzamFilter.addChangeHandler(new VersenySzamFilterChangeHandler());
 

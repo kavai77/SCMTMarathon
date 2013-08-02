@@ -9,6 +9,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import net.himadri.scmt.client.entity.Verseny;
 import net.himadri.scmt.client.exception.NotAuthorizedException;
 import net.himadri.scmt.client.panel.MainRootPanel;
+import net.himadri.scmt.client.panel.PrintAllRunnersRootPanel;
 import net.himadri.scmt.client.panel.PrintResultRootPanel;
 import net.himadri.scmt.client.serializable.MarathonActionListener;
 
@@ -31,6 +32,7 @@ public class SCMTMarathon implements EntryPoint {
         final RootPanel rootPanel = RootPanel.get();
         final MainRootPanel mainRootPanel = new MainRootPanel(this);
         final PrintResultRootPanel printResultRootPanel = new PrintResultRootPanel(this);
+        final PrintAllRunnersRootPanel printAllRunnersRootPanel = new PrintAllRunnersRootPanel(this);
 
         History.addValueChangeHandler(new ValueChangeHandler<String>() {
             @Override
@@ -41,6 +43,9 @@ public class SCMTMarathon implements EntryPoint {
                     TavVersenySzam tavVersenySzam = TavVersenySzamToken.decode(historyToken);
                     printResultRootPanel.showResultPanel(tavVersenySzam);
                     rootPanel.add(printResultRootPanel);
+                } else if (PrintAllRunnersRootPanel.HISTORY_TOKEN.equals(historyToken)) {
+                    printAllRunnersRootPanel.showAllRunnersPanel();
+                    rootPanel.add(printAllRunnersRootPanel);
                 } else {
                     rootPanel.add(mainRootPanel);
                 }
