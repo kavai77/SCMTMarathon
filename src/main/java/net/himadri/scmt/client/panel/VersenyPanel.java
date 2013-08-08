@@ -18,9 +18,7 @@ import com.google.gwt.view.client.SingleSelectionModel;
 import net.himadri.scmt.client.*;
 import net.himadri.scmt.client.entity.Verseny;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,14 +29,16 @@ public class VersenyPanel extends Composite {
 
     private static final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.YEAR_MONTH_DAY);
 
-    private CellTable<Verseny> versenyTable = new CellTable<Verseny>();
-    private ListDataProvider<Verseny> versenyList = new ListDataProvider<Verseny>();
+    private final SCMTMarathon scmtMarathon;
+    private final MarathonServiceAsync marathonService = GWT.create(MarathonService.class);
 
-    public VersenyPanel(final SCMTMarathon scmtMarathon) {
-        final MarathonServiceAsync marathonService = GWT.create(MarathonService.class);
+    public VersenyPanel(SCMTMarathon scmtMarathon) {
+        this.scmtMarathon = scmtMarathon;
 
-        AbsolutePanel rootPanel = new AbsolutePanel();
-        rootPanel.setSize("500px", "330px");
+
+        VerticalPanel rootPanel = new VerticalPanel();
+        rootPanel.setSpacing(10);
+//        rootPanel.setSize("500px", "330px");
         rootPanel.addStyleName("centerWithMargin");
 
         initWidget(rootPanel);
@@ -46,11 +46,67 @@ public class VersenyPanel extends Composite {
         Label lblVlasszVersenyt = new Label("Válassz versenyt");
         rootPanel.add(lblVlasszVersenyt);
 
-        ScrollPanel scrollPanel = new ScrollPanel();
-        rootPanel.add(scrollPanel, 0, 27);
-        scrollPanel.setSize("500px", "250px");
+        final ListDataProvider<Verseny> currentYearVersenyek = new ListDataProvider<Verseny>();
+        final StackPanel stackPanel = new StackPanel();
 
-        scrollPanel.setWidget(versenyTable);
+        marathonService.getVersenyek(new AsyncCallback<List<Verseny>>() {
+            @Override
+            public void onFailure(Throwable throwable) {
+                SCMTMarathon.commonFailureHandling(throwable);
+            }
+
+            @Override
+            public void onSuccess(List<Verseny> versenyek) {
+                int currentYear = new Date().getYear();
+                Map<Integer, ListDataProvider<Verseny>> evVersenyMap = new TreeMap<Integer, ListDataProvider<Verseny>>();
+                for (Verseny verseny: versenyek) {
+                    int year = verseny.getRaceStartTime() != null ?
+                            new Date(verseny.getRaceStartTime()).getYear() :
+                            currentYear;
+                    ListDataProvider<Verseny> versenyListDataProvider = evVersenyMap.get(year);
+                    if (versenyListDataProvider == null) {
+                        if (year == currentYear) {
+                            versenyListDataProvider = currentYearVersenyek;
+                        } else {
+                            versenyListDataProvider = new ListDataProvider<Verseny>();
+                        }
+                        evVersenyMap.put(year, versenyListDataProvider);
+                    }
+                    versenyListDataProvider.getList().add(verseny);
+                }
+                for (Integer year: evVersenyMap.keySet()) {
+                    stackPanel.add(createVersenyTable(evVersenyMap.get(year)), Integer.toString(year + 1900));
+                }
+                stackPanel.showStack(evVersenyMap.size() - 1);
+            }
+        });
+        rootPanel.add(stackPanel);
+
+        Button addVersenyButton = new ImageButton("edit_add.png", "Új verseny", new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent clickEvent) {
+                String versenyNev = Window.prompt("Verseny neve:", null);
+                if (!versenyNev.isEmpty()) {
+                    marathonService.addVerseny(versenyNev, new AsyncCallback<Verseny>() {
+                        @Override
+                        public void onFailure(Throwable throwable) {
+                            SCMTMarathon.commonFailureHandling(throwable);
+                        }
+
+                        @Override
+                        public void onSuccess(Verseny verseny) {
+                            currentYearVersenyek.getList().add(verseny);
+                        }
+                    });
+                }
+            }
+        });
+
+        rootPanel.add(addVersenyButton);
+    }
+
+    private CellTable<Verseny> createVersenyTable(final ListDataProvider<Verseny> versenyList) {
+        final CellTable<Verseny> versenyTable = new CellTable<Verseny>();
         versenyTable.setSize("100%", "100%");
         versenyList.addDataDisplay(versenyTable);
         versenyTable.setPageSize(Integer.MAX_VALUE);
@@ -125,44 +181,13 @@ public class VersenyPanel extends Composite {
             }
         });
         versenyTable.setSelectionModel(versenySelectionModel);
-        marathonService.getVersenyek(new AsyncCallback<List<Verseny>>() {
-            @Override
-            public void onFailure(Throwable throwable) {
-                SCMTMarathon.commonFailureHandling(throwable);
-            }
 
-            @Override
-            public void onSuccess(List<Verseny> versenyek) {
-                versenyList.getList().addAll(versenyek);
-            }
-        });
         versenySelectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
             @Override
             public void onSelectionChange(SelectionChangeEvent selectionChangeEvent) {
                 scmtMarathon.getVersenySyncSupport().notifyRefreshed(Collections.singletonList(versenySelectionModel.getSelectedObject()));
             }
         });
-
-        Button addVersenyButton = new ImageButton("edit_add.png", "Új verseny", new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent clickEvent) {
-                String versenyNev = Window.prompt("Verseny neve:", null);
-                if (!versenyNev.isEmpty()) {
-                    marathonService.addVerseny(versenyNev, new AsyncCallback<Verseny>() {
-                        @Override
-                        public void onFailure(Throwable throwable) {
-                            SCMTMarathon.commonFailureHandling(throwable);
-                        }
-
-                        @Override
-                        public void onSuccess(Verseny verseny) {
-                            versenyList.getList().add(verseny);
-                        }
-                    });
-                }
-            }
-        });
-
-        rootPanel.add(addVersenyButton, 0, 290);
+        return versenyTable;
     }
 }
