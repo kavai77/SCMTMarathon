@@ -27,6 +27,11 @@
         <property name="time" direction="asc"/>
     </datastore-index>
 
+    <datastore-index kind="PersonLap" ancestor="false" source="manual">
+        <property name="versenyId" direction="asc"/>
+        <property name="raceNumber" direction="asc"/>
+    </datastore-index>
+
     <datastore-index kind="VersenySzam" ancestor="false" source="manual">
         <property name="versenyId" direction="asc"/>
         <property name="creationTime" direction="asc"/>

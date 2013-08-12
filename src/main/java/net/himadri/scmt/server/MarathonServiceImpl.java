@@ -3,6 +3,10 @@ package net.himadri.scmt.server;
 import com.google.appengine.api.channel.ChannelMessage;
 import com.google.appengine.api.channel.ChannelService;
 import com.google.appengine.api.channel.ChannelServiceFactory;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.PropertyProjection;
 import com.google.appengine.api.memcache.Expiration;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
@@ -350,7 +354,15 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
     }
 
     private int getVersenyzoSzam(Long versenyId) {
-        return ofy.query(Versenyzo.class).filter("versenyId", versenyId).count();
+        com.google.appengine.api.datastore.Query query = new com.google.appengine.api.datastore.Query(PersonLap.class.getSimpleName());
+        query.addProjection(new PropertyProjection("raceNumber", String.class));
+        query.setDistinct(true);
+        query.setFilter(new com.google.appengine.api.datastore.Query.FilterPredicate("versenyId",
+                com.google.appengine.api.datastore.Query.FilterOperator.EQUAL, versenyId));
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        return datastore.prepare(query).countEntities(FetchOptions.Builder.withDefaults());
+
+//        return ofy.query(Versenyzo.class).filter("versenyId", versenyId).count();
     }
 
     private void broadcastModification() {
