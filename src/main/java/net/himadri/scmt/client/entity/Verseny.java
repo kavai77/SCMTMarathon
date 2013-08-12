@@ -17,6 +17,7 @@ public class Verseny implements Serializable {
     private String nev;
     private Long raceStartTime;
     private RaceStatus raceStatus = RaceStatus.NOT_STARTED;
+    private Integer versenyzoSzam;
     private int personLapSyncValue = 1;
     private int versenyzoSyncValue = 1;
     private int versenySzamSyncValue = 1;
@@ -56,6 +57,14 @@ public class Verseny implements Serializable {
 
     public void setRaceStatus(RaceStatus raceStatus) {
         this.raceStatus = raceStatus;
+    }
+
+    public Integer getVersenyzoSzam() {
+        return versenyzoSzam;
+    }
+
+    public void setVersenyzoSzam(Integer versenyzoSzam) {
+        this.versenyzoSzam = versenyzoSzam;
     }
 
     public int getPersonLapSyncValue() {

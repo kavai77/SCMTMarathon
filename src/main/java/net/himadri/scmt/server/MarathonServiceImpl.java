@@ -77,6 +77,7 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
     public void stopRace(Long versenyId) {
         Verseny verseny = getVersenyFromCache(versenyId);
         verseny.setRaceStatus(RaceStatus.FINISHED);
+        verseny.setVersenyzoSzam(getVersenyzoSzam(versenyId));
         updateVerseny(verseny);
         broadcastModification();
     }
@@ -293,7 +294,13 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
 
     @Override
     public List<Verseny> getVersenyek() {
-        return ofy.query(Verseny.class).list();
+        List<Verseny> versenyList = ofy.query(Verseny.class).list();
+        for (Verseny verseny: versenyList) {
+            if (verseny.getVersenyzoSzam() == null) {
+                verseny.setVersenyzoSzam(getVersenyzoSzam(verseny.getId()));
+            }
+        }
+        return versenyList;
     }
 
     @Override
@@ -340,6 +347,10 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
     public Boolean isFerfiNev(String nev) {
         Nev foundNev = ofy.find(Nev.class, nev.trim().toUpperCase());
         return foundNev != null ? foundNev.isFerfi() : null;
+    }
+
+    private int getVersenyzoSzam(Long versenyId) {
+        return ofy.query(Versenyzo.class).filter("versenyId", versenyId).count();
     }
 
     private void broadcastModification() {

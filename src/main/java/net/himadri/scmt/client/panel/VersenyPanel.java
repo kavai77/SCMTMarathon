@@ -58,7 +58,8 @@ public class VersenyPanel extends Composite {
             @Override
             public void onSuccess(List<Verseny> versenyek) {
                 int currentYear = new Date().getYear();
-                Map<Integer, ListDataProvider<Verseny>> evVersenyMap = new TreeMap<Integer, ListDataProvider<Verseny>>();
+                Map<Integer, ListDataProvider<Verseny>> evVersenyMap =
+                        new TreeMap<Integer, ListDataProvider<Verseny>>();
                 for (Verseny verseny: versenyek) {
                     int year = verseny.getRaceStartTime() != null ?
                             new Date(verseny.getRaceStartTime()).getYear() :
@@ -119,7 +120,8 @@ public class VersenyPanel extends Composite {
         versenyTable.addColumn(new TextColumn<Verseny>() {
             @Override
             public String getValue(Verseny verseny) {
-                return verseny.getRaceStartTime() != null ? dateTimeFormat.format(new Date(verseny.getRaceStartTime()))
+                return verseny.getRaceStartTime() != null ?
+                        dateTimeFormat.format(new Date(verseny.getRaceStartTime()))
                         : null;
             }
         }, "Dátum");
@@ -138,6 +140,12 @@ public class VersenyPanel extends Composite {
                 }
             }
         }, "Státusz");
+        versenyTable.addColumn(new RightAlignmentTextColumn<Verseny>() {
+            @Override
+            public String getValue(Verseny verseny) {
+                return Integer.toString(verseny.getVersenyzoSzam());
+            }
+        }, "Versenyzők");
         UserServiceAsync userService = GWT.create(UserService.class);
         userService.isSuperUserAuthorized(new AsyncCallback<Boolean>() {
             @Override
@@ -148,7 +156,8 @@ public class VersenyPanel extends Composite {
             @Override
             public void onSuccess(Boolean authorized) {
                 if (authorized) {
-                    versenyTable.addColumn(new Column<Verseny, Verseny>(new ActionCell<Verseny>("Törlés", new ActionCell.Delegate<Verseny>() {
+                    versenyTable.addColumn(new Column<Verseny, Verseny>(
+                            new ActionCell<Verseny>("Törlés", new ActionCell.Delegate<Verseny>() {
                         @Override
                         public void execute(final Verseny verseny) {
                             if (Window.confirm("Azt a műveletet csak a rendszer adminisztrátor tudja megtenni. Biztos folytatod?")) {
@@ -174,7 +183,8 @@ public class VersenyPanel extends Composite {
                 }
             }
         });
-        final SingleSelectionModel<Verseny> versenySelectionModel = new SingleSelectionModel<Verseny>(new ProvidesKey<Verseny>() {
+        final SingleSelectionModel<Verseny> versenySelectionModel = new SingleSelectionModel<Verseny>
+                (new ProvidesKey<Verseny>() {
             @Override
             public Object getKey(Verseny verseny) {
                 return verseny.getId();
@@ -189,5 +199,11 @@ public class VersenyPanel extends Composite {
             }
         });
         return versenyTable;
+    }
+
+    private static abstract class RightAlignmentTextColumn<T> extends TextColumn<T> {
+        protected RightAlignmentTextColumn() {
+            setHorizontalAlignment(ALIGN_RIGHT);
+        }
     }
 }

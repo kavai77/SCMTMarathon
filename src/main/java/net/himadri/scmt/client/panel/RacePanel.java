@@ -139,11 +139,9 @@ public class RacePanel extends Composite {
                 new ClickHandler() {
                     @Override
                     public void onClick(ClickEvent event) {
-                        String password = Window.prompt("Jelszó megadása szükséges:", null);
-                        if ("scmt".equals(password)) {
-                            marathonService.stopRace(scmtMarathon.getVerseny().getId(),
-                                    new EmptyFailureHandlingAsyncCallback<Void>());
-                        }
+                        checkAuthorization();
+                        marathonService.stopRace(scmtMarathon.getVerseny().getId(),
+                                new EmptyFailureHandlingAsyncCallback<Void>());
                     }
                 });
         raceInProgressBar.add(btnStopRace, 180, 103);
@@ -152,6 +150,7 @@ public class RacePanel extends Composite {
                 new ClickHandler() {
                     @Override
                     public void onClick(ClickEvent event) {
+                        checkAuthorization();
                         String miliSecStr = Window.prompt("Add meg a csúsztatás idejét ezredmásodpercben", null);
                         try {
                             if (miliSecStr != null) {
@@ -204,6 +203,13 @@ public class RacePanel extends Composite {
         scmtMarathon.getPollingService().getRaceStatusSync().addMarathonActionListener(new RaceStatusActionListener());
 
         initWidget(racePanel);
+    }
+
+    private void checkAuthorization() {
+        String password = Window.prompt("Jelszó megadása szükséges:", null);
+        if (!"scmt".equals(password)) {
+            throw new RuntimeException("Permission denied");
+        }
     }
 
     private class LastFivePersonLapActionListener implements MarathonActionListener<PersonLap> {
