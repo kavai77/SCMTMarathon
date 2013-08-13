@@ -2,14 +2,16 @@ package net.himadri.scmt.client.panel;
 
 import com.google.gwt.cell.client.ActionCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.FormElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.AbsolutePanel;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.view.client.ListDataProvider;
 import net.himadri.scmt.client.*;
 import net.himadri.scmt.client.dialog.VersenySzamEntryDialog;
@@ -35,7 +37,6 @@ public class VersenySzamPanel extends Composite {
     private Button btnUjVersenyszam;
     private Column<VersenySzam, VersenySzam> modositasColumn;
     private Column<VersenySzam, VersenySzam> torlesColumn;
-    private Column<VersenySzam,VersenySzam> oklevelNyomtatasColumn;
 
     public VersenySzamPanel(final SCMTMarathon scmtMarathon) {
         AbsolutePanel versenySzamPanel = new AbsolutePanel();
@@ -48,14 +49,6 @@ public class VersenySzamPanel extends Composite {
             }
         });
         versenySzamPanel.add(btnUjVersenyszam, 817, 0);
-
-        final FormPanel formPanel = new FormPanel();
-        final Hidden pdfServiceParam = new Hidden("versenySzam");
-        formPanel.setAction("/scmtmarathon/PDFService");
-        formPanel.setMethod(FormPanel.METHOD_GET);
-        formPanel.getElement().<FormElement>cast().setTarget("_blank");
-        formPanel.add(pdfServiceParam);
-        versenySzamPanel.add(formPanel);
 
         ScrollPanel tableScroll = new ScrollPanel();
         versenySzamPanel.add(tableScroll);
@@ -128,22 +121,6 @@ public class VersenySzamPanel extends Composite {
             }
         };
         versenySzamTable.addColumn(torlesColumn);
-
-        oklevelNyomtatasColumn = new Column<VersenySzam, VersenySzam>(
-                new ActionCell("Oklevelek", new ActionCell.Delegate<VersenySzam>() {
-                    @Override
-                    public void execute(final VersenySzam versenySzam) {
-                        pdfServiceParam.setValue(versenySzam.getId().toString());
-                        formPanel.submit();
-                    }
-                })) {
-            @Override
-            public VersenySzam getValue(VersenySzam versenySzam) {
-                return versenySzam;
-            }
-        };
-        versenySzamTable.addColumn(oklevelNyomtatasColumn);
-
         versenySzamTable.setPageSize(Integer.MAX_VALUE);
         versenySzamList.addDataDisplay(versenySzamTable);
 
@@ -185,7 +162,6 @@ public class VersenySzamPanel extends Composite {
                 modositasColumn.setCellStyleNames("hidden");
                 torlesColumn.setCellStyleNames("hidden");
             }
-            oklevelNyomtatasColumn.setCellStyleNames(raceStatus == RaceStatus.NOT_STARTED ? "hidden" : "visible");
             versenySzamTable.redraw();
         }
     }

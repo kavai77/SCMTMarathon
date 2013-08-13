@@ -2,16 +2,14 @@ package net.himadri.scmt.client.panel;
 
 import com.google.gwt.cell.client.ActionCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.FormElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.AbsolutePanel;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import net.himadri.scmt.client.*;
 import net.himadri.scmt.client.dialog.TavEntryDialog;
@@ -37,9 +35,10 @@ public class TavPanel extends Composite {
     private Button btnUjTav;
     private Column<Tav, Tav> modositasColumn;
     private Column<Tav, Tav> torlesColumn;
+    private Column<Tav, Tav> oklevelNyomtatasColumn;
 
     public TavPanel(final SCMTMarathon scmtMarathon) {
-        AbsolutePanel versenySzamPanel = new AbsolutePanel();
+        AbsolutePanel tavPanel = new AbsolutePanel();
 
         tavEntryDialog = new TavEntryDialog(scmtMarathon);
         btnUjTav = new ImageButton("edit_add.png", "Új táv", new ClickHandler() {
@@ -48,10 +47,18 @@ public class TavPanel extends Composite {
                 tavEntryDialog.showDialogForNew();
             }
         });
-        versenySzamPanel.add(btnUjTav, 627, 0);
+        tavPanel.add(btnUjTav, 627, 0);
+
+        final FormPanel formPanel = new FormPanel();
+        final Hidden pdfServiceParam = new Hidden("tav");
+        formPanel.setAction("/scmtmarathon/PDFService");
+        formPanel.setMethod(FormPanel.METHOD_GET);
+        formPanel.getElement().<FormElement>cast().setTarget("_blank");
+        formPanel.add(pdfServiceParam);
+        tavPanel.add(formPanel);
 
         ScrollPanel tableScroll = new ScrollPanel();
-        versenySzamPanel.add(tableScroll);
+        tavPanel.add(tableScroll);
         tableScroll.setSize("600px", "500px");
         tableScroll.setWidget(tavTable);
         tavTable.setSize("100%", "100%");
@@ -119,13 +126,29 @@ public class TavPanel extends Composite {
             }
         };
         tavTable.addColumn(torlesColumn);
+
+        oklevelNyomtatasColumn = new Column<Tav, Tav>(
+                new ActionCell("Oklevelek", new ActionCell.Delegate<Tav>() {
+                    @Override
+                    public void execute(final Tav tav) {
+                        pdfServiceParam.setValue(tav.getId().toString());
+                        formPanel.submit();
+                    }
+                })) {
+            @Override
+            public Tav getValue(Tav tav) {
+                return tav;
+            }
+        };
+        tavTable.addColumn(oklevelNyomtatasColumn);
+
         tavTable.setPageSize(Integer.MAX_VALUE);
         tavList.addDataDisplay(tavTable);
 
         scmtMarathon.getPollingService().getTavSync().addMarathonActionListener(new TavActionListener());
         scmtMarathon.getPollingService().getRaceStatusSync().addMarathonActionListener(new RaceStatusActionListener());
 
-        initWidget(versenySzamPanel);
+        initWidget(tavPanel);
     }
 
     private class TavActionListener implements MarathonActionListener<Tav> {
@@ -159,6 +182,7 @@ public class TavPanel extends Composite {
                 modositasColumn.setCellStyleNames("hidden");
                 torlesColumn.setCellStyleNames("hidden");
             }
+            oklevelNyomtatasColumn.setCellStyleNames(raceStatus == RaceStatus.NOT_STARTED ? "hidden" : "visible");
             tavTable.redraw();
         }
     }

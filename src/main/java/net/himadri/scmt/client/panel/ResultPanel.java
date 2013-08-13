@@ -25,6 +25,7 @@ public class ResultPanel extends Composite {
     private ResultTable resultPanel;
     private ListBox versenySzamValaszto = new ListBox();
     private SCMTMarathon scmtMarathon;
+    private Button nyomtatasButton;
 
     public ResultPanel(SCMTMarathon scmtMarathon) {
         this.scmtMarathon = scmtMarathon;
@@ -35,13 +36,14 @@ public class ResultPanel extends Composite {
         racePanel.add(versenySzamValaszto, 10, 10);
         versenySzamValaszto.addChangeHandler(new VersenySzamValasztoChangeHandler());
 
-        Button nyomtatasButton = new ImageButton("fileprint.png", "Nyomatási kép", new ClickHandler() {
+        nyomtatasButton = new ImageButton("fileprint.png", "Nyomatási kép", new ClickHandler() {
             @Override
             public void onClick(ClickEvent clickEvent) {
                 History.newItem(TavVersenySzamToken.encode(resultPanel.getFilter()));
             }
         });
         racePanel.add(nyomtatasButton, 215, 10);
+        nyomtatasButton.setVisible(false);
 
         resultPanel = new ResultTable(scmtMarathon, TavVersenySzam.createAllAcceptance());
         racePanel.add(resultPanel, 0, 60);
@@ -58,6 +60,7 @@ public class ResultPanel extends Composite {
             int selectedIndex = versenySzamValaszto.getSelectedIndex();
             String value = versenySzamValaszto.getValue(selectedIndex);
             resultPanel.refilterRaceStatusRows(TavVersenySzamToken.decode(value));
+            nyomtatasButton.setVisible(selectedIndex > 0);
         }
     }
 

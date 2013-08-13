@@ -218,8 +218,7 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
     }
 
     @Override
-    public void addPersonLap(Long versenyId, String raceNumber) throws AlreadyExistingEntityException {
-        long raceTime = getRaceTime(versenyId);
+    public void addPersonLap(Long versenyId, String raceNumber, long raceTime) throws AlreadyExistingEntityException {
         PersonLap personLap = ofy.query(PersonLap.class)
                 .filter("versenyId", versenyId)
                 .filter("raceNumber", raceNumber)

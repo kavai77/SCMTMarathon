@@ -176,7 +176,7 @@ public class NyomtatoPanel extends Composite {
         cellTable.addColumn(igazitasColumn, "Igazítás");
 		
         final FormPanel formPanel = new FormPanel();
-        final Hidden pdfServiceParam = new Hidden("versenySzam", "minta");
+        final Hidden pdfServiceParam = new Hidden("tav", "minta");
         formPanel.setAction("/scmtmarathon/PDFService");
         formPanel.setMethod(FormPanel.METHOD_GET);
         formPanel.getElement().<FormElement>cast().setTarget("_blank");

@@ -27,7 +27,7 @@ import java.util.List;
  * Date: 2012.04.08. 11:06
  */
 public class RacePanel extends Composite {
-    public static final int CLOCK_TIMER_PERIOD = 1000;
+    public static final int CLOCK_TIMER_PERIOD = 500;
     public static final int MAX_LAST_PERSON_LAP = 5;
 
     private MarathonServiceAsync marathonService = GWT.create(MarathonService.class);
@@ -333,7 +333,9 @@ public class RacePanel extends Composite {
             if (keyPressEvent.getNativeKeyCode() == KeyCodes.KEY_ENTER && !raceNb.isEmpty()) {
                 raceNumberInputText.setText(null);
                 versenyzoSuggestionLabel.setVisible(false);
-                marathonService.addPersonLap(scmtMarathon.getVerseny().getId(), raceNb, new AsyncCallback<Void>() {
+                Long versenyId = scmtMarathon.getVerseny().getId();
+                long raceTime = System.currentTimeMillis() - raceStartTime;
+                marathonService.addPersonLap(versenyId, raceNb, raceTime, new AsyncCallback<Void>() {
                     @Override
                     public void onFailure(Throwable throwable) {
                         if (throwable instanceof AlreadyExistingEntityException) {

@@ -28,7 +28,7 @@ public class PDFService extends HttpServlet {
     private static Objectify ofy = ObjectifyService.begin();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String versenySzamId = request.getParameter("versenySzam");
+        String tavId = request.getParameter("tav");
 //        response.addHeader("Content-Disposition", "attachment; filename=raceresult.pdf");
         response.setContentType("application/pdf");
         try {
@@ -36,10 +36,10 @@ public class PDFService extends HttpServlet {
             PdfWriter writer = PdfWriter.getInstance(document, response.getOutputStream());
             document.open();
             PdfContentByte canvas = writer.getDirectContentUnder();
-            if ("minta".equals(versenySzamId)) {
+            if ("minta".equals(tavId)) {
                 printSamplePage(canvas);
             } else {
-                printVersenySzam(canvas, document, versenySzamId);
+                printTav(canvas, document, Long.parseLong(tavId));
             }
             document.close();
         } catch (DocumentException e) {
@@ -47,13 +47,18 @@ public class PDFService extends HttpServlet {
         }
     }
 
-    private void printVersenySzam(PdfContentByte canvas, Document document, String versenySzamIdStr) throws IOException, DocumentException {
-        long versenySzamId = Long.parseLong(versenySzamIdStr);
+    private void printTav(PdfContentByte canvas, Document document, long tavId) throws IOException, DocumentException {
+        Query<VersenySzam> versenySzamQuery = ofy.query(VersenySzam.class).filter("tavId", tavId);
+        for (VersenySzam versenySzam: versenySzamQuery) {
+            printVersenySzam(canvas, document, versenySzam);
+        }
+    }
+
+    private void printVersenySzam(PdfContentByte canvas, Document document, VersenySzam versenySzam) throws IOException, DocumentException {
         List<PageProfile> pageProfiles = new MarathonServiceImpl().getAllPageProfiles();
-        VersenySzam versenySzam = ofy.get(VersenySzam.class, versenySzamId);
         Tav tav = ofy.get(Tav.class, versenySzam.getTavId());
         Query<Versenyzo> versenyzoQuery = ofy.query(Versenyzo.class)
-                .filter("versenySzamId", versenySzamId)
+                .filter("versenySzamId", versenySzam.getId())
                 .filter("versenyId", versenySzam.getVersenyId());
         Map<String, Versenyzo> raceNumberVersenyzoMap = new HashMap<String, Versenyzo>();
         for (Versenyzo versenyzo: versenyzoQuery) {
@@ -100,9 +105,7 @@ public class PDFService extends HttpServlet {
             data.put(PageProfileId.IDO, Utils.getElapsedTimeString(versenyzoResults.get(i).ido));
             data.put(PageProfileId.HELYEZES, Utils.numberToRoman(i + 1) + ".");
             printSinglePage(canvas, pageProfiles, data);
-            if (i < versenyzoResults.size() - 1) {
-                document.newPage();
-            }
+            document.newPage();
         }
     }
 

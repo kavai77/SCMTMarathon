@@ -24,7 +24,7 @@ public interface MarathonServiceAsync {
 
     void getRaceTime(Long versenyId, AsyncCallback<Long> async);
 
-    void addPersonLap(Long versenyId, String raceNumber, AsyncCallback<Void> async);
+    void addPersonLap(Long versenyId, String raceNumber, long raceTime, AsyncCallback<Void> async);
 
     void updateRaceNumber(Long personLapId, String raceNumber, AsyncCallback<Void> async);
 
