@@ -2,10 +2,9 @@ package net.himadri.scmt.client;
 
 import net.himadri.scmt.client.serializable.MarathonActionListener;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,6 +17,8 @@ public class SyncSupport<T> {
     public enum Priority {
         HIGH, MEDIUM, NORMAL
     }
+
+    private static final Logger logger = Logger.getLogger(SyncSupport.class.getName());
 
     private Map<Priority, List<MarathonActionListener<T>>> marathonActionListeners = new EnumMap<Priority, List<MarathonActionListener<T>>>(Priority.class);
 
@@ -36,10 +37,12 @@ public class SyncSupport<T> {
 
     public void notifyItemsAdded(List<T> items) {
         for (Priority priority : Priority.values()) {
-            List<MarathonActionListener<T>> marathonActionListenerList = marathonActionListeners.get(priority);
-            if (marathonActionListenerList != null) {
-                for (MarathonActionListener<T> actionListener : marathonActionListenerList) {
+            List<MarathonActionListener<T>> marathonActionListenerList = getMarathonActionListenerList(priority);
+            for (MarathonActionListener<T> actionListener : marathonActionListenerList) {
+                try {
                     actionListener.itemAdded(items);
+                } catch (RuntimeException e) {
+                    logger.log(Level.SEVERE, "ActionListener exception", e);
                 }
             }
         }
@@ -47,13 +50,24 @@ public class SyncSupport<T> {
 
     public void notifyRefreshed(List<T> items) {
         for (Priority priority : Priority.values()) {
-            List<MarathonActionListener<T>> marathonActionListenerList = marathonActionListeners.get(priority);
-            if (marathonActionListenerList != null) {
-                for (MarathonActionListener<T> actionListener : marathonActionListenerList) {
+            List<MarathonActionListener<T>> marathonActionListenerList = getMarathonActionListenerList(priority);
+            for (MarathonActionListener<T> actionListener : marathonActionListenerList) {
+                try {
                     actionListener.itemRefreshed(items);
+                } catch (RuntimeException e) {
+                    logger.log(Level.SEVERE, "ActionListener exception", e);
                 }
             }
         }
+    }
+
+    private List<MarathonActionListener<T>> getMarathonActionListenerList(Priority priority) {
+        if (marathonActionListeners.containsKey(priority)) {
+            return marathonActionListeners.get(priority);
+        } else {
+            return Collections.emptyList();
+        }
+
     }
 
     public int getSyncId() {

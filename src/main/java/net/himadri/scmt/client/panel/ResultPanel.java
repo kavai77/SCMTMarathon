@@ -30,7 +30,7 @@ public class ResultPanel extends Composite {
     public ResultPanel(SCMTMarathon scmtMarathon) {
         this.scmtMarathon = scmtMarathon;
         AbsolutePanel racePanel = new AbsolutePanel();
-        racePanel.setSize("1001px", "620px");
+        racePanel.setSize("100%", "620px");
 
         versenySzamValaszto.setSize("190px", "33px");
         racePanel.add(versenySzamValaszto, 10, 10);

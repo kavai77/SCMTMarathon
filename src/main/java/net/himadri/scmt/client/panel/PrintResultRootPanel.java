@@ -45,9 +45,6 @@ public class PrintResultRootPanel extends Composite {
         verticalPanel.clear();
         String megnevezes;
         switch (filter.getMode()) {
-            case ALL:
-                megnevezes = "Összesített eredménylista";
-                break;
             case VERSENYSZAM:
                 megnevezes = Utils.getVersenySzamMegnevezes(scmtMarathon,
                         scmtMarathon.getVersenyszamMapCache().getVersenySzam(
@@ -58,7 +55,7 @@ public class PrintResultRootPanel extends Composite {
                         " eredménylistája";
                 break;
             default:
-                throw new IllegalStateException(filter.getMode() + "missing");
+                throw new IllegalStateException(filter.getMode() + "not supported");
         }
         verticalPanel.add(new HTML("<h1>" + megnevezes + "</h1>"));
         verticalPanel.add(createFlexTable());
@@ -85,10 +82,12 @@ public class PrintResultRootPanel extends Composite {
         flexTable.addStyleName("collapse");
         flexTable.setText(0, 0, "Hely");
         flexTable.setText(0, 1, "Rajtszám");
-        flexTable.setText(0, 2, "Versenyző");
-        flexTable.setText(0, 3, "Kategória");
-        flexTable.setText(0, 4, "Kat. hely");
-        flexTable.setText(0, 5, "Idő");
+        flexTable.setText(0, 2, "Név");
+        flexTable.setText(0, 3, "Szül.év");
+        flexTable.setText(0, 4, "Egyesület");
+        flexTable.setText(0, 5, "Kategória");
+        flexTable.setText(0, 6, "Kat. hely");
+        flexTable.setText(0, 7, "Idő");
         ArrayList<RaceStatusRow> acceptedRows = new ArrayList<RaceStatusRow>();
         for (RaceStatusRow raceStatusRow : scmtMarathon.getRaceStatusRowCache().getAllRaceStatusRows()) {
             if (TavVersenyszamFilter.isAccepted(filter, raceStatusRow.getVersenySzam()) &&
@@ -106,13 +105,15 @@ public class PrintResultRootPanel extends Composite {
             flexTable.setText(rowIndex, 1, raceStatusRow.getRaceNumber());
             if (raceStatusRow.getVersenyzo() != null) {
                 flexTable.setText(rowIndex, 2, raceStatusRow.getVersenyzo().getName());
+                flexTable.setText(rowIndex, 3, raceStatusRow.getVersenyzo().getSzuletesiEv().toString());
+                flexTable.setText(rowIndex, 4, raceStatusRow.getVersenyzo().getEgyesulet());
             }
             if (raceStatusRow.getVersenySzam() != null) {
-                flexTable.setText(rowIndex, 3, Utils.getVersenySzamMegnevezes(scmtMarathon, raceStatusRow.getVersenySzam()));
+                flexTable.setText(rowIndex, 5, Utils.getVersenySzamMegnevezes(scmtMarathon, raceStatusRow.getVersenySzam()));
                 Integer katHely = getHelyezes(kategoriaHelyCounter, raceStatusRow.getVersenySzam().getId());
-                flexTable.setText(rowIndex, 4, katHely + ".");
+                flexTable.setText(rowIndex, 6, katHely + ".");
             }
-            flexTable.setText(rowIndex, 5, Utils.getElapsedTimeString(raceStatusRow.getLapTimes().get(raceStatusRow.getTav().getKorSzam() - 1)));
+            flexTable.setText(rowIndex, 7, Utils.getElapsedTimeString(raceStatusRow.getLapTimes().get(raceStatusRow.getTav().getKorSzam() - 1)));
         }
         return flexTable;
     }

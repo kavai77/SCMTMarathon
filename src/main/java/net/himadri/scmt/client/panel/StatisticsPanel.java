@@ -2,17 +2,19 @@ package net.himadri.scmt.client.panel;
 
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.*;
+import net.himadri.scmt.client.ImageButton;
 import net.himadri.scmt.client.SCMTMarathon;
+import net.himadri.scmt.client.TabChangeHandler;
 import net.himadri.scmt.client.Utils;
-import net.himadri.scmt.client.entity.PersonLap;
 import net.himadri.scmt.client.entity.Tav;
 import net.himadri.scmt.client.entity.VersenySzam;
 import net.himadri.scmt.client.entity.Versenyzo;
-import net.himadri.scmt.client.serializable.MarathonActionListener;
 import net.himadri.scmt.client.serializable.RaceStatusRow;
 
 import java.util.*;
@@ -22,15 +24,15 @@ import java.util.*;
  * User: Kavai
  * Date: 2012.07.16. 21:44
  */
-public class StatisticsPanel extends Composite {
+public class StatisticsPanel extends Composite implements TabChangeHandler {
     private CellTable<StatisticsTableRow> statisticsCellTable;
     private SCMTMarathon scmtMarathon;
     private StatisticsOverview statisticsOverview = new StatisticsOverview();
 
     public StatisticsPanel(final SCMTMarathon scmtMarathon) {
         this.scmtMarathon = scmtMarathon;
-        AbsolutePanel racePanel = new AbsolutePanel();
-        racePanel.setSize("1001px", "620px");
+        VerticalPanel racePanel = new VerticalPanel();
+        racePanel.setSpacing(20);
 
         statisticsCellTable = new CellTable<StatisticsTableRow>(Integer.MAX_VALUE);
         statisticsCellTable.addColumn(new TextColumn<StatisticsTableRow>() {
@@ -69,51 +71,24 @@ public class StatisticsPanel extends Composite {
                 return statisticsTable.gaveup;
             }
         }, "Feladta");
+
         ScrollPanel tableScroll = new ScrollPanel(statisticsCellTable);
         tableScroll.setSize("900px", "350px");
         racePanel.add(tableScroll);
-        racePanel.add(new Label("* Részletekhez kattints a számra!"), 30, 370);
-
-        scmtMarathon.getPollingService().getVersenyzoSync().addMarathonActionListener(new TabPanelActionListener<Versenyzo>());
-        scmtMarathon.getPollingService().getVersenySzamSync().addMarathonActionListener(new TabPanelActionListener<VersenySzam>());
-        scmtMarathon.getPollingService().getTavSync().addMarathonActionListener(new TabPanelActionListener<Tav>());
-        scmtMarathon.getPollingService().getPersonLapSync().addMarathonActionListener(new MarathonActionListener<PersonLap>() {
+        racePanel.add(new Label("* Részletekhez kattints a számra!"));
+        racePanel.add(new ImageButton("reload.png", "Frissítés", new ClickHandler() {
             @Override
-            public void itemAdded(List<PersonLap> items) {
-                if (recalculateNeeded(items)) {
-                    recalculateStatistics();
-                }
-            }
-
-            @Override
-            public void itemRefreshed(List<PersonLap> items) {
+            public void onClick(ClickEvent clickEvent) {
                 recalculateStatistics();
             }
-
-            private boolean recalculateNeeded(List<PersonLap> items) {
-                for (PersonLap personLap: items) {
-                    RaceStatusRow raceStatusRow = scmtMarathon.getRaceStatusRowCache().getRaceStatusRowByRaceNumber(personLap.getRaceNumber());
-                    if (raceStatusRow.getTav() != null && raceStatusRow.getTav().getKorSzam() <= raceStatusRow.getLapTimes().size()) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-        });
+        }));
 
         initWidget(racePanel);
     }
 
-    private class TabPanelActionListener<T> implements MarathonActionListener<T> {
-        @Override
-        public void itemAdded(List<T> items) {
-            recalculateStatistics();
-        }
-
-        @Override
-        public void itemRefreshed(List<T> items) {
-            recalculateStatistics();
-        }
+    @Override
+    public void activated() {
+        recalculateStatistics();
     }
 
     private void recalculateStatistics() {

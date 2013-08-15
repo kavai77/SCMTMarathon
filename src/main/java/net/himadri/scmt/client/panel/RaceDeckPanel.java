@@ -16,7 +16,7 @@ import java.util.List;
 public class RaceDeckPanel extends Composite {
     public RaceDeckPanel(SCMTMarathon scmtMarathon) {
         final DeckPanel raceDeckPanel = new DeckPanel();
-        raceDeckPanel.setSize("990px", "600px");
+        raceDeckPanel.setSize("100%", "600px");
         raceDeckPanel.add(new NoRacePanel(scmtMarathon));
         raceDeckPanel.add(new RaceTabPanel(scmtMarathon));
 

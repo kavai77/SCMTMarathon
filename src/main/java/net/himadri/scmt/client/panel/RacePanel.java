@@ -49,7 +49,7 @@ public class RacePanel extends Composite {
     public RacePanel(final SCMTMarathon scmtMarathon) {
         this.scmtMarathon = scmtMarathon;
         AbsolutePanel racePanel = new AbsolutePanel();
-        racePanel.setSize("1001px", "620px");
+        racePanel.setSize("100%", "600px");
         clockLabel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         clockLabel.addStyleName("bigger");
 

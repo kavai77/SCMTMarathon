@@ -12,7 +12,10 @@ import net.himadri.scmt.client.entity.VersenySzam;
 import net.himadri.scmt.client.entity.Versenyzo;
 import net.himadri.scmt.client.serializable.MarathonActionListener;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class PrintAllRunnersRootPanel extends Composite {
     public static final String HISTORY_TOKEN = "StartList";
@@ -54,11 +57,10 @@ public class PrintAllRunnersRootPanel extends Composite {
         flexTable.addStyleName("collapse");
         flexTable.setText(0, 0, "Rajtszám");
         flexTable.setText(0, 1, "Név");
-        flexTable.setText(0, 2, "Életkor");
+        flexTable.setText(0, 2, "Szül.év");
         flexTable.setText(0, 3, "Kategória");
         flexTable.setText(0, 4, "Egyesület");
         int rowIndex = 1;
-        int currentYear = new Date().getYear() + 1900;
         VersenyszamMapCache versenyszamMapCache = scmtMarathon.getVersenyszamMapCache();
         List<Versenyzo> allVersenyzo = new ArrayList<Versenyzo>(scmtMarathon.getVersenyzoMapCache().getAllVersenyzo());
         Collections.sort(allVersenyzo, new Comparator<Versenyzo>() {
@@ -76,7 +78,7 @@ public class PrintAllRunnersRootPanel extends Composite {
         for (Versenyzo versenyzo: allVersenyzo) {
             flexTable.setText(rowIndex, 0, versenyzo.getRaceNumber());
             flexTable.setText(rowIndex, 1, versenyzo.getName());
-            flexTable.setText(rowIndex, 2, Integer.toString(currentYear - versenyzo.getSzuletesiEv()));
+            flexTable.setText(rowIndex, 2, versenyzo.getSzuletesiEv().toString());
             flexTable.setText(rowIndex, 3, Utils.getVersenySzamMegnevezes(scmtMarathon,
                     versenyszamMapCache.getVersenySzam(versenyzo.getVersenySzamId())));
             flexTable.setText(rowIndex, 4, versenyzo.getEgyesulet());
