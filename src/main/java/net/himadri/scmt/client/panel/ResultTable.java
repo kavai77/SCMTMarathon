@@ -8,7 +8,12 @@ import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.view.client.ListDataProvider;
-import net.himadri.scmt.client.*;
+import net.himadri.scmt.client.SCMTMarathon;
+import net.himadri.scmt.client.SortableColumn;
+import net.himadri.scmt.client.SortableTextColumn;
+import net.himadri.scmt.client.TavVersenySzam;
+import net.himadri.scmt.client.TavVersenyszamFilter;
+import net.himadri.scmt.client.Utils;
 import net.himadri.scmt.client.entity.PersonLap;
 import net.himadri.scmt.client.entity.Tav;
 import net.himadri.scmt.client.entity.VersenySzam;
@@ -34,12 +39,6 @@ public class ResultTable extends Composite {
     private ListDataProvider<RaceStatusRow> raceStatusRowList = new ListDataProvider<RaceStatusRow>();
     private Map<RaceStatusRow, Integer> helyezesMap = new HashMap<RaceStatusRow, Integer>();
     private ColumnSortEvent.ListHandler<RaceStatusRow> listHandler = new ColumnSortEvent.ListHandler<RaceStatusRow>(raceStatusRowList.getList());
-
-    class TimeCellData {
-        Long actualTime;
-        Long elapsedTime;
-        boolean feladta;
-    }
 
     public ResultTable(final SCMTMarathon scmtMarathon, TavVersenySzam filter) {
         this.scmtMarathon = scmtMarathon;
@@ -116,10 +115,10 @@ public class ResultTable extends Composite {
         }
         for (int i = statusTable.getColumnCount() - FIX_COLUMN_COUNT; i < maxLapCount; i++) {
             final int lapNb = i;
-            statusTable.addColumn(new Column<RaceStatusRow, TimeCellData>(new TimeCell()) {
+            statusTable.addColumn(new Column<RaceStatusRow, TimeCell.TimeCellData>(new TimeCell()) {
                 @Override
-                public TimeCellData getValue(RaceStatusRow raceStatusRow) {
-                    TimeCellData cellTime = new TimeCellData();
+                public TimeCell.TimeCellData getValue(RaceStatusRow raceStatusRow) {
+                    TimeCell.TimeCellData cellTime = new TimeCell.TimeCellData();
                     cellTime.feladta = raceStatusRow.getVersenyzo() != null &&
                             raceStatusRow.getVersenyzo().isFeladta();
                     if (lapNb < raceStatusRow.getLapTimes().size()) {

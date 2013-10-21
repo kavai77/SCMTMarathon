@@ -9,10 +9,10 @@ import net.himadri.scmt.client.Utils;
  * User: Kavai
  * Date: 2012.02.24. 10:07
  */
-public class TimeCell extends AbstractCell<ResultTable.TimeCellData> {
+public class TimeCell extends AbstractCell<TimeCell.TimeCellData> {
 
     @Override
-    public void render(Context context, ResultTable.TimeCellData cellTime, SafeHtmlBuilder safeHtmlBuilder) {
+    public void render(Context context, TimeCellData cellTime, SafeHtmlBuilder safeHtmlBuilder) {
         if (cellTime.actualTime != null) {
             safeHtmlBuilder.appendEscaped(Utils.getElapsedTimeString(cellTime.actualTime));
             if (cellTime.elapsedTime != null) {
@@ -24,5 +24,11 @@ public class TimeCell extends AbstractCell<ResultTable.TimeCellData> {
         } else if (cellTime.feladta) {
             safeHtmlBuilder.appendEscaped("Feladta");
         }
+    }
+
+    static class TimeCellData {
+        Long actualTime;
+        Long elapsedTime;
+        boolean feladta;
     }
 }

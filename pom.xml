@@ -13,8 +13,8 @@
     <properties>
         <!-- Convenience property to set the GWT version -->
         <gwtVersion>2.5.0</gwtVersion>
-        <appEngineVersion>1.7.4</appEngineVersion>
-        <appEngineSdk>/usr/lib/java/appengine-java-sdk-${appEngineVersion}/</appEngineSdk>
+        <appEngineVersion>1.8.2</appEngineVersion>
+        <appEngineSdk>${settings.localRepository}/com/google/appengine/appengine-java-sdk/${appEngineVersion}/appengine-java-sdk/appengine-java-sdk-${appEngineVersion}</appEngineSdk>
         <!-- GWT needs at least java 1.6 -->
         <maven.compiler.source>1.6</maven.compiler.source>
         <maven.compiler.target>1.6</maven.compiler.target>

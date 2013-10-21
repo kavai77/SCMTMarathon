@@ -22,6 +22,7 @@ public class RaceTabPanel extends Composite {
         tabPanel.add(new RacePanel(scmtMarathon), "Körrögzítés", false);
         tabPanel.add(new ResultPanel(scmtMarathon), "Eredmények", false);
         tabPanel.add(new StatisticsPanel(scmtMarathon), "Statisztikák", false);
+        tabPanel.add(new ProblemsPanel(scmtMarathon), "Tévesztések keresése", false);
 
         tabPanel.addSelectionHandler(new SelectionHandler<Integer>() {
             @Override
