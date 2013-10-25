@@ -16,8 +16,8 @@
         <appEngineVersion>1.8.2</appEngineVersion>
         <appEngineSdk>${settings.localRepository}/com/google/appengine/appengine-java-sdk/${appEngineVersion}/appengine-java-sdk/appengine-java-sdk-${appEngineVersion}</appEngineSdk>
         <!-- GWT needs at least java 1.6 -->
-        <maven.compiler.source>1.6</maven.compiler.source>
-        <maven.compiler.target>1.6</maven.compiler.target>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -166,31 +166,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-
-            <!-- Delete gwt generated stuff -->
-            <plugin>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>2.3</version>
-                <configuration>
-                    <filesets>
-                        <fileset>
-                            <directory>src/main/webapp/scmtmarathon</directory>
-                        </fileset>
-                        <fileset>
-                            <directory>src/main/webapp/WEB-INF/classes</directory>
-                        </fileset>
-                        <fileset>
-                            <directory>tomcat</directory>
-                        </fileset>
-                        <fileset>
-                            <directory>www-test</directory>
-                        </fileset>
-                        <fileset>
-                            <directory>.gwt-tmp</directory>
-                        </fileset>
-                    </filesets>
-                </configuration>
             </plugin>
 
             <plugin>

@@ -164,14 +164,14 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
     }
 
     @Override
-    public void addVersenyzo(String raceNumber, String name, Boolean ferfi, Integer szuletesiEv, String egyesulet, Long versenySzamId, Long versenyId) throws AlreadyExistingEntityException {
+    public void addVersenyzo(String raceNumber, String name, Boolean ferfi, Integer szuletesiEv, String egyesulet, String email, Long versenySzamId, Long versenyId) throws AlreadyExistingEntityException {
         int count = ofy.query(Versenyzo.class)
                 .filter("versenyId", versenyId)
                 .filter("raceNumber", raceNumber).count();
         if (count > 0) {
             throw new AlreadyExistingEntityException();
         }
-        Versenyzo versenyzo = new Versenyzo(raceNumber, name, ferfi, szuletesiEv, egyesulet, versenySzamId, versenyId);
+        Versenyzo versenyzo = new Versenyzo(raceNumber, name, ferfi, szuletesiEv, egyesulet, email, versenySzamId, versenyId);
         ofy.put(versenyzo);
         memcacheService.put(getMaxCreationTimeCacheKey(Versenyzo.class, versenyId),
                 versenyzo.getCreationTime(), DEFAULT_CACHE_EXPIRATION);

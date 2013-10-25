@@ -124,6 +124,12 @@ public class VersenyzoPanel extends Composite {
         versenyzoTable.addColumn(new SortableTextColumn<Versenyzo>(listHandler) {
             @Override
             public String getValue(Versenyzo versenyzo) {
+                return versenyzo.getEmail();
+            }
+        }, "Email");
+        versenyzoTable.addColumn(new SortableTextColumn<Versenyzo>(listHandler) {
+            @Override
+            public String getValue(Versenyzo versenyzo) {
                 VersenySzam versenySzam = scmtMarathon.getVersenyszamMapCache().getVersenySzam(versenyzo.getVersenySzamId());
                 return Utils.getVersenySzamMegnevezes(scmtMarathon, versenySzam);
             }

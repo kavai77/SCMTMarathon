@@ -21,6 +21,7 @@ public class Versenyzo implements Serializable, HasCreationTime {
     private Boolean ferfi;
     private Integer szuletesiEv;
     private String egyesulet;
+    private String email;
     private Long versenySzamId;
     private Long versenyId;
     private boolean feladta;
@@ -38,12 +39,13 @@ public class Versenyzo implements Serializable, HasCreationTime {
     }
 
 
-    public Versenyzo(String raceNumber, String name, Boolean ferfi, Integer szuletesiEv, String egyesulet, Long versenySzamId, Long versenyId) {
+    public Versenyzo(String raceNumber, String name, Boolean ferfi, Integer szuletesiEv, String egyesulet, String email, Long versenySzamId, Long versenyId) {
         this.raceNumber = raceNumber;
         this.name = name;
         this.ferfi = ferfi;
         this.szuletesiEv = szuletesiEv;
         this.egyesulet = egyesulet;
+        this.email = email;
         this.versenySzamId = versenySzamId;
         this.versenyId = versenyId;
         creationTime = System.currentTimeMillis();
@@ -71,6 +73,10 @@ public class Versenyzo implements Serializable, HasCreationTime {
 
     public String getEgyesulet() {
         return egyesulet;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public Long getVersenySzamId() {
@@ -107,6 +113,10 @@ public class Versenyzo implements Serializable, HasCreationTime {
 
     public void setEgyesulet(String egyesulet) {
         this.egyesulet = egyesulet;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setVersenySzamId(Long versenySzamId) {

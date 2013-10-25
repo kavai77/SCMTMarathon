@@ -11,17 +11,20 @@ import net.himadri.scmt.client.VersenyzoCSVUploadService;
 import net.himadri.scmt.client.entity.Tav;
 import net.himadri.scmt.client.entity.VersenySzam;
 import net.himadri.scmt.client.entity.Versenyzo;
-import net.himadri.scmt.client.panel.VersenyzoImportPanel;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class VersenyzoCSVUploadServiceImpl extends RemoteServiceServlet implements VersenyzoCSVUploadService {
 
     private static Objectify ofy = ObjectifyService.begin();
-    public static final String[] HEADER = {"Rajtszám", "Név", "Született", "Egyesület"};
+    public static final String[] HEADER = {"Rajtszám", "Név", "Született", "Egyesület", "Email"};
     public static final Pattern SZULETES_PATTERN = Pattern.compile("(\\d\\d\\d\\d).*");
     public final MarathonService marathonService = new MarathonServiceImpl();
 
@@ -50,7 +53,7 @@ public class VersenyzoCSVUploadServiceImpl extends RemoteServiceServlet implemen
                     String name = getName(nextLine);
                     boolean ferfi = getFerfi(name);
                     int szuletesiEv = getSzuletesiEv(nextLine);
-                    Versenyzo versenyzo = new Versenyzo(raceNumber, name, ferfi, getSzuletesiEv(nextLine), getEgyesulet(nextLine),
+                    Versenyzo versenyzo = new Versenyzo(raceNumber, name, ferfi, getSzuletesiEv(nextLine), getEgyesulet(nextLine), getEmail(nextLine),
                             getVersenySzamId(versenyId, getTavId(raceNumber, versenyId), ferfi, szuletesiEv), versenyId);
                     ofy.put(versenyzo);
                     sikeres++;
@@ -116,6 +119,14 @@ public class VersenyzoCSVUploadServiceImpl extends RemoteServiceServlet implemen
 
     private String getEgyesulet(String[] line) throws HibasSorException {
         return line[3];
+    }
+
+    private String getEmail(String[] line) throws HibasSorException {
+        String email = line[4];
+        if (!Utils.isEmpty(email) && !email.contains("@")) {
+            throw new HibasSorException("Az email cím helytelen.");
+        }
+        return email;
     }
 
     private boolean getFerfi(String name) throws HibasSorException {

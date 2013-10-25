@@ -36,7 +36,7 @@ public interface MarathonServiceAsync {
 
     void removeVersenySzam(Long versenySzamId, AsyncCallback<Void> async);
 
-    void addVersenyzo(String raceNumber, String name, Boolean ferfi, Integer szuletesiEv, String egyesulet, Long versenySzamId, Long versenyId, AsyncCallback<Void> async);
+    void addVersenyzo(String raceNumber, String name, Boolean ferfi, Integer szuletesiEv, String egyesulet, String email, Long versenySzamId, Long versenyId, AsyncCallback<Void> async);
 
     void modifyVersenyzo(Versenyzo versenyzo, AsyncCallback<Void> async);
 
