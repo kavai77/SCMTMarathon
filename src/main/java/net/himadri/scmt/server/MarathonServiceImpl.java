@@ -13,17 +13,33 @@ import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.googlecode.objectify.NotFoundException;
 import com.googlecode.objectify.Objectify;
-import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Query;
 import net.himadri.scmt.client.MarathonService;
-import net.himadri.scmt.client.entity.*;
+import net.himadri.scmt.client.entity.HasCreationTime;
+import net.himadri.scmt.client.entity.Nev;
+import net.himadri.scmt.client.entity.PageProfile;
+import net.himadri.scmt.client.entity.PageProfileId;
+import net.himadri.scmt.client.entity.PersonLap;
+import net.himadri.scmt.client.entity.RaceStatus;
+import net.himadri.scmt.client.entity.Tav;
+import net.himadri.scmt.client.entity.Verseny;
+import net.himadri.scmt.client.entity.VersenySzam;
+import net.himadri.scmt.client.entity.Versenyzo;
 import net.himadri.scmt.client.exception.AlreadyExistingEntityException;
 import net.himadri.scmt.client.exception.NotAuthorizedException;
 import net.himadri.scmt.client.exception.NotExistingEntityException;
 import net.himadri.scmt.client.serializable.PollingRequest;
 import net.himadri.scmt.client.serializable.PollingResult;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * The server side implementation of the RPC service.
@@ -37,21 +53,11 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
     private enum SyncValueType {PERSON_LAP, VERSENYZO, VERSENYSZAM, TAV}
 
     public static final long RACE_TIME_THRESHOLD = 60000;
-    private static Objectify ofy = ObjectifyService.begin();
+    private static Objectify ofy = ObjectifyUtils.beginObjectify();
     private static MemcacheService memcacheService = MemcacheServiceFactory.getMemcacheService();
 
     static Set<Long> channelIdSet = new HashSet<Long>();
     static Set<Long> pendingChannelIdSet = new HashSet<Long>();
-
-    static {
-        ObjectifyService.register(PersonLap.class);
-        ObjectifyService.register(VersenySzam.class);
-        ObjectifyService.register(Tav.class);
-        ObjectifyService.register(Versenyzo.class);
-        ObjectifyService.register(Verseny.class);
-        ObjectifyService.register(PageProfile.class);
-        ObjectifyService.register(Nev.class);
-    }
 
     @Override
     public void startRace(Long versenyId) {

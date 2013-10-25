@@ -14,7 +14,9 @@
         <!-- Convenience property to set the GWT version -->
         <gwtVersion>2.5.0</gwtVersion>
         <appEngineVersion>1.8.2</appEngineVersion>
-        <appEngineSdk>${settings.localRepository}/com/google/appengine/appengine-java-sdk/${appEngineVersion}/appengine-java-sdk/appengine-java-sdk-${appEngineVersion}</appEngineSdk>
+        <appEngineSdk>
+            ${settings.localRepository}/com/google/appengine/appengine-java-sdk/${appEngineVersion}/appengine-java-sdk/appengine-java-sdk-${appEngineVersion}
+        </appEngineSdk>
         <!-- GWT needs at least java 1.6 -->
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
@@ -71,6 +73,11 @@
             <groupId>jdo</groupId>
             <artifactId>jdo</artifactId>
             <version>2.0-beta</version>
+        </dependency>        
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.2.2</version>
         </dependency>
     </dependencies>
 
@@ -194,8 +201,8 @@
                                         classpathref="tools.class.path"
                                         classname="org.datanucleus.enhancer.tools.EnhancerTask"/>
                                 <datanucleusenhancer verbose="false"
-                                        classpathref="tools.class.path"
-                                        failonerror="true">
+                                                     classpathref="tools.class.path"
+                                                     failonerror="true">
                                     <fileset dir="target/www/WEB-INF/classes" includes="**/*.class"/>
                                 </datanucleusenhancer>
                             </target>

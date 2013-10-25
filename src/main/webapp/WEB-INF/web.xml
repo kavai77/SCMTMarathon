@@ -27,6 +27,14 @@
         <servlet-name>VersenyzoCSVUploadService</servlet-name>
         <servlet-class>net.himadri.scmt.server.VersenyzoCSVUploadServiceImpl</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>EntityCollectorServlet</servlet-name>
+        <servlet-class>net.himadri.scmt.server.dbcopy.EntityCollectorServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>EntityFetcherServlet</servlet-name>
+        <servlet-class>net.himadri.scmt.server.dbcopy.EntityFetcherServlet</servlet-class>
+    </servlet>
 
     <servlet-mapping>
         <servlet-name>marathonServlet</servlet-name>
@@ -54,6 +62,14 @@
         <servlet-name>VersenyzoCSVUploadService</servlet-name>
         <url-pattern>/scmtmarathon/import</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EntityCollectorServlet</servlet-name>
+        <url-pattern>/scmtmarathon/entities</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EntityFetcherServlet</servlet-name>
+        <url-pattern>/scmtmarathon/dbcopy</url-pattern>
+    </servlet-mapping>
 
     <!-- Default page to serve -->
     <welcome-file-list>
@@ -65,6 +81,7 @@
             <web-resource-name>admin</web-resource-name>
             <url-pattern>/scmtmarathon/marathon</url-pattern>
             <url-pattern>/scmtmarathon/import</url-pattern>
+            <url-pattern>/scmtmarathon/entities</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>
@@ -78,5 +95,5 @@
         <auth-constraint>
             <role-name>*</role-name>
         </auth-constraint>
-    </security-constraint>
+    </security-constraint>    
 </web-app>

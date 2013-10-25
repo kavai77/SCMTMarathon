@@ -3,7 +3,6 @@ package net.himadri.scmt.server;
 import au.com.bytecode.opencsv.CSVReader;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.googlecode.objectify.Objectify;
-import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Query;
 import net.himadri.scmt.client.MarathonService;
 import net.himadri.scmt.client.Utils;
@@ -23,7 +22,7 @@ import java.util.regex.Pattern;
 
 public class VersenyzoCSVUploadServiceImpl extends RemoteServiceServlet implements VersenyzoCSVUploadService {
 
-    private static Objectify ofy = ObjectifyService.begin();
+    private static Objectify ofy = ObjectifyUtils.beginObjectify();
     public static final String[] HEADER = {"Rajtszám", "Név", "Született", "Egyesület", "Email"};
     public static final Pattern SZULETES_PATTERN = Pattern.compile("(\\d\\d\\d\\d).*");
     public final MarathonService marathonService = new MarathonServiceImpl();

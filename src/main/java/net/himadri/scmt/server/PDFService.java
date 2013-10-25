@@ -1,23 +1,35 @@
 package net.himadri.scmt.server;
 
 import com.googlecode.objectify.Objectify;
-import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Query;
-import com.itextpdf.text.*;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
 import net.himadri.scmt.client.Utils;
-import net.himadri.scmt.client.entity.*;
+import net.himadri.scmt.client.entity.PageProfile;
+import net.himadri.scmt.client.entity.PageProfileId;
+import net.himadri.scmt.client.entity.PersonLap;
+import net.himadri.scmt.client.entity.Tav;
+import net.himadri.scmt.client.entity.VersenySzam;
+import net.himadri.scmt.client.entity.Versenyzo;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,7 +37,7 @@ import java.util.List;
  * Date: 2012.06.01. 6:59
  */
 public class PDFService extends HttpServlet {
-    private static Objectify ofy = ObjectifyService.begin();
+    private static Objectify ofy = ObjectifyUtils.beginObjectify();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String tavId = request.getParameter("tav");
