@@ -43,22 +43,26 @@ public class PrintResultRootPanel extends Composite {
 
     private void buildUi() {
         verticalPanel.clear();
-        String megnevezes;
         switch (filter.getMode()) {
             case VERSENYSZAM:
-                megnevezes = Utils.getVersenySzamMegnevezes(scmtMarathon,
+                String versenySzamMegnevezes = Utils.getVersenySzamMegnevezes(scmtMarathon,
                         scmtMarathon.getVersenyszamMapCache().getVersenySzam(
                                 filter.getVersenySzamId())) + " eredménylistája";
+                verticalPanel.add(new HTML("<h1>" + versenySzamMegnevezes + " - Férfi</h1>"));
+                verticalPanel.add(createFlexTable(null));
                 break;
             case TAV:
-                megnevezes = scmtMarathon.getTavMapCache().getTav(filter.getTavId()).getMegnevezes() +
+                String tavMegnevezes = scmtMarathon.getTavMapCache().getTav(filter.getTavId()).getMegnevezes() +
                         " eredménylistája";
+                verticalPanel.add(new HTML("<h1>" + tavMegnevezes + " - Férfi</h1>"));
+                verticalPanel.add(createFlexTable(true));
+                verticalPanel.add(new HTML("<br><br><br><h1>" + tavMegnevezes + " - Női</h1>"));
+                verticalPanel.add(createFlexTable(false));
                 break;
             default:
                 throw new IllegalStateException(filter.getMode() + "not supported");
         }
-        verticalPanel.add(new HTML("<h1>" + megnevezes + "</h1>"));
-        verticalPanel.add(createFlexTable());
+
     }
 
     private class RefreshSyncRequest<T> implements MarathonActionListener<T> {
@@ -75,7 +79,7 @@ public class PrintResultRootPanel extends Composite {
         }
     }
 
-    private FlexTable createFlexTable() {
+    private FlexTable createFlexTable(Boolean ferfi) {
         FlexTable flexTable = new FlexTable();
         flexTable.setBorderWidth(1);
         flexTable.setCellPadding(5);
@@ -91,7 +95,8 @@ public class PrintResultRootPanel extends Composite {
         ArrayList<RaceStatusRow> acceptedRows = new ArrayList<RaceStatusRow>();
         for (RaceStatusRow raceStatusRow : scmtMarathon.getRaceStatusRowCache().getAllRaceStatusRows()) {
             if (TavVersenyszamFilter.isAccepted(filter, raceStatusRow.getVersenySzam()) &&
-                    raceStatusRow.getTav() != null && raceStatusRow.getTav().getKorSzam() <= raceStatusRow.getLapTimes().size()) {
+                    isKorSzamFinished(raceStatusRow) &&
+                    isNemAccepted(raceStatusRow, ferfi)) {
                 acceptedRows.add(raceStatusRow);
             }
         }
@@ -116,6 +121,15 @@ public class PrintResultRootPanel extends Composite {
             flexTable.setText(rowIndex, 7, Utils.getElapsedTimeString(raceStatusRow.getLapTimes().get(raceStatusRow.getTav().getKorSzam() - 1)));
         }
         return flexTable;
+    }
+
+    private boolean isKorSzamFinished(RaceStatusRow raceStatusRow) {
+        return raceStatusRow.getTav() != null && raceStatusRow.getTav().getKorSzam() <= raceStatusRow.getLapTimes().size();
+    }
+
+    private boolean isNemAccepted(RaceStatusRow raceStatusRow, Boolean ferfi) {
+        return raceStatusRow.getVersenyzo() != null && raceStatusRow.getVersenyzo().getFerfi() != null &&
+                (ferfi == null || raceStatusRow.getVersenyzo().getFerfi().booleanValue() == ferfi.booleanValue());
     }
 
     private Integer getHelyezes(Map<Long, Integer> helyCounter, Long id) {

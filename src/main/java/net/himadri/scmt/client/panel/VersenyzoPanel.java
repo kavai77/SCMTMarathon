@@ -42,6 +42,7 @@ public class VersenyzoPanel extends Composite {
     private Column<Versenyzo, Versenyzo> modositasColumn;
     private Column<Versenyzo, Boolean> feladtaColumn;
     private ListBox versenySzamFilter = new ListBox();
+    private Label szuroSzamLabel = new Label();
     private Button btnUjVersenyszm;
 
     private TavVersenySzam filter = TavVersenySzam.createAllAcceptance();
@@ -76,6 +77,8 @@ public class VersenyzoPanel extends Composite {
         versenyzoPanel.add(versenySzamFilter, 810, 135);
         versenySzamFilter.addItem("Összes versenyző", "");
         versenySzamFilter.addChangeHandler(new VersenySzamFilterChangeHandler());
+
+        versenyzoPanel.add(szuroSzamLabel, 810, 170);
 
         ScrollPanel tableScroll = new ScrollPanel();
         versenyzoPanel.add(tableScroll);
@@ -231,6 +234,7 @@ public class VersenyzoPanel extends Composite {
                     versenyzoListDataProvider.getList().add(versenyzo);
                 }
             }
+            refreshSzuroSzamLabel();
         }
 
         @Override
@@ -298,12 +302,18 @@ public class VersenyzoPanel extends Composite {
             String selectedValue = versenySzamFilter.getValue(selectedIndex);
             filter = TavVersenySzamToken.decode(selectedValue);
 
-            versenyzoListDataProvider.getList().clear();
+            List<Versenyzo> versenyzoList = versenyzoListDataProvider.getList();
+            versenyzoList.clear();
             for (Versenyzo versenyzo: scmtMarathon.getVersenyzoMapCache().getAllVersenyzo()) {
                 if (TavVersenyszamFilter.isAccepted(filter, versenyzo, scmtMarathon)) {
-                    versenyzoListDataProvider.getList().add(versenyzo);
+                    versenyzoList.add(versenyzo);
                 }
             }
+            refreshSzuroSzamLabel();
         }
+    }
+
+    private void refreshSzuroSzamLabel() {
+        szuroSzamLabel.setText("Listázott versenyzők: " + versenyzoListDataProvider.getList().size());
     }
 }
