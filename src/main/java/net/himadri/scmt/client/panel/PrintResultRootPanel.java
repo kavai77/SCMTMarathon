@@ -48,7 +48,7 @@ public class PrintResultRootPanel extends Composite {
                 String versenySzamMegnevezes = Utils.getVersenySzamMegnevezes(scmtMarathon,
                         scmtMarathon.getVersenyszamMapCache().getVersenySzam(
                                 filter.getVersenySzamId())) + " eredménylistája";
-                verticalPanel.add(new HTML("<h1>" + versenySzamMegnevezes + " - Férfi</h1>"));
+                verticalPanel.add(new HTML("<h1>" + versenySzamMegnevezes + "</h1>"));
                 verticalPanel.add(createFlexTable(null));
                 break;
             case TAV:
