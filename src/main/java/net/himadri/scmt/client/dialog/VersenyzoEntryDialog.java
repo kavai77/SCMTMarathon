@@ -39,7 +39,7 @@ public class VersenyzoEntryDialog extends DialogBox {
     private Versenyzo versenyzo;
     private SCMTMarathon scmtMarathon;
 
-    public VersenyzoEntryDialog(SCMTMarathon scmtMarathon) {
+    public VersenyzoEntryDialog(final SCMTMarathon scmtMarathon) {
         this.scmtMarathon = scmtMarathon;
         setHTML("Versenyző");
         setAnimationEnabled(true);
@@ -60,7 +60,26 @@ public class VersenyzoEntryDialog extends DialogBox {
 
         absolutePanel.add(rajtszamText, 10, 34);
         rajtszamText.setSize("96px", "18px");
-        rajtszamText.addBlurHandler(filterVersenySzamBlurHandler);
+        rajtszamText.addBlurHandler(new BlurHandler() {
+            @Override
+            public void onBlur(BlurEvent event) {
+                Versenyzo existingVersenyzo = scmtMarathon.getVersenyzoMapCache().getVersenyzo(rajtszamText.getText());
+                if (existingVersenyzo == null) {
+                    filterVersenySzam();
+                } else {
+                    if (Window.confirm("Ezzel a rajtszámmal már létezik versenyző:\n" + existingVersenyzo.getName() +
+                            "\nSzületési év: " + existingVersenyzo.getSzuletesiEv() +
+                            "\nEgyesület: " + existingVersenyzo.getEgyesulet() +
+                            "\nEmail: " + existingVersenyzo.getEmail() +
+                            "\nVersenyszám: " + Utils.getVersenySzamMegnevezes(scmtMarathon, existingVersenyzo.getVersenySzamId()) +
+                            "\nMódosítsuk?")) {
+                        showDialog(existingVersenyzo);
+                    } else {
+                        hide();
+                    }
+                }
+            }
+        });
 
         Label lblNv = new Label("Név *");
         absolutePanel.add(lblNv, 10, 74);

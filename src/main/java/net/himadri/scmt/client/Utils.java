@@ -29,6 +29,11 @@ public class Utils {
         return ferfi != null ? (ferfi ? "Férfi" : "Női") : null;
     }
 
+    public static String getVersenySzamMegnevezes(SCMTMarathon scmtMarathon, Long versenySzamId) {
+        VersenySzam versenySzam = scmtMarathon.getVersenyszamMapCache().getVersenySzam(versenySzamId);
+        return getVersenySzamMegnevezes(scmtMarathon, versenySzam);
+    }
+
     public static String getVersenySzamMegnevezes(SCMTMarathon scmtMarathon, VersenySzam versenySzam) {
         return getVersenySzamMegnevezes(scmtMarathon, versenySzam.getTavId(), versenySzam.getKorTol(), versenySzam.getKorIg(), versenySzam.getFerfi());
     }
