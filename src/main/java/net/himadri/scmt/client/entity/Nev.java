@@ -4,11 +4,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.io.Serializable;
 
-/**
- * Created by IntelliJ IDEA.
- * User: Kavai
- * Date: 2012.07.10. 22:07
- */
 @Entity
 public class Nev implements Serializable {
     @Id

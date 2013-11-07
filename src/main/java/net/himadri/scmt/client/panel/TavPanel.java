@@ -51,7 +51,7 @@ public class TavPanel extends Composite {
 
         final FormPanel formPanel = new FormPanel();
         final Hidden pdfServiceParam = new Hidden("tav");
-        formPanel.setAction("/scmtmarathon/PDFService");
+        formPanel.setAction("/scmtmarathon/PrePrintedPDFService");
         formPanel.setMethod(FormPanel.METHOD_GET);
         formPanel.getElement().<FormElement>cast().setTarget("_blank");
         formPanel.add(pdfServiceParam);

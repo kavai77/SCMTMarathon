@@ -2,13 +2,7 @@ package net.himadri.scmt.server;
 
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyService;
-import net.himadri.scmt.client.entity.Nev;
-import net.himadri.scmt.client.entity.PageProfile;
-import net.himadri.scmt.client.entity.PersonLap;
-import net.himadri.scmt.client.entity.Tav;
-import net.himadri.scmt.client.entity.Verseny;
-import net.himadri.scmt.client.entity.VersenySzam;
-import net.himadri.scmt.client.entity.Versenyzo;
+import net.himadri.scmt.client.entity.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,6 +19,7 @@ public class ObjectifyUtils {
         ObjectifyService.register(Verseny.class);
         ObjectifyService.register(PageProfile.class);
         ObjectifyService.register(Nev.class);
+        ObjectifyService.register(OklevelPdfBlob.class);
     }
     
     public static Objectify beginObjectify() {

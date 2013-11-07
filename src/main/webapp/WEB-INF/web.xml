@@ -20,12 +20,20 @@
         <servlet-class>net.himadri.scmt.server.UserServiceImpl</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>PDFService</servlet-name>
-        <servlet-class>net.himadri.scmt.server.PDFService</servlet-class>
+        <servlet-name>PrePrintedPDFService</servlet-name>
+        <servlet-class>net.himadri.scmt.server.PrePrintedPDFService</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>OklevelPDFService</servlet-name>
+        <servlet-class>net.himadri.scmt.server.OklevelPDFService</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>VersenyzoCSVUploadService</servlet-name>
         <servlet-class>net.himadri.scmt.server.VersenyzoCSVUploadServiceImpl</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>OklevelUploadHandler</servlet-name>
+        <servlet-class>net.himadri.scmt.server.OklevelUploadHandler</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>EntityCollectorServlet</servlet-name>
@@ -55,12 +63,20 @@
         <url-pattern>/scmtmarathon/UserService</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>PDFService</servlet-name>
-        <url-pattern>/scmtmarathon/PDFService</url-pattern>
+        <servlet-name>PrePrintedPDFService</servlet-name>
+        <url-pattern>/scmtmarathon/PrePrintedPDFService</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OklevelPDFService</servlet-name>
+        <url-pattern>/scmtmarathon/OklevelPDFService</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>VersenyzoCSVUploadService</servlet-name>
         <url-pattern>/scmtmarathon/import</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OklevelUploadHandler</servlet-name>
+        <url-pattern>/scmtmarathon/OklevelUploadHandler</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>EntityCollectorServlet</servlet-name>
@@ -82,6 +98,7 @@
             <url-pattern>/scmtmarathon/marathon</url-pattern>
             <url-pattern>/scmtmarathon/import</url-pattern>
             <url-pattern>/scmtmarathon/entities</url-pattern>
+            <url-pattern>/scmtmarathon/OklevelUploadHandler</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>

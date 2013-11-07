@@ -5,7 +5,6 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.SelectionCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.FormElement;
-import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.NumberFormat;
@@ -22,6 +21,8 @@ import net.himadri.scmt.client.MarathonServiceAsync;
 import net.himadri.scmt.client.SCMTMarathon;
 import net.himadri.scmt.client.entity.PageProfile;
 import net.himadri.scmt.client.entity.PageProfileId;
+import net.himadri.scmt.client.entity.Verseny;
+import net.himadri.scmt.client.serializable.MarathonActionListener;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,11 +38,11 @@ public class NyomtatoPanel extends Composite {
             BaseFont.COURIER, BaseFont.COURIER_BOLD, BaseFont.COURIER_OBLIQUE, BaseFont.COURIER_BOLDOBLIQUE
     );
 
-	public NyomtatoPanel() {
+	public NyomtatoPanel(final SCMTMarathon scmtMarathon) {
 		
-		AbsolutePanel absolutePanel = new AbsolutePanel();
+		final AbsolutePanel absolutePanel = new AbsolutePanel();
 		initWidget(absolutePanel);
-		absolutePanel.setSize("900px", "330px");
+		absolutePanel.setSize("900px", "360px");
 		
 		Label lblEmlklapnyomtatsBelltsai = new Label("Emléklapnyomtatás beállításai");
 		absolutePanel.add(lblEmlklapnyomtatsBelltsai, 20, 10);
@@ -174,24 +175,54 @@ public class NyomtatoPanel extends Composite {
             }
         });
         cellTable.addColumn(igazitasColumn, "Igazítás");
-		
+
+        Button probaNyomtatas = createRedirectButton(absolutePanel, "Próbanyomtatás", "/scmtmarathon/PrePrintedPDFService",
+                new Hidden("tav", "minta"));
+        probaNyomtatas.setSize("150px", "30px");
+        absolutePanel.add(probaNyomtatas, 20, 282);
+
+        scmtMarathon.getVersenySyncSupport().addMarathonActionListener(new MarathonActionListener<Verseny>() {
+            @Override
+            public void itemAdded(List<Verseny> items) {
+                itemRefreshed(items);
+            }
+
+            @Override
+            public void itemRefreshed(List<Verseny> items) {
+                Verseny verseny = items.get(0);
+                Button oklevelButton = createRedirectButton(absolutePanel, "Oklevel", "/OklevelPdfServe.jsp",
+                        new Hidden("versenyId", verseny.getId().toString()));
+                oklevelButton.setSize("150px", "30px");
+                absolutePanel.add(oklevelButton, 20, 320);
+
+                Button probaOklevelButton = createRedirectButton(absolutePanel, "Oklevel mintával", "/scmtmarathon/OklevelPDFService",
+                        new Hidden("versenyId", verseny.getId().toString()), new Hidden("rajtSzam", "minta"));
+                oklevelButton.setSize("150px", "30px");
+                absolutePanel.add(probaOklevelButton, 190, 320);
+            }
+        });
+
+        //cellTable.setColumnWidth(cellTable.getColumn(2), 50, Style.Unit.PX);
+    }
+
+    private Button createRedirectButton(AbsolutePanel absolutePanel, String name, String url, Widget... params) {
         final FormPanel formPanel = new FormPanel();
-        final Hidden pdfServiceParam = new Hidden("tav", "minta");
-        formPanel.setAction("/scmtmarathon/PDFService");
+        formPanel.setAction(url);
         formPanel.setMethod(FormPanel.METHOD_GET);
         formPanel.getElement().<FormElement>cast().setTarget("_blank");
-        formPanel.add(pdfServiceParam);
+        FlowPanel flowPanel = new FlowPanel();
+        for (Widget param:params) {
+            flowPanel.add(param);
+        }
+        formPanel.add(flowPanel);
         absolutePanel.add(formPanel);
 
-        Button probaNyomtatas = new Button("Próbanyomtatás", new ClickHandler() {
+        return new Button(name, new ClickHandler() {
             @Override
             public void onClick(ClickEvent clickEvent) {
                 formPanel.submit();
             }
         });
-        absolutePanel.add(probaNyomtatas, 20, 282);
-		probaNyomtatas.setSize("150px", "30px");
-        cellTable.setColumnWidth(cellTable.getColumn(2), 50, Style.Unit.PX);
     }
 
     private void saveProfile(PageProfile pageProfile) {
