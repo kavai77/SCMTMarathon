@@ -7,13 +7,11 @@ import com.googlecode.objectify.Objectify;
 import net.himadri.scmt.client.entity.OklevelPdfBlob;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet("/scmtmarathon/serveemptyoklevelpdf")
 public class ServeEmptyOklevelPdf extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

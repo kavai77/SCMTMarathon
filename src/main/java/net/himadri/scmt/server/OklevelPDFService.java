@@ -1,8 +1,7 @@
 package net.himadri.scmt.server;
 
 import com.google.appengine.api.blobstore.BlobKey;
-import com.google.appengine.api.blobstore.BlobstoreService;
-import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
+import com.google.appengine.api.blobstore.BlobstoreInputStream;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
@@ -12,6 +11,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class OklevelPDFService extends AbstractPDFService {
     @Override
@@ -22,10 +23,9 @@ public class OklevelPDFService extends AbstractPDFService {
             try {
                 String raceNumber = request.getParameter("raceNumber");
                 response.setContentType("application/pdf");
-                BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
-                byte[] bytes = blobstoreService.fetchData(new BlobKey(oklevelPdfBlob.getUploadedPdfBlobKey()), 0, oklevelPdfBlob.getSize());
+                BlobKey blobKey = new BlobKey(oklevelPdfBlob.getUploadedPdfBlobKey());
 
-                PdfReader pdfReader = new PdfReader(bytes);
+                PdfReader pdfReader = new PdfReader(new BlobstoreInputStream(blobKey));
                 PdfStamper pdfStamper = new PdfStamper(pdfReader, response.getOutputStream());
                 PdfContentByte canvas = pdfStamper.getOverContent(1);
                 if (raceNumber.equals("minta")) {
@@ -36,6 +36,7 @@ public class OklevelPDFService extends AbstractPDFService {
                 pdfStamper.close();
                 pdfReader.close();
             }catch (Exception e) {
+                Logger.getLogger(OklevelPDFService.class.getName()).log(Level.SEVERE, "Oklevel nyomtatás hiba", e);
                 response.setContentType("text/html; charset=UTF-8");
                 response.getWriter().println("A megadott rajtszám ismeretlen");
             }
