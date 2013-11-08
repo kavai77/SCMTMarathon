@@ -37,5 +37,24 @@ public class PrePrintedPDFService extends AbstractPDFService {
         }
     }
 
+//    public static void main(String[] args) throws IOException, DocumentException {
+//        Document document = new Document(PageSize.A4);
+//        File pdfFile = new File("out.pdf");
+//        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdfFile));
+//        document.open();
+//
+//        PdfContentByte canvas = writer.getDirectContentUnder();
+//        PrePrintedPDFService pdfService = new PrePrintedPDFService();
+//        Map<PageProfileId, String> data = pdfService.createSampleText();
+//        List<PageProfile> pageProfiles = Arrays.asList(
+//                new PageProfile(PageProfileId.NEV, 5, 5, 0, BaseFont.COURIER, 14)
+//        );
+//        pdfService.printSinglePage(canvas, pageProfiles, data);
+//        document.close();
+//
+//        Desktop.getDesktop().open(pdfFile);
+//    }
+
+
 
 }

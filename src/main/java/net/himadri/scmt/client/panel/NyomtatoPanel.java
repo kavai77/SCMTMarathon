@@ -190,13 +190,14 @@ public class NyomtatoPanel extends Composite {
             @Override
             public void itemRefreshed(List<Verseny> items) {
                 Verseny verseny = items.get(0);
-                Button oklevelButton = createRedirectButton(absolutePanel, "Oklevel", "/OklevelPdfServe.jsp",
+//                Button oklevelButton = createRedirectButton(absolutePanel, "Oklevel", "/OklevelPdfServe.jsp",
+                Button oklevelButton = createRedirectButton(absolutePanel, "Oklevel", "/scmtmarathon/serveemptyoklevelpdf",
                         new Hidden("versenyId", verseny.getId().toString()));
                 oklevelButton.setSize("150px", "30px");
                 absolutePanel.add(oklevelButton, 20, 320);
 
-                Button probaOklevelButton = createRedirectButton(absolutePanel, "Oklevel mintával", "/scmtmarathon/OklevelPDFService",
-                        new Hidden("versenyId", verseny.getId().toString()), new Hidden("rajtSzam", "minta"));
+                Button probaOklevelButton = createRedirectButton(absolutePanel, "Oklevel mintával", "/public/OklevelPDFService",
+                        new Hidden("versenyId", verseny.getId().toString()), new Hidden("raceNumber", "minta"));
                 oklevelButton.setSize("150px", "30px");
                 absolutePanel.add(probaOklevelButton, 190, 320);
             }

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type"/>
+    <link href="../SCMTMarathon.css" rel="stylesheet" type="text/css"/>
+    <title>Oklevél nyomtatás</title>
+</head>
+<body>
+<div class="centerWithMargin" style="position: relative; overflow: hidden; width: 990px; height: auto;">
+    <img src="../images/header.jpg" style="width: 990px; height: auto;"/>
+    <h2>16. Sri Chinmoy Győri Maraton Oklevelek Nyomtatása</h2>
+    <form action="/public/OklevelPDFService" method="GET">
+        <input type="hidden" name="versenyId" value="5724160613416960"/>
+        Rajtszám:&nbsp;&nbsp;
+        <input type="text" name="raceNumber" size="4" maxlength="3"/> <br/><br/>
+        <input type="submit" value="Nyomtat">
+    </form>
+</div>
+</body>

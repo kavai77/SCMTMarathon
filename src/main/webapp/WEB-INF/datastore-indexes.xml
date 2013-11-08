@@ -52,6 +52,11 @@
         <property name="creationTime" direction="desc"/>
     </datastore-index>
 
+    <datastore-index kind="Versenyzo" ancestor="false" source="manual">
+        <property name="raceNumber" direction="asc"/>
+        <property name="versenyId" direction="desc"/>
+    </datastore-index>
+
     <datastore-index kind="Tav" ancestor="false" source="manual">
         <property name="versenyId" direction="asc"/>
         <property name="creationTime" direction="asc"/>

@@ -43,6 +43,10 @@
         <servlet-name>EntityFetcherServlet</servlet-name>
         <servlet-class>net.himadri.scmt.server.dbcopy.EntityFetcherServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ServeEmptyOklevelPdf</servlet-name>
+        <servlet-class>net.himadri.scmt.server.ServeEmptyOklevelPdf</servlet-class>
+    </servlet>
 
     <servlet-mapping>
         <servlet-name>marathonServlet</servlet-name>
@@ -68,7 +72,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>OklevelPDFService</servlet-name>
-        <url-pattern>/scmtmarathon/OklevelPDFService</url-pattern>
+        <url-pattern>/public/OklevelPDFService</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>VersenyzoCSVUploadService</servlet-name>
@@ -85,6 +89,10 @@
     <servlet-mapping>
         <servlet-name>EntityFetcherServlet</servlet-name>
         <url-pattern>/scmtmarathon/dbcopy</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ServeEmptyOklevelPdf</servlet-name>
+        <url-pattern>/scmtmarathon/serveemptyoklevelpdf</url-pattern>
     </servlet-mapping>
 
     <!-- Default page to serve -->
@@ -106,11 +114,17 @@
     </security-constraint>
     <security-constraint>
         <web-resource-collection>
+            <web-resource-name>no-auth</web-resource-name>
+            <url-pattern>/public/*</url-pattern>
+        </web-resource-collection>
+    </security-constraint>
+    <security-constraint>
+        <web-resource-collection>
             <web-resource-name>public</web-resource-name>
             <url-pattern>/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>*</role-name>
         </auth-constraint>
-    </security-constraint>    
+    </security-constraint>
 </web-app>
