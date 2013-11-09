@@ -27,9 +27,8 @@ public class AbstractPDFService extends HttpServlet {
         }
     }
 
-    protected void printVersenyzo(PdfContentByte canvas, String raceNumber, Long versenyId)  throws IOException, DocumentException {
+    protected void printVersenyzo(PdfContentByte canvas, Versenyzo versenyzo) throws IOException, DocumentException {
         List<PageProfile> pageProfiles = new MarathonServiceImpl().getAllPageProfiles();
-        Versenyzo versenyzo = ofy.query(Versenyzo.class).filter("raceNumber", raceNumber).filter("versenyId", versenyId).get();
         VersenySzam versenySzam = ofy.get(VersenySzam.class, versenyzo.getVersenySzamId());
         Tav tav = ofy.get(Tav.class, versenySzam.getTavId());
         List<VersenyzoResult> versenySzamResult = createVersenySzamResult(versenySzam, tav);

@@ -20,6 +20,7 @@ public class ObjectifyUtils {
         ObjectifyService.register(PageProfile.class);
         ObjectifyService.register(Nev.class);
         ObjectifyService.register(OklevelPdfBlob.class);
+        ObjectifyService.register(PrintOklevelLog.class);
     }
     
     public static Objectify beginObjectify() {
