@@ -103,10 +103,8 @@
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>admin</web-resource-name>
-            <url-pattern>/scmtmarathon/marathon</url-pattern>
-            <url-pattern>/scmtmarathon/import</url-pattern>
-            <url-pattern>/scmtmarathon/entities</url-pattern>
-            <url-pattern>/scmtmarathon/OklevelUploadHandler</url-pattern>
+            <url-pattern>/scmtmarathon/*</url-pattern>
+            <url-pattern>/admin/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>
@@ -114,17 +112,8 @@
     </security-constraint>
     <security-constraint>
         <web-resource-collection>
-            <web-resource-name>no-auth</web-resource-name>
-            <url-pattern>/public/*</url-pattern>
-        </web-resource-collection>
-    </security-constraint>
-    <security-constraint>
-        <web-resource-collection>
             <web-resource-name>public</web-resource-name>
             <url-pattern>/*</url-pattern>
         </web-resource-collection>
-        <auth-constraint>
-            <role-name>*</role-name>
-        </auth-constraint>
     </security-constraint>
 </web-app>
