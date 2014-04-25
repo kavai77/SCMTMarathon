@@ -6,4 +6,10 @@
     <inbound-services>
         <service>channel_presence</service>
     </inbound-services>
+    
+    <!--<static-files>-->
+        <!--<include path="/scmtmarathon/UserService" >-->
+            <!--<http-header name="Access-Control-Allow-Origin" value="https://accounts.google.com" />-->
+        <!--</include>-->
+    <!--</static-files>-->
 </appengine-web-app>

@@ -12,14 +12,14 @@
 
     <properties>
         <!-- Convenience property to set the GWT version -->
-        <gwtVersion>2.5.0</gwtVersion>
+        <gwtVersion>2.6.0</gwtVersion>
         <appEngineVersion>1.8.2</appEngineVersion>
         <appEngineSdk>
             ${settings.localRepository}/com/google/appengine/appengine-java-sdk/${appEngineVersion}/appengine-java-sdk/appengine-java-sdk-${appEngineVersion}
         </appEngineSdk>
         <!-- GWT needs at least java 1.6 -->
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.source>1.6</maven.compiler.source>
+        <maven.compiler.target>1.6</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -90,7 +90,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>gwt-maven-plugin</artifactId>
-                <version>2.2.0</version>
+                <version>${gwtVersion}</version>
                 <dependencies>
                     <dependency>
                         <groupId>com.google.gwt</groupId>
@@ -108,7 +108,6 @@
                         <version>${gwtVersion}</version>
                     </dependency>
                 </dependencies>
-                <!-- JS is only needed in the package phase, this speeds up testing -->
                 <executions>
                     <execution>
                         <phase>prepare-package</phase>
@@ -117,39 +116,12 @@
                         </goals>
                     </execution>
                 </executions>
-                <!-- Plugin configuration. There are many available options,
-           see gwt-maven-plugin documentation at codehaus.org -->
                 <configuration>
-                    <!-- URL that should be automatically opened in the GWT shell (gwt:run). -->
                     <runTarget>SCMTMarathon.html</runTarget>
-                    <!-- Location of the develop-mode web application structure (gwt:run). -->
                     <hostedWebapp>target/www</hostedWebapp>
-                    <!-- Ask GWT to create the Story of Your Compile (SOYC) (gwt:compile) -->
                     <compileReport>true</compileReport>
                     <appEngineHome>${appEngineSdk}</appEngineHome>
                     <server>com.google.appengine.tools.development.gwt.AppEngineLauncher</server>
-                </configuration>
-            </plugin>
-
-            <!-- Add source folders to test classpath in order to run gwt-tests as normal junit-tests -->
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.5</version>
-                <configuration>
-                    <additionalClasspathElements>
-                        <additionalClasspathElement>${project.build.sourceDirectory}</additionalClasspathElement>
-                        <additionalClasspathElement>${project.build.testSourceDirectory}</additionalClasspathElement>
-                    </additionalClasspathElements>
-                    <useManifestOnlyJar>false</useManifestOnlyJar>
-                    <forkMode>always</forkMode>
-
-                    <!-- Folder for generated testing stuff -->
-                    <systemProperties>
-                        <property>
-                            <name>gwt.args</name>
-                            <value>-out target/www</value>
-                        </property>
-                    </systemProperties>
                 </configuration>
             </plugin>
 
@@ -179,52 +151,6 @@
                 <groupId>com.google.appengine</groupId>
                 <artifactId>appengine-maven-plugin</artifactId>
                 <version>${appEngineVersion}</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.7</version>
-                <executions>
-                    <execution>
-                        <id>datanucleusenhancer</id>
-                        <configuration>
-                            <target>
-                                <path id="tools.class.path">
-                                    <path refid="maven.compile.classpath"/>
-                                    <fileset dir="${appEngineSdk}/lib/tools">
-                                        <include name="**/*.jar"/>
-                                    </fileset>
-                                </path>
-                                <taskdef
-                                        name="datanucleusenhancer"
-                                        classpathref="tools.class.path"
-                                        classname="org.datanucleus.enhancer.tools.EnhancerTask"/>
-                                <datanucleusenhancer verbose="false"
-                                                     classpathref="tools.class.path"
-                                                     failonerror="true">
-                                    <fileset dir="target/www/WEB-INF/classes" includes="**/*.class"/>
-                                </datanucleusenhancer>
-                            </target>
-                        </configuration>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>commons-net</groupId>
-                        <artifactId>commons-net</artifactId>
-                        <version>1.4.1</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.apache.ant</groupId>
-                        <artifactId>ant-commons-net</artifactId>
-                        <version>1.8.1</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>

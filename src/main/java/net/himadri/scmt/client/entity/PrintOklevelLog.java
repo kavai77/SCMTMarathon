@@ -2,41 +2,48 @@ package net.himadri.scmt.client.entity;
 
 import com.googlecode.objectify.Key;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import java.io.Serializable;
+
 import java.util.Date;
 
-@Entity
-public class PrintOklevelLog implements Serializable {
-    @Id
-    private Long id;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity public class PrintOklevelLog implements Serializable
+{
     private Date dateTime;
+    @Id private Long id;
     private String ip;
     private Key<Versenyzo> versenyzoKey;
 
-    public PrintOklevelLog() {
+    public PrintOklevelLog()
+    {
     }
 
-    public PrintOklevelLog(Date dateTime, String ip, Versenyzo versenyzo) {
+    public PrintOklevelLog(Date dateTime, String ip, Versenyzo versenyzo)
+    {
         this.dateTime = dateTime;
         this.ip = ip;
-        this.versenyzoKey = new Key<>(Versenyzo.class, versenyzo.getId());
+        this.versenyzoKey = new Key<Versenyzo>(Versenyzo.class, versenyzo.getId());
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public Date getDateTime() {
+    public Date getDateTime()
+    {
         return dateTime;
     }
 
-    public String getIp() {
+    public Long getId()
+    {
+        return id;
+    }
+
+    public String getIp()
+    {
         return ip;
     }
 
-    public Key<Versenyzo> getVersenyzoKey() {
+    public Key<Versenyzo> getVersenyzoKey()
+    {
         return versenyzoKey;
     }
 }
