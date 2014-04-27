@@ -93,7 +93,7 @@ public class StatisticsPanel extends Composite implements TabChangeHandler {
 
     private void recalculateStatistics() {
         Collection<Tav> tavok = scmtMarathon.getTavMapCache().getAllTav();
-        Collection<VersenySzam> versenySzamok = scmtMarathon.getVersenyszamMapCache().getAllVersenySzam();
+        List<VersenySzam> versenySzamok = scmtMarathon.getVersenyszamMapCache().getAllVersenySzamSorted();
         List<StatisticsTableRow> statisticsTableRowList = new ArrayList<StatisticsTableRow>(tavok.size() + versenySzamok.size());
 
         Map<Long, StatisticsTableRow> tavStatisticsTableRowMap = new HashMap<Long, StatisticsTableRow>(tavok.size());

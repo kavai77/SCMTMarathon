@@ -3,10 +3,7 @@ package net.himadri.scmt.client;
 import net.himadri.scmt.client.entity.VersenySzam;
 import net.himadri.scmt.client.serializable.MarathonActionListener;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,8 +13,10 @@ import java.util.Map;
 public class VersenyszamMapCache {
     private Map<Long, VersenySzam> idVersenySzamMap = new HashMap<Long, VersenySzam>();
     private long maxTime;
+    private SCMTMarathon scmtMarathon;
 
     public VersenyszamMapCache(SCMTMarathon scmtMarathon) {
+        this.scmtMarathon = scmtMarathon;
         scmtMarathon.getPollingService().getVersenySzamSync().addMarathonActionListener(
                 SyncSupport.Priority.HIGH, new MarathonActionListener<VersenySzam>() {
             @Override
@@ -49,5 +48,16 @@ public class VersenyszamMapCache {
 
     public Collection<VersenySzam> getAllVersenySzam() {
         return idVersenySzamMap.values();
+    }
+
+    public List<VersenySzam> getAllVersenySzamSorted() {
+        ArrayList<VersenySzam> versenySzamok = new ArrayList<VersenySzam>(idVersenySzamMap.values());
+        Collections.sort(versenySzamok, new Comparator<VersenySzam>() {
+            @Override
+            public int compare(VersenySzam o1, VersenySzam o2) {
+                return Utils.getVersenySzamMegnevezes(scmtMarathon, o1).compareTo(Utils.getVersenySzamMegnevezes(scmtMarathon, o2));
+            }
+        });
+        return versenySzamok;
     }
 }

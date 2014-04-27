@@ -15,8 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class OklevelPDFService extends AbstractPDFService {
     @Override
@@ -45,7 +43,6 @@ public class OklevelPDFService extends AbstractPDFService {
                 pdfStamper.close();
                 pdfReader.close();
             } catch (NotExistingRunnerException e) {
-                Logger.getLogger(OklevelPDFService.class.getName()).log(Level.SEVERE, "Oklevel nyomtatás hiba", e);
                 resposeSimpleText(response, "A megadott rajtszám ismeretlen: " + raceNumber);
             } catch (DocumentException e) {
                 throw new ServletException(e);

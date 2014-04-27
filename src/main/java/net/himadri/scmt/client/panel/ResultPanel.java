@@ -82,7 +82,7 @@ public class ResultPanel extends Composite {
                 versenySzamValaszto.addItem(tav.getMegnevezes() + " összes",
                         TavVersenySzamToken.encode(TavVersenySzam.createTav(tav.getId())));
             }
-            for (VersenySzam versenySzam : scmtMarathon.getVersenyszamMapCache().getAllVersenySzam()) {
+            for (VersenySzam versenySzam : scmtMarathon.getVersenyszamMapCache().getAllVersenySzamSorted()) {
                 versenySzamValaszto.addItem(Utils.getVersenySzamMegnevezes(scmtMarathon, versenySzam),
                         TavVersenySzamToken.encode(TavVersenySzam.createVersenyszamFilter(versenySzam.getId())));
             }

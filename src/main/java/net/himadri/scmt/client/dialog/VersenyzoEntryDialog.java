@@ -66,7 +66,7 @@ public class VersenyzoEntryDialog extends DialogBox {
                 Versenyzo existingVersenyzo = scmtMarathon.getVersenyzoMapCache().getVersenyzo(rajtszamText.getText());
                 if (existingVersenyzo == null) {
                     filterVersenySzam();
-                } else {
+                } else if (!existingVersenyzo.getId().equals(versenyzo.getId())){
                     if (Window.confirm("Ezzel a rajtszámmal már létezik versenyző:\n" + existingVersenyzo.getName() +
                             "\nSzületési év: " + existingVersenyzo.getSzuletesiEv() +
                             "\nEgyesület: " + existingVersenyzo.getEgyesulet() +
