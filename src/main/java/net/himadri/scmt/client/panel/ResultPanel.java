@@ -4,12 +4,20 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ListBox;
-import net.himadri.scmt.client.*;
+import com.google.gwt.user.client.ui.TextBox;
+
+import net.himadri.scmt.client.ImageButton;
+import net.himadri.scmt.client.SCMTMarathon;
+import net.himadri.scmt.client.TavVersenySzam;
+import net.himadri.scmt.client.TavVersenySzamToken;
+import net.himadri.scmt.client.Utils;
 import net.himadri.scmt.client.entity.Tav;
 import net.himadri.scmt.client.entity.VersenySzam;
 import net.himadri.scmt.client.serializable.MarathonActionListener;
@@ -21,72 +29,104 @@ import java.util.List;
  * User: Kavai
  * Date: 2012.07.16. 21:44
  */
-public class ResultPanel extends Composite {
-    private ResultTable resultPanel;
-    private ListBox versenySzamValaszto = new ListBox();
-    private SCMTMarathon scmtMarathon;
+public class ResultPanel extends Composite
+{
     private Button nyomtatasButton;
+    private TextBox raceNumberFilterBox = new TextBox();
+    private ResultTable resultPanel;
+    private SCMTMarathon scmtMarathon;
+    private ListBox versenySzamValaszto = new ListBox();
 
-    public ResultPanel(SCMTMarathon scmtMarathon) {
+    public ResultPanel(SCMTMarathon scmtMarathon)
+    {
         this.scmtMarathon = scmtMarathon;
         AbsolutePanel racePanel = new AbsolutePanel();
-        racePanel.setSize("100%", "620px");
 
-        versenySzamValaszto.setSize("190px", "33px");
+        racePanel.setSize("100%", "620px");
+        versenySzamValaszto.setSize("190px", "27px");
         racePanel.add(versenySzamValaszto, 10, 10);
         versenySzamValaszto.addChangeHandler(new VersenySzamValasztoChangeHandler());
+        raceNumberFilterBox.setSize("70px", "auto");
+        raceNumberFilterBox.getElement().setPropertyString("placeholder", "rajtszám");
+        racePanel.add(raceNumberFilterBox, 215, 10);
+        raceNumberFilterBox.addKeyUpHandler(new KeyUpHandler()
+            {
+                @Override public void onKeyUp(KeyUpEvent keyUpEvent)
+                {
+                    String filter = raceNumberFilterBox.getText().trim();
 
-        nyomtatasButton = new ImageButton("fileprint.png", "Nyomatási kép", new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent clickEvent) {
-                History.newItem(TavVersenySzamToken.encode(resultPanel.getFilter()));
-            }
-        });
-        racePanel.add(nyomtatasButton, 215, 10);
+                    if (filter.isEmpty())
+                    {
+                        new VersenySzamValasztoChangeHandler().onChange(null);
+                    }
+                    else
+                    {
+                        resultPanel.refilterRaceStatusRows(TavVersenySzam.createRaceNumber(filter));
+                        nyomtatasButton.setVisible(false);
+                        versenySzamValaszto.setSelectedIndex(versenySzamValaszto.getItemCount() - 1);
+                    }
+                }
+            });
+        nyomtatasButton = new ImageButton("fileprint.png", "Nyomatási kép", new ClickHandler()
+                {
+                    @Override public void onClick(ClickEvent clickEvent)
+                    {
+                        History.newItem(TavVersenySzamToken.encode(resultPanel.getFilter()));
+                    }
+                });
+        racePanel.add(nyomtatasButton, 310, 10);
         nyomtatasButton.setVisible(false);
-
         resultPanel = new ResultTable(scmtMarathon, TavVersenySzam.createAllAcceptance());
         racePanel.add(resultPanel, 0, 60);
-
         scmtMarathon.getPollingService().getVersenySzamSync().addMarathonActionListener(new TabPanelActionListener<VersenySzam>());
         scmtMarathon.getPollingService().getTavSync().addMarathonActionListener(new TabPanelActionListener<Tav>());
-
         initWidget(racePanel);
     }
 
-    private class VersenySzamValasztoChangeHandler implements ChangeHandler {
-        @Override
-        public void onChange(ChangeEvent changeEvent) {
-            int selectedIndex = versenySzamValaszto.getSelectedIndex();
-            String value = versenySzamValaszto.getValue(selectedIndex);
-            resultPanel.refilterRaceStatusRows(TavVersenySzamToken.decode(value));
-            nyomtatasButton.setVisible(selectedIndex > 0);
+    private class TabPanelActionListener<T> implements MarathonActionListener<T>
+    {
+        @Override public void itemAdded(List<T> items)
+        {
+            refreshVersenySzamValaszto();
+        }
+
+        @Override public void itemRefreshed(List<T> items)
+        {
+            refreshVersenySzamValaszto();
+        }
+
+        private void refreshVersenySzamValaszto()
+        {
+            versenySzamValaszto.clear();
+            versenySzamValaszto.addItem("Összes versenyző", TavVersenySzamToken.encode(TavVersenySzam.createAllAcceptance()));
+            for (Tav tav : scmtMarathon.getTavMapCache().getAllTav())
+            {
+                versenySzamValaszto.addItem(tav.getMegnevezes() + " összes",
+                    TavVersenySzamToken.encode(TavVersenySzam.createTav(tav.getId())));
+            }
+
+            for (VersenySzam versenySzam : scmtMarathon.getVersenyszamMapCache().getAllVersenySzamSorted())
+            {
+                versenySzamValaszto.addItem(Utils.getVersenySzamMegnevezes(scmtMarathon, versenySzam),
+                    TavVersenySzamToken.encode(TavVersenySzam.createVersenyszamFilter(versenySzam.getId())));
+            }
+
+            versenySzamValaszto.addItem("Versenyszám szűrés", TavVersenySzamToken.encode(TavVersenySzam.createRaceNumber("")));
+            resultPanel.refilterRaceStatusRows(TavVersenySzam.createAllAcceptance());
         }
     }
 
-    private class TabPanelActionListener<T> implements MarathonActionListener<T> {
-        @Override
-        public void itemAdded(List<T> items) {
-            refreshVersenySzamValaszto();
-        }
+    private class VersenySzamValasztoChangeHandler implements ChangeHandler
+    {
+        @Override public void onChange(ChangeEvent changeEvent)
+        {
+            int selectedIndex = versenySzamValaszto.getSelectedIndex();
+            String value = versenySzamValaszto.getValue(selectedIndex);
+            TavVersenySzam tavVersenySzam = TavVersenySzamToken.decode(value);
 
-        @Override
-        public void itemRefreshed(List<T> items) {
-            refreshVersenySzamValaszto();
-        }
-
-        private void refreshVersenySzamValaszto() {
-            versenySzamValaszto.clear();
-            versenySzamValaszto.addItem("Összes versenyző", TavVersenySzamToken.encode(TavVersenySzam.createAllAcceptance()));
-            for (Tav tav : scmtMarathon.getTavMapCache().getAllTav()) {
-                versenySzamValaszto.addItem(tav.getMegnevezes() + " összes",
-                        TavVersenySzamToken.encode(TavVersenySzam.createTav(tav.getId())));
-            }
-            for (VersenySzam versenySzam : scmtMarathon.getVersenyszamMapCache().getAllVersenySzamSorted()) {
-                versenySzamValaszto.addItem(Utils.getVersenySzamMegnevezes(scmtMarathon, versenySzam),
-                        TavVersenySzamToken.encode(TavVersenySzam.createVersenyszamFilter(versenySzam.getId())));
-            }
-            resultPanel.refilterRaceStatusRows(TavVersenySzam.createAllAcceptance());
+            resultPanel.refilterRaceStatusRows(tavVersenySzam);
+            nyomtatasButton.setVisible(tavVersenySzam.getMode().isPrintButtonVisible());
+            raceNumberFilterBox.setText("");
         }
     }
 }
