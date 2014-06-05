@@ -5,7 +5,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.VerticalPanel;
-
 import net.himadri.scmt.client.SCMTMarathon;
 import net.himadri.scmt.client.TavVersenySzam;
 import net.himadri.scmt.client.TavVersenySzamToken;
@@ -154,7 +153,7 @@ public class PrintResultRootPanel extends Composite
             }
 
             flexTable.setText(rowIndex, 7,
-                Utils.getElapsedTimeString(raceStatusRow.getLapTimes().get(raceStatusRow.getTav().getKorSzam() - 1)));
+                Utils.getElapsedTimeString(raceStatusRow, raceStatusRow.getTav().getKorSzam() - 1));
         }
 
         return flexTable;

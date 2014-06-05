@@ -6,13 +6,17 @@ import com.google.gwt.appengine.channel.client.SocketError;
 import com.google.gwt.appengine.channel.client.SocketListener;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.storage.client.Storage;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import net.himadri.scmt.client.entity.*;
+import net.himadri.scmt.client.entity.PersonLap;
+import net.himadri.scmt.client.entity.RaceStatus;
+import net.himadri.scmt.client.entity.Tav;
+import net.himadri.scmt.client.entity.VersenySzam;
+import net.himadri.scmt.client.entity.Versenyzo;
 import net.himadri.scmt.client.serializable.PollingRequest;
 import net.himadri.scmt.client.serializable.PollingResult;
 
 import java.util.Collections;
+import java.util.logging.Logger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,6 +26,7 @@ import java.util.Collections;
 public class PollingService {
     public static final String CHANNEL_TOKEN_KEY = "channelToken";
     public static final String CHANNEL_TOKEN_CREATION_KEY = "channelTokenCreation";
+    public static final Logger LOGGER = Logger.getLogger(PollingService.class.getName());
     private MarathonServiceAsync marathonService = GWT.create(MarathonService.class);
     private static Storage localStorage = Storage.getLocalStorageIfSupported();
 
@@ -47,7 +52,7 @@ public class PollingService {
             String channelTokenCreationStr = localStorage.getItem(CHANNEL_TOKEN_CREATION_KEY);
             long channelTokenCreation = channelTokenCreationStr != null ?
                     Long.parseLong(channelTokenCreationStr) : 0;
-            if (System.currentTimeMillis() - channelTokenCreation > 6 * 60 * 60 * 1000) {
+            if (System.currentTimeMillis() - channelTokenCreation > 60 * 60 * 1000) {
                 requestNewKey();
             } else {
                 connectToChannel(channelToken);
@@ -81,6 +86,7 @@ public class PollingService {
                 channel.open(new SocketListener() {
                     @Override
                     public void onOpen() {
+                        LOGGER.info("Socket open");
                         makeRequest();
                     }
 
@@ -92,13 +98,15 @@ public class PollingService {
                     @Override
                     public void onError(SocketError socketError) {
                         localStorage.removeItem(CHANNEL_TOKEN_KEY);
-                        Window.alert("Hiba történt a szerverhez való kapcsolódáskor. Töltsd újra az oldat!");
+                        LOGGER.warning("Socket error" + socketError.getDescription());
+                        establishChannelConnection();
                     }
 
                     @Override
                     public void onClose() {
                         localStorage.removeItem(CHANNEL_TOKEN_KEY);
-                        Window.alert("Lejárt a kapcsolat. Töltsd újra az oldat!");
+                        LOGGER.info("Socket close");
+                        establishChannelConnection();
                     }
                 });
             }

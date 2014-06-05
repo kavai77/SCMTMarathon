@@ -8,18 +8,30 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.AbsolutePanel;
+import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.view.client.ListDataProvider;
 import net.himadri.scmt.client.MarathonService;
 import net.himadri.scmt.client.MarathonServiceAsync;
 import net.himadri.scmt.client.SCMTMarathon;
 import net.himadri.scmt.client.Utils;
 import net.himadri.scmt.client.entity.PersonLap;
+import net.himadri.scmt.client.entity.VersenySzam;
+import net.himadri.scmt.client.entity.Versenyzo;
 
-import java.util.*;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CorrectionDialogBox extends DialogBox {
 
@@ -31,7 +43,7 @@ public class CorrectionDialogBox extends DialogBox {
     MarathonServiceAsync marathonService = GWT.create(MarathonService.class);
     private SCMTMarathon scmtMarathon;
 
-    public CorrectionDialogBox(SCMTMarathon scmtMarathon) {
+    public CorrectionDialogBox(final SCMTMarathon scmtMarathon) {
         super(true);
         this.scmtMarathon = scmtMarathon;
         setHTML("Javító ablak");
@@ -120,30 +132,7 @@ public class CorrectionDialogBox extends DialogBox {
             @Override
             public void update(int index, final PersonLap personLap, String timeString) {
                 try {
-                    String idoFormatumUzenet = "Az időt ilyen formátumba írhatod be: 12:32 vagy 1:12:32";
-                    // parsing lapTime
-                    String[] stringElements = timeString.split(":");
-                    if (stringElements.length != 2 && stringElements.length != 3) {
-                        throw new Exception(idoFormatumUzenet);
-                    }
-                    long[] longElements = new long[stringElements.length];
-                    for (int i = 0; i < stringElements.length; i++) {
-                        try {
-                            longElements[i] = Long.parseLong(stringElements[i]);
-                            if (longElements[i] < 0 || longElements[i] >= 60) {
-                                throw new Exception(idoFormatumUzenet);
-                            }
-                        } catch (NumberFormatException e) {
-                            throw new Exception(idoFormatumUzenet);
-                        }
-                    }
-
-                    final long lapTime;
-                    if (longElements.length == 3) {
-                        lapTime = (longElements[0] * 60 * 60 + longElements[1] * 60 + longElements[2]) * 1000;
-                    } else {
-                        lapTime = (longElements[0] * 60 + longElements[1]) * 1000;
-                    }
+                    final long lapTime = Utils.parseTime(timeString);
 
                     marathonService.updateLapTime(personLap.getId(), lapTime, new AsyncCallback<Void>() {
                         @Override
@@ -157,8 +146,8 @@ public class CorrectionDialogBox extends DialogBox {
                             personLap.setTime(lapTime);
                         }
                     });
-                } catch (Exception e) {
-                    Window.alert(e.getMessage());
+                } catch (ParseException e) {
+                    Window.alert("Az időt ilyen formátumba írhatod be: 12:32 vagy 1:12:32");
                     undoChange(personLap);
                 }
             }
@@ -168,7 +157,19 @@ public class CorrectionDialogBox extends DialogBox {
                 cellTable.redraw();
             }
         });
-        cellTable.addColumn(timeColumn, "Idő");
+        cellTable.addColumn(timeColumn, "Verseny Idő");
+        cellTable.addColumn(new TextColumn<PersonLap>() {
+            @Override
+            public String getValue(PersonLap personLap) {
+                long diff = 0L;
+                Versenyzo versenyzo = scmtMarathon.getVersenyzoMapCache().getVersenyzo(personLap.getRaceNumber());
+                if (versenyzo != null) {
+                    VersenySzam versenySzam = scmtMarathon.getVersenyszamMapCache().getVersenySzam(versenyzo.getVersenySzamId());
+                    diff = scmtMarathon.getTavMapCache().getTav(versenySzam.getTavId()).getRaceStartDiff();
+                }
+                return Utils.getElapsedTimeString(personLap.getTime() - diff);
+            }
+        }, "Futam Idő");
         cellTable.addColumn(new Column<PersonLap, PersonLap>(new ActionCell<PersonLap>("Törlés", new ActionCell.Delegate<PersonLap>() {
             @Override
             public void execute(final PersonLap personLap) {

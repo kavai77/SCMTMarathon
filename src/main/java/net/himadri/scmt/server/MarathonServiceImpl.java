@@ -11,10 +11,12 @@ import com.google.appengine.api.memcache.Expiration;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.googlecode.objectify.Key;
 import com.googlecode.objectify.NotFoundException;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
 import net.himadri.scmt.client.MarathonService;
+import net.himadri.scmt.client.entity.ClientChannel;
 import net.himadri.scmt.client.entity.HasCreationTime;
 import net.himadri.scmt.client.entity.Nev;
 import net.himadri.scmt.client.entity.PageProfile;
@@ -35,9 +37,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -49,15 +51,13 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         MarathonService {
 
     public static final Expiration DEFAULT_CACHE_EXPIRATION = Expiration.byDeltaSeconds(60 * 60);
+    public static final long CHANNEL_EXPIRATION = 24 * 60 * 60 * 1000;
 
     private enum SyncValueType {PERSON_LAP, VERSENYZO, VERSENYSZAM, TAV}
 
     public static final long RACE_TIME_THRESHOLD = 60000;
     private static Objectify ofy = ObjectifyUtils.beginObjectify();
     private static MemcacheService memcacheService = MemcacheServiceFactory.getMemcacheService();
-
-    static Set<Long> channelIdSet = new HashSet<Long>();
-    static Set<Long> pendingChannelIdSet = new HashSet<Long>();
 
     @Override
     public void startRace(Long versenyId) {
@@ -141,8 +141,8 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
     }
 
     @Override
-    public void addTav(Long versenyId, String megnevezes, Integer korszam, Integer versenySzamtol, Integer versenySzamig) {
-        Tav tav = new Tav(versenyId, megnevezes, korszam, versenySzamtol, versenySzamig);
+    public void addTav(Long versenyId, String megnevezes, Integer korszam, Integer versenySzamtol, Integer versenySzamig, long raceStartDiff) {
+        Tav tav = new Tav(versenyId, megnevezes, korszam, versenySzamtol, versenySzamig, raceStartDiff);
         ofy.put(tav);
         memcacheService.put(getMaxCreationTimeCacheKey(Tav.class, versenyId),
                 tav.getCreationTime(), DEFAULT_CACHE_EXPIRATION);
@@ -150,12 +150,23 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
     }
 
     @Override
-    public void modifyTav(Long tavId, String megnevezes, Integer korszam, Integer versenySzamtol, Integer versenySzamig) {
+    public Long futamStart(long tavId) {
+        Tav tav = ofy.get(Tav.class, tavId);
+        Verseny verseny = getVersenyFromCache(tav.getVersenyId());
+        tav.setRaceStartDiff(System.currentTimeMillis() - verseny.getRaceStartTime());
+        ofy.put(tav);
+        return tav.getRaceStartDiff();
+    }
+
+    @Override
+    public void modifyTav(Long tavId, String megnevezes, Integer korszam, Integer versenySzamtol, Integer versenySzamig, long raceStartDiff) {
         Tav tav = ofy.get(Tav.class, tavId);
         tav.setMegnevezes(megnevezes);
         tav.setKorSzam(korszam);
         tav.setVersenySzamtol(versenySzamtol);
         tav.setVersenySzamig(versenySzamig);
+        tav.setVersenySzamig(versenySzamig);
+        tav.setRaceStartDiff(raceStartDiff);
         ofy.put(tav);
         incrementSyncValue(tav.getVersenyId(), SyncValueType.TAV);
         broadcastModification();
@@ -284,13 +295,8 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
     @Override
     public String createChannelToken() {
         ChannelService channelService = ChannelServiceFactory.getChannelService();
-        long channelId;
-        Random random = new Random();
-        do {
-            channelId = random.nextLong();
-        } while (channelIdSet.contains(channelId) || pendingChannelIdSet.contains(channelId));
-        pendingChannelIdSet.add(channelId);
-        return channelService.createChannel(Long.toString(channelId), 12 * 60);
+        Key<ClientChannel> key = ofy.put(new ClientChannel(new Date()));
+        return channelService.createChannel(Long.toString(key.getId()));
     }
 
 
@@ -366,14 +372,19 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
                 com.google.appengine.api.datastore.Query.FilterOperator.EQUAL, versenyId));
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         return datastore.prepare(query).countEntities(FetchOptions.Builder.withDefaults());
-
-//        return ofy.query(Versenyzo.class).filter("versenyId", versenyId).count();
     }
+    
+    
 
     private void broadcastModification() {
         ChannelService channelService = ChannelServiceFactory.getChannelService();
-        for (Long channelId : channelIdSet) {
-            channelService.sendMessage(new ChannelMessage(channelId.toString(), "modifiedContent"));
+        long creationDeadline = System.currentTimeMillis() - CHANNEL_EXPIRATION;
+        for (ClientChannel channel: ofy.query(ClientChannel.class).list()) {
+            if (channel.getCreationDate().getTime() < creationDeadline) {
+                ofy.delete(channel);
+            } else if (channel.isConnected()) {
+                channelService.sendMessage(new ChannelMessage(channel.getChannelId().toString(), "modifiedContent"));
+            }
         }
     }
 

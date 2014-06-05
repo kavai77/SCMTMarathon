@@ -12,7 +12,15 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.AbsolutePanel;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.Hidden;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.itextpdf.text.pdf.BaseFont;
 import net.himadri.scmt.client.EmptyFailureHandlingAsyncCallback;
@@ -38,16 +46,16 @@ public class NyomtatoPanel extends Composite {
             BaseFont.COURIER, BaseFont.COURIER_BOLD, BaseFont.COURIER_OBLIQUE, BaseFont.COURIER_BOLDOBLIQUE
     );
 
-	public NyomtatoPanel(final SCMTMarathon scmtMarathon) {
-		
-		final AbsolutePanel absolutePanel = new AbsolutePanel();
-		initWidget(absolutePanel);
-		absolutePanel.setSize("900px", "360px");
-		
-		Label lblEmlklapnyomtatsBelltsai = new Label("Emléklapnyomtatás beállításai");
-		absolutePanel.add(lblEmlklapnyomtatsBelltsai, 20, 10);
-		
-		final CellTable<PageProfile> cellTable = new CellTable<PageProfile>();
+    public NyomtatoPanel(final SCMTMarathon scmtMarathon) {
+        
+        final AbsolutePanel absolutePanel = new AbsolutePanel();
+        initWidget(absolutePanel);
+        absolutePanel.setSize("900px", "360px");
+        
+        Label lblEmlklapnyomtatsBelltsai = new Label("Emléklapnyomtatás beállításai");
+        absolutePanel.add(lblEmlklapnyomtatsBelltsai, 20, 10);
+        
+        final CellTable<PageProfile> cellTable = new CellTable<PageProfile>();
         final ListDataProvider<PageProfile> cellTableData = new ListDataProvider<PageProfile>();
         cellTableData.addDataDisplay(cellTable);
 
@@ -64,7 +72,7 @@ public class NyomtatoPanel extends Composite {
         });
 
         absolutePanel.add(cellTable, 20, 44);
-		cellTable.setSize("459px", "214px");
+        cellTable.setSize("459px", "214px");
         cellTable.addColumn(new TextColumn<PageProfile>() {
             @Override
             public String getValue(PageProfile pageProfile) {

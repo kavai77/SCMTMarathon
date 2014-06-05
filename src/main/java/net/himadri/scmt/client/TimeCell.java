@@ -36,10 +36,4 @@ public class TimeCell extends AbstractCell<Long> {
         }
         safeHtmlBuilder.append(clockSeconds);
     }
-
-    public static String getElapsedTimeString(Long elapsedTime) {
-        SafeHtmlBuilder safeHtmlBuilder = new SafeHtmlBuilder();
-        TimeCell.buildElapsedTimeString(elapsedTime, safeHtmlBuilder);
-        return safeHtmlBuilder.toSafeHtml().asString();
-    }
 }

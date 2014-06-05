@@ -44,9 +44,11 @@ public interface MarathonService extends RemoteService {
 
     void removeVersenySzam(Long versenySzamId);
 
-    void addTav(Long versenyId, String megnevezes, Integer korszam, Integer versenySzamtol, Integer versenySzamig);
+    void addTav(Long versenyId, String megnevezes, Integer korszam, Integer versenySzamtol, Integer versenySzamig, long raceStartDiff);
 
-    void modifyTav(Long tavId, String megnevezes, Integer korszam, Integer versenySzamtol, Integer versenySzamig);
+    void modifyTav(Long tavId, String megnevezes, Integer korszam, Integer versenySzamtol, Integer versenySzamig, long raceStartDiff);
+
+    Long futamStart(long tavId);
 
     void removeTav(Long tavId);
 

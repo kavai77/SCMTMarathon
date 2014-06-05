@@ -8,7 +8,6 @@ import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.view.client.ListDataProvider;
-
 import net.himadri.scmt.client.SCMTMarathon;
 import net.himadri.scmt.client.SortableColumn;
 import net.himadri.scmt.client.SortableTextColumn;
@@ -129,7 +128,8 @@ public class ResultTable extends Composite
                         cellTime.feladta = (raceStatusRow.getVersenyzo() != null) && raceStatusRow.getVersenyzo().isFeladta();
                         if (lapNb < raceStatusRow.getLapTimes().size())
                         {
-                            cellTime.actualTime = raceStatusRow.getLapTimes().get(lapNb);
+                            long diff = raceStatusRow.getTav() != null ? raceStatusRow.getTav().getRaceStartDiff() : 0; 
+                            cellTime.actualTime = raceStatusRow.getLapTimes().get(lapNb) - diff;
                             if (lapNb > 0)
                             {
                                 cellTime.elapsedTime = cellTime.actualTime - raceStatusRow.getLapTimes().get(lapNb - 1);

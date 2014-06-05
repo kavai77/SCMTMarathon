@@ -1,14 +1,31 @@
 package net.himadri.scmt.client.panel;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.*;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.*;
-import net.himadri.scmt.client.*;
+import com.google.gwt.user.client.ui.AbsolutePanel;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.DeckPanel;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
+import net.himadri.scmt.client.EmptyFailureHandlingAsyncCallback;
+import net.himadri.scmt.client.ImageButton;
+import net.himadri.scmt.client.MarathonService;
+import net.himadri.scmt.client.MarathonServiceAsync;
+import net.himadri.scmt.client.SCMTMarathon;
+import net.himadri.scmt.client.Utils;
 import net.himadri.scmt.client.dialog.CorrectionDialogBox;
 import net.himadri.scmt.client.entity.PersonLap;
 import net.himadri.scmt.client.entity.RaceStatus;
@@ -92,7 +109,7 @@ public class RacePanel extends Composite {
         lastRaceNbList.addColumn(new TextColumn<RaceStatusRowWithLapNb>() {
             @Override
             public String getValue(RaceStatusRowWithLapNb raceStatusRow) {
-                return Utils.getElapsedTimeString(raceStatusRow.raceStatusRow.getLapTimes().get(raceStatusRow.lapNb - 1));
+                return Utils.getElapsedTimeString(raceStatusRow.raceStatusRow, raceStatusRow.lapNb - 1);
             }
         }, "Idő");
         lastRaceNbList.addColumn(new TextColumn<RaceStatusRowWithLapNb>() {

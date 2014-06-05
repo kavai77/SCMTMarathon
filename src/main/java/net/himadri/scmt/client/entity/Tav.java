@@ -18,18 +18,20 @@ public class Tav implements Serializable, HasCreationTime {
     private String megnevezes;
     private Integer korSzam;
     private Integer versenySzamtol, versenySzamig;
+    private long raceStartDiff;
     private long creationTime;
 
     @SuppressWarnings({"UnusedDeclaration"})
     public Tav() {
     }
 
-    public Tav(Long versenyId, String megnevezes, Integer korSzam, Integer versenySzamtol, Integer versenySzamig) {
+    public Tav(Long versenyId, String megnevezes, Integer korSzam, Integer versenySzamtol, Integer versenySzamig, long raceStartDiff) {
         this.versenyId = versenyId;
         this.megnevezes = megnevezes;
         this.korSzam = korSzam;
         this.versenySzamtol = versenySzamtol;
         this.versenySzamig = versenySzamig;
+        this.raceStartDiff = raceStartDiff;
         creationTime = System.currentTimeMillis();
     }
 
@@ -71,6 +73,14 @@ public class Tav implements Serializable, HasCreationTime {
 
     public void setVersenySzamig(Integer versenySzamig) {
         this.versenySzamig = versenySzamig;
+    }
+
+    public long getRaceStartDiff() {
+        return raceStartDiff;
+    }
+
+    public void setRaceStartDiff(long raceStartDiff) {
+        this.raceStartDiff = raceStartDiff;
     }
 
     public long getCreationTime() {

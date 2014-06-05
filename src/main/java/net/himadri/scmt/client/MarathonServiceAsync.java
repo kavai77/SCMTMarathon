@@ -56,9 +56,11 @@ public interface MarathonServiceAsync {
 
     void removePersonLap(Long personLapId, AsyncCallback<Void> async);
 
-    void addTav(Long versenyId, String megnevezes, Integer korszam, Integer versenySzamtol, Integer versenySzamig, AsyncCallback<Void> async);
+    void addTav(Long versenyId, String megnevezes, Integer korszam, Integer versenySzamtol, Integer versenySzamig, long raceStartDiff, AsyncCallback<Void> async);
 
-    void modifyTav(Long tavId, String megnevezes, Integer korszam, Integer versenySzamtol, Integer versenySzamig, AsyncCallback<Void> async);
+    void modifyTav(Long tavId, String megnevezes, Integer korszam, Integer versenySzamtol, Integer versenySzamig, long raceStartDiff, AsyncCallback<Void> async);
+
+    void futamStart(long tavId, AsyncCallback<Long> async);
 
     void removeTav(Long tavId, AsyncCallback<Void> async);
 

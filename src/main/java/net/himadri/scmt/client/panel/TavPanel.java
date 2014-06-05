@@ -9,9 +9,20 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.AbsolutePanel;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.Hidden;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.view.client.ListDataProvider;
-import net.himadri.scmt.client.*;
+import net.himadri.scmt.client.EmptyFailureHandlingAsyncCallback;
+import net.himadri.scmt.client.ImageButton;
+import net.himadri.scmt.client.MarathonService;
+import net.himadri.scmt.client.MarathonServiceAsync;
+import net.himadri.scmt.client.SCMTMarathon;
+import net.himadri.scmt.client.SortableTextColumn;
+import net.himadri.scmt.client.Utils;
 import net.himadri.scmt.client.dialog.TavEntryDialog;
 import net.himadri.scmt.client.entity.RaceStatus;
 import net.himadri.scmt.client.entity.Tav;
@@ -36,6 +47,7 @@ public class TavPanel extends Composite {
     private Column<Tav, Tav> modositasColumn;
     private Column<Tav, Tav> torlesColumn;
     private Column<Tav, Tav> oklevelNyomtatasColumn;
+    private Column<Tav, Tav> futamInditasColumn;
 
     public TavPanel(final SCMTMarathon scmtMarathon) {
         AbsolutePanel tavPanel = new AbsolutePanel();
@@ -142,6 +154,25 @@ public class TavPanel extends Composite {
         };
         tavTable.addColumn(oklevelNyomtatasColumn);
 
+        futamInditasColumn = new Column<Tav, Tav>(
+                new ActionCell("Futam Indítása", new ActionCell.Delegate<Tav>() {
+                    @Override
+                    public void execute(final Tav tav) {
+                        marathonService.futamStart(tav.getId(), new EmptyFailureHandlingAsyncCallback<Long>() {
+                            @Override
+                            public void onSuccess(Long diff) {
+                                scmtMarathon.getTavMapCache().getTav(tav.getId()).setRaceStartDiff(diff);    
+                            }
+                        });
+                    }
+                })) {
+            @Override
+            public Tav getValue(Tav tav) {
+                return tav;
+            }
+        };
+        tavTable.addColumn(futamInditasColumn);
+
         tavTable.setPageSize(Integer.MAX_VALUE);
         tavList.addDataDisplay(tavTable);
 
@@ -177,10 +208,12 @@ public class TavPanel extends Composite {
                 btnUjTav.setVisible(true);
                 modositasColumn.setCellStyleNames("visible");
                 torlesColumn.setCellStyleNames("visible");
+                futamInditasColumn.setCellStyleNames("visible");
             } else {
                 btnUjTav.setVisible(false);
                 modositasColumn.setCellStyleNames("hidden");
                 torlesColumn.setCellStyleNames("hidden");
+                futamInditasColumn.setCellStyleNames("hidden");
             }
             oklevelNyomtatasColumn.setCellStyleNames(raceStatus == RaceStatus.NOT_STARTED ? "hidden" : "visible");
             tavTable.redraw();

@@ -2,7 +2,9 @@ package net.himadri.scmt.client;
 
 import net.himadri.scmt.client.entity.Tav;
 import net.himadri.scmt.client.entity.VersenySzam;
+import net.himadri.scmt.client.serializable.RaceStatusRow;
 
+import java.text.ParseException;
 import java.util.Arrays;
 
 /**
@@ -135,6 +137,11 @@ public class Utils {
         return builder.toString();
     }
 
+    public static String getElapsedTimeString(RaceStatusRow raceStatusRow, int lapNumber) {
+        long elapsedTime = raceStatusRow.getLapTimes().get(lapNumber) - raceStatusRow.getTav().getRaceStartDiff();
+        return getElapsedTimeString(elapsedTime);
+    }
+
     // Parallel arrays used in the conversion process.
     private static final String[] RCODE = {"M", "CM", "D", "CD", "C", "XC", "L",
             "XL", "X", "IX", "V", "IV", "I"};
@@ -154,5 +161,32 @@ public class Utils {
             }
         }
         return roman.toString();
+    }
+
+    public static long parseTime(String timeString) throws ParseException {
+        // parsing lapTime
+        String[] stringElements = timeString.split(":");
+        if (stringElements.length != 2 && stringElements.length != 3) {
+            throw new ParseException(timeString, 0);
+        }
+        long[] longElements = new long[stringElements.length];
+        for (int i = 0; i < stringElements.length; i++) {
+            try {
+                longElements[i] = Long.parseLong(stringElements[i]);
+                if (longElements[i] < 0 || longElements[i] >= 60) {
+                    throw new ParseException(timeString, 0);
+                }
+            } catch (NumberFormatException e) {
+                throw new ParseException(timeString, 0);
+            }
+        }
+
+        final long lapTime;
+        if (longElements.length == 3) {
+            lapTime = (longElements[0] * 60 * 60 + longElements[1] * 60 + longElements[2]) * 1000;
+        } else {
+            lapTime = (longElements[0] * 60 + longElements[1]) * 1000;
+        }
+        return lapTime;
     }
 }

@@ -5,7 +5,13 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.IntegerBox;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.view.client.ListDataProvider;
 import net.himadri.scmt.client.ImageButton;
 import net.himadri.scmt.client.SCMTMarathon;
@@ -61,7 +67,7 @@ public class ProblemsPanel extends Composite {
             public String getValue(StatusTableType statusTableType) {
                 StringBuilder stringBuilder = new StringBuilder();
                 List<Long> lapTimes = statusTableType.raceStatusRow.getLapTimes();
-                stringBuilder.append("1. kör: ").append(Utils.getElapsedTimeString(lapTimes.get(0)));
+                stringBuilder.append("1. kör: ").append(Utils.getElapsedTimeString(statusTableType.raceStatusRow, 0));
                 for (int i = 0; i < lapTimes.size() - 1; i++) {
                     stringBuilder.append(", ").append(i + 2).append(" kör: ");
                     stringBuilder.append(Utils.getElapsedTimeString(lapTimes.get(i + 1) - lapTimes.get(i)));
