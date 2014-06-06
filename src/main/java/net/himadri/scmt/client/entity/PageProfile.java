@@ -17,25 +17,11 @@ import javax.persistence.Id;
     @Id private String id;
     private int size;
     private float xAxis, yAxis;
+    private boolean printProfile;
 
     @SuppressWarnings({ "UnusedDeclaration" })
     public PageProfile()
     {
-    }
-
-    public PageProfile(PageProfileId pageProfileId)
-    {
-        id = pageProfileId.name();
-    }
-
-    public PageProfile(PageProfileId pageProfileId, float xAxis, float yAxis, int alignment, String fontFamily, int size)
-    {
-        id = pageProfileId.name();
-        this.xAxis = xAxis;
-        this.yAxis = yAxis;
-        this.alignment = alignment;
-        this.fontFamily = fontFamily;
-        this.size = size;
     }
 
     public int getAlignment()
@@ -91,5 +77,13 @@ import javax.persistence.Id;
     public void setyAxis(float yAxis)
     {
         this.yAxis = yAxis;
+    }
+
+    public boolean isPrintProfile() {
+        return printProfile;
+    }
+
+    public void setPrintProfile(boolean printProfile) {
+        this.printProfile = printProfile;
     }
 }

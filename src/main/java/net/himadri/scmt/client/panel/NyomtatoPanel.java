@@ -1,5 +1,6 @@
 package net.himadri.scmt.client.panel;
 
+import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.EditTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.SelectionCell;
@@ -32,7 +33,10 @@ import net.himadri.scmt.client.entity.PageProfileId;
 import net.himadri.scmt.client.entity.Verseny;
 import net.himadri.scmt.client.serializable.MarathonActionListener;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class NyomtatoPanel extends Composite {
@@ -67,7 +71,14 @@ public class NyomtatoPanel extends Composite {
 
             @Override
             public void onSuccess(List<PageProfile> pageProfiles) {
-                cellTableData.setList(pageProfiles);
+                List<PageProfile> sortedProfiles = new ArrayList<PageProfile>(pageProfiles);
+                Collections.sort(sortedProfiles, new Comparator<PageProfile>() {
+                    @Override
+                    public int compare(PageProfile o1, PageProfile o2) {
+                        return Float.compare(o1.getyAxis(), o2.getyAxis());
+                    }
+                });
+                cellTableData.setList(sortedProfiles);
             }
         });
 
@@ -79,6 +90,24 @@ public class NyomtatoPanel extends Composite {
                 return PageProfileId.valueOf(pageProfile.getId()).getMegnevezes();
             }
         }, "Mező");
+
+        final CheckboxCell checkboxCell = new CheckboxCell(false, false);
+        Column<PageProfile, Boolean> printProfileColumn = new Column<PageProfile, Boolean>(checkboxCell) {
+            @Override
+            public Boolean getValue(PageProfile pageProfile) {
+                return pageProfile.isPrintProfile();
+            }
+        };
+
+        printProfileColumn.setFieldUpdater(new FieldUpdater<PageProfile, Boolean>() {
+            @Override
+            public void update(int i, final PageProfile pageProfile, Boolean printProfile) {
+                pageProfile.setPrintProfile(printProfile);
+                saveProfile(pageProfile);
+            }
+
+        });
+        cellTable.addColumn(printProfileColumn, "Nyomtatás");
 
         final EditTextCell xTextInputCell = new EditTextCell();
         final Column<PageProfile, String> xColumn = new Column<PageProfile, String>(xTextInputCell) {

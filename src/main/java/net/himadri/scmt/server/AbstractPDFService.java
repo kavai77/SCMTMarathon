@@ -88,7 +88,7 @@ public class AbstractPDFService extends HttpServlet {
     protected void printSinglePage(PdfContentByte canvas, List<PageProfile> pageProfiles, Map<PageProfileId, String> data) throws IOException, DocumentException {
         for (PageProfile pageProfile: pageProfiles) {
             String entry = data.get(PageProfileId.valueOf(pageProfile.getId()));
-            if (entry != null && (pageProfile.getxAxis() > 0 || pageProfile.getyAxis() > 0)) {
+            if (pageProfile.isPrintProfile() && entry != null) {
                 String fontFamily = pageProfile.getFontFamily();
                 if (Utils.isEmpty(fontFamily)) fontFamily = BaseFont.TIMES_ROMAN;
                 int size = pageProfile.getSize();

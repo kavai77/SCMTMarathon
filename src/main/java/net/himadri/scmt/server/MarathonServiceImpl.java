@@ -20,7 +20,6 @@ import net.himadri.scmt.client.entity.ClientChannel;
 import net.himadri.scmt.client.entity.HasCreationTime;
 import net.himadri.scmt.client.entity.Nev;
 import net.himadri.scmt.client.entity.PageProfile;
-import net.himadri.scmt.client.entity.PageProfileId;
 import net.himadri.scmt.client.entity.PersonLap;
 import net.himadri.scmt.client.entity.RaceStatus;
 import net.himadri.scmt.client.entity.Tav;
@@ -35,12 +34,8 @@ import net.himadri.scmt.client.serializable.PollingResult;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -327,23 +322,7 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
 
     @Override
     public List<PageProfile> getAllPageProfiles() {
-        List<PageProfile> pageProfiles = ofy.query(PageProfile.class).list();
-        Set<String> availableKeys = new HashSet<String>();
-        for (PageProfile pageProfile: pageProfiles) {
-            availableKeys.add(pageProfile.getId());
-        }
-        for (PageProfileId pageProfileId: PageProfileId.values()) {
-            if (!availableKeys.contains(pageProfileId.name())) {
-                pageProfiles.add(new PageProfile(pageProfileId));
-            }
-        }
-        Collections.sort(pageProfiles, new Comparator<PageProfile>() {
-            @Override
-            public int compare(PageProfile o1, PageProfile o2) {
-                return PageProfileId.valueOf(o1.getId()).compareTo(PageProfileId.valueOf(o2.getId()));
-            }
-        });
-        return pageProfiles;
+        return ofy.query(PageProfile.class).list();
     }
 
     @Override
