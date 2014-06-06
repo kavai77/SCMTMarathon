@@ -1,5 +1,13 @@
 package net.himadri.scmt.client;
 
+import com.google.gwt.dom.client.FormElement;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.AbsolutePanel;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.Widget;
 import net.himadri.scmt.client.entity.Tav;
 import net.himadri.scmt.client.entity.VersenySzam;
 import net.himadri.scmt.client.serializable.RaceStatusRow;
@@ -188,5 +196,25 @@ public class Utils {
             lapTime = (longElements[0] * 60 + longElements[1]) * 1000;
         }
         return lapTime;
+    }
+
+    public static Button createRedirectButton(AbsolutePanel absolutePanel, String name, String url, Widget... params) {
+        final FormPanel formPanel = new FormPanel();
+        formPanel.setAction(url);
+        formPanel.setMethod(FormPanel.METHOD_GET);
+        formPanel.getElement().<FormElement>cast().setTarget("_blank");
+        FlowPanel flowPanel = new FlowPanel();
+        for (Widget param:params) {
+            flowPanel.add(param);
+        }
+        formPanel.add(flowPanel);
+        absolutePanel.add(formPanel);
+
+        return new Button(name, new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent clickEvent) {
+                formPanel.submit();
+            }
+        });
     }
 }

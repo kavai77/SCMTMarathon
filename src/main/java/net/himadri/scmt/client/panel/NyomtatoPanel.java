@@ -5,9 +5,6 @@ import com.google.gwt.cell.client.EditTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.SelectionCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.FormElement;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
@@ -16,22 +13,21 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.itextpdf.text.pdf.BaseFont;
 import net.himadri.scmt.client.EmptyFailureHandlingAsyncCallback;
 import net.himadri.scmt.client.MarathonService;
 import net.himadri.scmt.client.MarathonServiceAsync;
 import net.himadri.scmt.client.SCMTMarathon;
+import net.himadri.scmt.client.Utils;
 import net.himadri.scmt.client.entity.PageProfile;
 import net.himadri.scmt.client.entity.PageProfileId;
 import net.himadri.scmt.client.entity.Verseny;
 import net.himadri.scmt.client.serializable.MarathonActionListener;
+import net.himadri.scmt.client.serializable.PdfServiceType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -213,8 +209,8 @@ public class NyomtatoPanel extends Composite {
         });
         cellTable.addColumn(igazitasColumn, "Igazítás");
 
-        Button probaNyomtatas = createRedirectButton(absolutePanel, "Próbanyomtatás", "/scmtmarathon/PrePrintedPDFService",
-                new Hidden("tav", "minta"));
+        Button probaNyomtatas = Utils.createRedirectButton(absolutePanel, "Próbanyomtatás", "/scmtmarathon/PrePrintedPDFService",
+                new Hidden("type", PdfServiceType.MINTA.name()));
         probaNyomtatas.setSize("150px", "30px");
         absolutePanel.add(probaNyomtatas, 20, 282);
 
@@ -228,12 +224,12 @@ public class NyomtatoPanel extends Composite {
             public void itemRefreshed(List<Verseny> items) {
                 Verseny verseny = items.get(0);
 //                Button oklevelButton = createRedirectButton(absolutePanel, "Oklevel", "/OklevelPdfServe.jsp",
-                Button oklevelButton = createRedirectButton(absolutePanel, "Oklevel", "/scmtmarathon/serveemptyoklevelpdf",
+                Button oklevelButton = Utils.createRedirectButton(absolutePanel, "Oklevel", "/scmtmarathon/serveemptyoklevelpdf",
                         new Hidden("versenyId", verseny.getId().toString()));
                 oklevelButton.setSize("150px", "30px");
                 absolutePanel.add(oklevelButton, 20, 320);
 
-                Button probaOklevelButton = createRedirectButton(absolutePanel, "Oklevel mintával", "/public/OklevelPDFService",
+                Button probaOklevelButton = Utils.createRedirectButton(absolutePanel, "Oklevel mintával", "/public/OklevelPDFService",
                         new Hidden("versenyId", verseny.getId().toString()), new Hidden("raceNumber", "minta"));
                 oklevelButton.setSize("150px", "30px");
                 absolutePanel.add(probaOklevelButton, 190, 320);
@@ -241,26 +237,6 @@ public class NyomtatoPanel extends Composite {
         });
 
         //cellTable.setColumnWidth(cellTable.getColumn(2), 50, Style.Unit.PX);
-    }
-
-    private Button createRedirectButton(AbsolutePanel absolutePanel, String name, String url, Widget... params) {
-        final FormPanel formPanel = new FormPanel();
-        formPanel.setAction(url);
-        formPanel.setMethod(FormPanel.METHOD_GET);
-        formPanel.getElement().<FormElement>cast().setTarget("_blank");
-        FlowPanel flowPanel = new FlowPanel();
-        for (Widget param:params) {
-            flowPanel.add(param);
-        }
-        formPanel.add(flowPanel);
-        absolutePanel.add(formPanel);
-
-        return new Button(name, new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent clickEvent) {
-                formPanel.submit();
-            }
-        });
     }
 
     private void saveProfile(PageProfile pageProfile) {

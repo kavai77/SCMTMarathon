@@ -5,6 +5,9 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
+import net.himadri.scmt.client.entity.VersenySzam;
+import net.himadri.scmt.client.entity.Versenyzo;
+import net.himadri.scmt.client.serializable.PdfServiceType;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -18,19 +21,32 @@ import java.io.IOException;
  */
 public class PrePrintedPDFService extends AbstractPDFService {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String tavId = request.getParameter("tav");
-//        response.addHeader("Content-Disposition", "attachment; filename=raceresult.pdf");
+        PdfServiceType type = PdfServiceType.valueOf(request.getParameter("type"));
+        String id = request.getParameter("id");
         response.setContentType("application/pdf");
         try {
             Document document = new Document(PageSize.A4);
             PdfWriter writer = PdfWriter.getInstance(document, response.getOutputStream());
             document.open();
             PdfContentByte canvas = writer.getDirectContentUnder();
-            if ("minta".equals(tavId)) {
-                printSamplePage(canvas);
-            } else {
-                printTav(canvas, document, Long.parseLong(tavId));
+            switch (type) {
+                case MINTA:
+                    printSamplePage(canvas);
+                    break;
+                case TAV:
+                    printTav(canvas, document, Long.parseLong(id));
+                    break;
+                case VERSENYSZAM:
+                    VersenySzam versenySzam = ofy.get(VersenySzam.class, Long.parseLong(id));
+                    printVersenySzam(canvas, document, versenySzam);
+                    break;
+                case VERSENYZO:
+                    Versenyzo versenyzo = ofy.query(Versenyzo.class).filter("raceNumber", id).get();
+                    printVersenyzo(canvas, versenyzo);
+                    break;
+                    
             }
+            
             document.close();
         } catch (DocumentException e) {
             throw new IOException(e);
