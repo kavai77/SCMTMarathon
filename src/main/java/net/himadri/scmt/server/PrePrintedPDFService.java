@@ -41,7 +41,8 @@ public class PrePrintedPDFService extends AbstractPDFService {
                     printVersenySzam(canvas, document, versenySzam);
                     break;
                 case VERSENYZO:
-                    Versenyzo versenyzo = ofy.query(Versenyzo.class).filter("raceNumber", id).get();
+                    Long versenyId = Long.valueOf(request.getParameter("versenyId"));
+                    Versenyzo versenyzo = ofy.query(Versenyzo.class).filter("versenyId", versenyId).filter("raceNumber", id).get();
                     printVersenyzo(canvas, versenyzo);
                     break;
                     

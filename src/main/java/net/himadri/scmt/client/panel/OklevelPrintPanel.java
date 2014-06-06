@@ -1,10 +1,9 @@
 package net.himadri.scmt.client.panel;
 
-import com.google.gwt.user.client.ui.AbsolutePanel;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Hidden;
-import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.dom.client.FormElement;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.*;
 import net.himadri.scmt.client.SCMTMarathon;
 import net.himadri.scmt.client.TabChangeHandler;
 import net.himadri.scmt.client.Utils;
@@ -33,17 +32,15 @@ public class OklevelPrintPanel extends Composite implements TabChangeHandler {
 
     public OklevelPrintPanel(SCMTMarathon scmtMarathon) {
         this.scmtMarathon = scmtMarathon;
-        AbsolutePanel panel = new AbsolutePanel();
-        panel.setSize("100%", "200px");
-        panel.add(tavValasztoValaszto, 10, 10);
-        panel.add(Utils.createRedirectButton(panel, "Oklevelek Távra", PRE_PRINTED_PDFSERVICE, new Hidden("type", PdfServiceType.TAV.name())), 300, 10);
-        panel.add(versenySzamValaszto, 10, 50);
-//        panel.add(Utils.createRedirectButton(panel, "Oklevelek Versenyszámra", PRE_PRINTED_PDFSERVICE, new Hidden("type", PdfServiceType.VERSENYSZAM.name()), createSelectedIdHidden(versenySzamValaszto)), 300, 50);
-        panel.add(versenyzoValaszto, 10, 100);
-//        panel.add(Utils.createRedirectButton(panel, "Oklevél Versenyzőnek Név alapján", PRE_PRINTED_PDFSERVICE, new Hidden("type", PdfServiceType.VERSENYZO.name()), createSelectedIdHidden(versenyzoValaszto)), 300, 100);
-        panel.add(raceNumberText, 10, 150);
-//        panel.add(Utils.createRedirectButton(panel, "Oklevél Versenyzőnek Rajtszám alapján", PRE_PRINTED_PDFSERVICE, new Hidden("type", PdfServiceType.VERSENYZO.name()), new Hidden("id", raceNumberText.getValue())), 300, 150);
-        initWidget(panel);
+        AbsolutePanel absolutePanel = new AbsolutePanel();
+        absolutePanel.setSize("100%", "200px");
+        absolutePanel.add(createRedirectPanel("Oklevelek Távra", tavValasztoValaszto, PdfServiceType.TAV), 10, 10);
+        absolutePanel.add(createRedirectPanel("Oklevelek Versenyszámra", versenySzamValaszto, PdfServiceType.VERSENYSZAM), 10, 50);
+        absolutePanel.add(createRedirectPanel("Oklevelek Versenyzőnek Név alapján", versenyzoValaszto, PdfServiceType.VERSENYZO), 10, 90);
+        raceNumberText.setSize("70px", "auto");
+        raceNumberText.getElement().setPropertyString("placeholder", "rajtszám");
+        absolutePanel.add(createRedirectPanel("Oklevelek Versenyzőnek Rajtszám alapján", raceNumberText, PdfServiceType.VERSENYZO), 10, 130);
+        initWidget(absolutePanel);
     }
 
     @Override
@@ -70,8 +67,28 @@ public class OklevelPrintPanel extends Composite implements TabChangeHandler {
         }
         
     }
-    
-    private Hidden createSelectedIdHidden(ListBox listBox) {
-        return new Hidden("id", listBox.getValue(listBox.getSelectedIndex()));
+
+    private Panel createRedirectPanel(String name, Widget idWidget, PdfServiceType pdfServiceType) {
+        final FormPanel formPanel = new FormPanel();
+        formPanel.setAction(PRE_PRINTED_PDFSERVICE);
+        formPanel.setMethod(FormPanel.METHOD_GET);
+        formPanel.getElement().<FormElement>cast().setTarget("_blank");
+        FlowPanel flowPanel = new FlowPanel();
+        flowPanel.add(new Hidden("type", pdfServiceType.name()));
+        final Hidden versenyIdHidden = new Hidden("versenyId");
+        flowPanel.add(versenyIdHidden);
+        ((HasName)idWidget).setName("id");
+        flowPanel.add(idWidget);
+        SubmitButton submitButton = new SubmitButton(name);
+        submitButton.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent clickEvent) {
+                versenyIdHidden.setValue(scmtMarathon.getVerseny().getId().toString());
+            }
+        });
+        flowPanel.add(submitButton);
+
+        formPanel.add(flowPanel);
+        return formPanel;
     }
 }
