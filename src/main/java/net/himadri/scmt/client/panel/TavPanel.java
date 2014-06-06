@@ -101,7 +101,13 @@ public class TavPanel extends Composite {
                 return (tav.getVersenySzamtol() != null ? tav.getVersenySzamtol().toString() : "") + "-" +
                        (tav.getVersenySzamig() != null ? tav.getVersenySzamig().toString() : "") ;
             }
-        }, "Versenyszámok");
+        }, "Rajtszámok");
+        tavTable.addColumn(new SortableTextColumn<Tav>(listHandler) {
+            @Override
+            public String getValue(Tav tav) {
+                return (tav.getRaceStartDiff() == 0 ? "" : Utils.getElapsedTimeString(tav.getRaceStartDiff()));
+            }
+        }, "Futam Start");
         modositasColumn = new Column<Tav, Tav>(
                 new ActionCell("Módosítás", new ActionCell.Delegate<Tav>() {
                     @Override

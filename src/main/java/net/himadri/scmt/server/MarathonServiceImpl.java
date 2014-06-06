@@ -155,6 +155,8 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         Verseny verseny = getVersenyFromCache(tav.getVersenyId());
         tav.setRaceStartDiff(System.currentTimeMillis() - verseny.getRaceStartTime());
         ofy.put(tav);
+        incrementSyncValue(tav.getVersenyId(), SyncValueType.TAV);
+        broadcastModification();
         return tav.getRaceStartDiff();
     }
 

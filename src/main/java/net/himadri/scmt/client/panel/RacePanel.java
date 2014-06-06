@@ -50,6 +50,7 @@ public class RacePanel extends Composite {
     private MarathonServiceAsync marathonService = GWT.create(MarathonService.class);
     private CellTable<RaceStatusRowWithLapNb> lastRaceNbList = new CellTable<RaceStatusRowWithLapNb>();
     private Label clockLabel = new Label();
+    private Label futamClockLabel = new Label();
     private DeckPanel raceDeckBar = new DeckPanel();
     private Label versenyzoSuggestionLabel = new Label();
     private TextBox raceNumberInputText = new TextBox();
@@ -72,6 +73,10 @@ public class RacePanel extends Composite {
 
         racePanel.add(clockLabel, 10, 10);
         clockLabel.setSize("958px", "auto");
+        
+        futamClockLabel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+        racePanel.add(futamClockLabel, 10, 45);
+        futamClockLabel.setSize("958px", "auto");
 
         lastRaceNbList.addColumn(new TextColumn<RaceStatusRowWithLapNb>() {
             @Override
@@ -261,13 +266,20 @@ public class RacePanel extends Composite {
     private class ClockTimer extends Timer {
         @Override
         public void run() {
-            long elapsedTime = System.currentTimeMillis() - raceStartTime;
-            long seconds = elapsedTime / 1000;
-            long minutes = seconds / 60;
-            long hours = minutes / 60;
-            clockLabel.setText("Versenyidő: " + hours + " : " +
-                    formatTwoDigitDecimal((int) (minutes % 60)) + " : " +
-                    formatTwoDigitDecimal((int) (seconds % 60)));
+            long elapsedTime = System.currentTimeMillis() - raceStartTime;            
+            
+            StringBuilder sb = new StringBuilder();
+            for (Tav tav: scmtMarathon.getTavMapCache().getAllTav()) {
+                if (tav.getRaceStartDiff() > 0) {
+                    if (sb.length() > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append(tav.getMegnevezes()).append(": ").append(Utils.getElapsedTimeString(elapsedTime - tav.getRaceStartDiff()));
+                }
+            }
+            
+            clockLabel.setText("Versenyidő: " + Utils.getElapsedTimeString(elapsedTime));
+            futamClockLabel.setText(sb.toString());
         }
     }
 
@@ -376,10 +388,6 @@ public class RacePanel extends Composite {
                 });
             }
         }
-    }
-
-    private String formatTwoDigitDecimal(int decimal) {
-        return (decimal < 10 ? "0" : "") + decimal;
     }
 
     private class RaceStatusRowWithLapNb {

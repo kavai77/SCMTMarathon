@@ -11,6 +11,7 @@ import net.himadri.scmt.client.TavVersenySzamToken;
 import net.himadri.scmt.client.TavVersenyszamFilter;
 import net.himadri.scmt.client.Utils;
 import net.himadri.scmt.client.entity.PersonLap;
+import net.himadri.scmt.client.entity.Tav;
 import net.himadri.scmt.client.entity.VersenySzam;
 import net.himadri.scmt.client.entity.Versenyzo;
 import net.himadri.scmt.client.serializable.MarathonActionListener;
@@ -39,6 +40,7 @@ public class PrintResultRootPanel extends Composite
         scmtMarathon.getPollingService().getPersonLapSync().addMarathonActionListener(new RefreshSyncRequest<PersonLap>());
         scmtMarathon.getPollingService().getVersenySzamSync().addMarathonActionListener(new RefreshSyncRequest<VersenySzam>());
         scmtMarathon.getPollingService().getVersenyzoSync().addMarathonActionListener(new RefreshSyncRequest<Versenyzo>());
+        scmtMarathon.getPollingService().getTavSync().addMarathonActionListener(new RefreshSyncRequest<Tav>());
     }
 
     public void showResultPanel(TavVersenySzam filter)

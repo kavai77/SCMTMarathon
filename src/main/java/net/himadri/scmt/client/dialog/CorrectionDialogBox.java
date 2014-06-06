@@ -8,7 +8,6 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -39,6 +38,9 @@ public class CorrectionDialogBox extends DialogBox {
     private List<PersonLap> allPersonLapList;
     private Map<String, List<PersonLap>> filterPersonLapMap;
     private TextBox szuresText = new TextBox();
+    private EditTextCell timeEditTextCell = new EditTextCell();
+    private EditTextCell futamTimeEditTextCell = new EditTextCell();
+    private CellTable<PersonLap> cellTable = new CellTable<PersonLap>();
 
     MarathonServiceAsync marathonService = GWT.create(MarathonService.class);
     private SCMTMarathon scmtMarathon;
@@ -80,7 +82,6 @@ public class CorrectionDialogBox extends DialogBox {
         absolutePanel.add(scrollPanel, 0, 74);
         scrollPanel.setSize("350px", "400px");
 
-        final CellTable<PersonLap> cellTable = new CellTable<PersonLap>();
         scrollPanel.setWidget(cellTable);
         cellTable.setSize("100%", "100%");
 
@@ -121,55 +122,24 @@ public class CorrectionDialogBox extends DialogBox {
         });
         cellTable.addColumn(raceNbColumn, "Rajtszám");
 
-        final EditTextCell timeEditTextCell = new EditTextCell();
         final Column<PersonLap, String> timeColumn = new Column<PersonLap, String>(timeEditTextCell) {
             @Override
             public String getValue(PersonLap personLap) {
                 return Utils.getElapsedTimeString(personLap.getTime());
             }
         };
-        timeColumn.setFieldUpdater(new FieldUpdater<PersonLap, String>() {
-            @Override
-            public void update(int index, final PersonLap personLap, String timeString) {
-                try {
-                    final long lapTime = Utils.parseTime(timeString);
-
-                    marathonService.updateLapTime(personLap.getId(), lapTime, new AsyncCallback<Void>() {
-                        @Override
-                        public void onFailure(Throwable throwable) {
-                            SCMTMarathon.commonFailureHandling(throwable);
-                            undoChange(personLap);
-                        }
-
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            personLap.setTime(lapTime);
-                        }
-                    });
-                } catch (ParseException e) {
-                    Window.alert("Az időt ilyen formátumba írhatod be: 12:32 vagy 1:12:32");
-                    undoChange(personLap);
-                }
-            }
-
-            private void undoChange(PersonLap personLap) {
-                timeEditTextCell.clearViewData(personLap);
-                cellTable.redraw();
-            }
-        });
+        timeColumn.setFieldUpdater(new TimeFieldUpdater(false));
         cellTable.addColumn(timeColumn, "Verseny Idő");
-        cellTable.addColumn(new TextColumn<PersonLap>() {
+
+        final Column<PersonLap, String> futamTimeColumn = new Column<PersonLap, String>(futamTimeEditTextCell) {
             @Override
             public String getValue(PersonLap personLap) {
-                long diff = 0L;
-                Versenyzo versenyzo = scmtMarathon.getVersenyzoMapCache().getVersenyzo(personLap.getRaceNumber());
-                if (versenyzo != null) {
-                    VersenySzam versenySzam = scmtMarathon.getVersenyszamMapCache().getVersenySzam(versenyzo.getVersenySzamId());
-                    diff = scmtMarathon.getTavMapCache().getTav(versenySzam.getTavId()).getRaceStartDiff();
-                }
-                return Utils.getElapsedTimeString(personLap.getTime() - diff);
+                return Utils.getElapsedTimeString(personLap.getTime() - getFutamTimeDiff(personLap));
             }
-        }, "Futam Idő");
+        };
+        futamTimeColumn.setFieldUpdater(new TimeFieldUpdater(true));
+        cellTable.addColumn(futamTimeColumn, "Futam Idő");
+
         cellTable.addColumn(new Column<PersonLap, PersonLap>(new ActionCell<PersonLap>("Törlés", new ActionCell.Delegate<PersonLap>() {
             @Override
             public void execute(final PersonLap personLap) {
@@ -195,6 +165,16 @@ public class CorrectionDialogBox extends DialogBox {
         });
         cellTable.setPageSize(Integer.MAX_VALUE);
         personLapListDataProvider.addDataDisplay(cellTable);
+    }
+
+    private long getFutamTimeDiff(PersonLap personLap) {
+        Versenyzo versenyzo = scmtMarathon.getVersenyzoMapCache().getVersenyzo(personLap.getRaceNumber());
+        if (versenyzo != null) {
+            VersenySzam versenySzam = scmtMarathon.getVersenyszamMapCache().getVersenySzam(versenyzo.getVersenySzamId());
+            return scmtMarathon.getTavMapCache().getTav(versenySzam.getTavId()).getRaceStartDiff();
+        } else {
+            return 0L;
+        }
     }
 
     public void showDialog() {
@@ -240,6 +220,48 @@ public class CorrectionDialogBox extends DialogBox {
             if (filterPersonLapList != null) {
                 filterPersonLapList.remove(personLap);
             }
+        }
+    }
+
+    private class TimeFieldUpdater implements FieldUpdater<PersonLap, String> {
+        private boolean minusFutamTime;
+
+        private TimeFieldUpdater(boolean minusFutamTime) {
+            this.minusFutamTime = minusFutamTime;
+        }
+
+        @Override
+        public void update(int index, final PersonLap personLap, String timeString) {
+            try {
+                long diff = 0;
+                if (minusFutamTime) {
+                    diff = getFutamTimeDiff(personLap);
+                }
+                final long lapTime = Utils.parseTime(timeString) + diff;
+                
+                marathonService.updateLapTime(personLap.getId(), lapTime, new AsyncCallback<Void>() {
+                    @Override
+                    public void onFailure(Throwable throwable) {
+                        SCMTMarathon.commonFailureHandling(throwable);
+                        redrawTimes(personLap);
+                    }
+
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        personLap.setTime(lapTime);
+                        redrawTimes(personLap);
+                    }
+                });
+            } catch (ParseException e) {
+                Window.alert("Az időt ilyen formátumba írhatod be: 12:32 vagy 1:12:32");
+                redrawTimes(personLap);
+            }
+        }
+
+        private void redrawTimes(PersonLap personLap) {
+            timeEditTextCell.clearViewData(personLap);            
+            futamTimeEditTextCell.clearViewData(personLap);            
+            cellTable.redraw();
         }
     }
 }

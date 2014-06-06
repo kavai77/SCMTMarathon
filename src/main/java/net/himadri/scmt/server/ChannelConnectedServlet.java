@@ -25,16 +25,9 @@ public class ChannelConnectedServlet extends HttpServlet {
         ChannelPresence presence = channelService.parsePresence(request);
         long clientId = Long.parseLong(presence.clientId());
         ClientChannel channel = ofy.get(ClientChannel.class, clientId);
-        if (presence.isConnected()) {
-            if (!channel.isConnected()) {
-                channel.setConnected(true);
-                ofy.put(channel);
-            }
-        } else {
-            if (channel.isConnected()) {
-                channel.setConnected(false);
-                ofy.put(channel);
-            }
-        }
+        if (presence.isConnected() != channel.isConnected()) {
+            channel.setConnected(presence.isConnected());
+            ofy.put(channel);
+        } 
     }
 }

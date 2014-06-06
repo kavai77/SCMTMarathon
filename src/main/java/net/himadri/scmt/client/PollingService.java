@@ -24,8 +24,6 @@ import java.util.logging.Logger;
  * Date: 2012.04.06. 15:58
  */
 public class PollingService {
-    public static final String CHANNEL_TOKEN_KEY = "channelToken";
-    public static final String CHANNEL_TOKEN_CREATION_KEY = "channelTokenCreation";
     public static final Logger LOGGER = Logger.getLogger(PollingService.class.getName());
     private MarathonServiceAsync marathonService = GWT.create(MarathonService.class);
     private static Storage localStorage = Storage.getLocalStorageIfSupported();
@@ -47,22 +45,7 @@ public class PollingService {
     }
 
     public void establishChannelConnection() {
-        String channelToken = localStorage.getItem(CHANNEL_TOKEN_KEY);
-        if (channelToken != null) {
-            String channelTokenCreationStr = localStorage.getItem(CHANNEL_TOKEN_CREATION_KEY);
-            long channelTokenCreation = channelTokenCreationStr != null ?
-                    Long.parseLong(channelTokenCreationStr) : 0;
-            if (System.currentTimeMillis() - channelTokenCreation > 60 * 60 * 1000) {
-                requestNewKey();
-            } else {
-                connectToChannel(channelToken);
-            }
-        } else {
-            requestNewKey();
-        }
-    }
-
-    private void requestNewKey() {
+        LOGGER.info("establishChannelConnection");
         marathonService.createChannelToken(new AsyncCallback<String>() {
             @Override
             public void onFailure(Throwable throwable) {
@@ -71,8 +54,7 @@ public class PollingService {
 
             @Override
             public void onSuccess(String token) {
-                localStorage.setItem(CHANNEL_TOKEN_KEY, token);
-                localStorage.setItem(CHANNEL_TOKEN_CREATION_KEY, Long.toString(System.currentTimeMillis()));
+                LOGGER.info("new token: " + token);
                 connectToChannel(token);
             }
         });
@@ -92,19 +74,18 @@ public class PollingService {
 
                     @Override
                     public void onMessage(String s) {
+                        LOGGER.info("onMessage");
                         makeRequest();
                     }
 
                     @Override
                     public void onError(SocketError socketError) {
-                        localStorage.removeItem(CHANNEL_TOKEN_KEY);
                         LOGGER.warning("Socket error" + socketError.getDescription());
                         establishChannelConnection();
                     }
 
                     @Override
                     public void onClose() {
-                        localStorage.removeItem(CHANNEL_TOKEN_KEY);
                         LOGGER.info("Socket close");
                         establishChannelConnection();
                     }
@@ -131,16 +112,17 @@ public class PollingService {
                     raceStatusSync.raceStatus = pollingResult.getRaceStatus();
                     raceStatusSync.notifyRefreshed(Collections.singletonList(pollingResult.getRaceStatus()));
                 }
-                notifyOnResult(pollingResult.getTav(), tavSync);
-                notifyOnResult(pollingResult.getVersenySzam(), versenySzamSync);
-                notifyOnResult(pollingResult.getVersenyzo(), versenyzoSync);
-                notifyOnResult(pollingResult.getPersonLap(), personLapSync);
+                notifyOnResult(pollingResult.getTav(), tavSync, "tav");
+                notifyOnResult(pollingResult.getVersenySzam(), versenySzamSync, "versenySzam");
+                notifyOnResult(pollingResult.getVersenyzo(), versenyzoSync, "versenyzo");
+                notifyOnResult(pollingResult.getPersonLap(), personLapSync, "personLap");
             }
         });
     }
 
-    private <T> void notifyOnResult(PollingResult.Entity<T> pollingResultEntity, SyncSupport<T> syncSupport) {
+    private <T> void notifyOnResult(PollingResult.Entity<T> pollingResultEntity, SyncSupport<T> syncSupport, String type) {
         if (pollingResultEntity != null) {
+            LOGGER.info("notifyOnResult: " + type);
             syncSupport.setSyncId(pollingResultEntity.getSyncId());
             if (pollingResultEntity.isFullSync()) {
                 syncSupport.notifyRefreshed(pollingResultEntity.getItems());
