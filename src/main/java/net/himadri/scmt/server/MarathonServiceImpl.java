@@ -232,6 +232,18 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
     }
 
     @Override
+    public void versenyzoEredmenyEllenorzott(Long id, boolean ellenorzott) throws NotExistingEntityException {
+        try {
+            Versenyzo versenyzo = ofy.get(Versenyzo.class, id);
+            versenyzo.setEllenorzott(ellenorzott);
+            ofy.put(versenyzo);
+            // az ellenőrzés csak adminisztrációs jellegű, és egy gépen zajlik, ezt nem broadcast-oljuk
+        } catch (NotFoundException e) {
+            throw new NotExistingEntityException();
+        }
+    }
+
+    @Override
     public void addPersonLap(Long versenyId, String raceNumber, long raceTime) throws AlreadyExistingEntityException {
         PersonLap personLap = ofy.query(PersonLap.class)
                 .filter("versenyId", versenyId)

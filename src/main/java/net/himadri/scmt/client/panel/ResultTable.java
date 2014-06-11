@@ -1,6 +1,9 @@
 package net.himadri.scmt.client.panel;
 
 import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.CheckboxCell;
+import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
@@ -8,6 +11,9 @@ import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.view.client.ListDataProvider;
+import net.himadri.scmt.client.EmptyFailureHandlingAsyncCallback;
+import net.himadri.scmt.client.MarathonService;
+import net.himadri.scmt.client.MarathonServiceAsync;
 import net.himadri.scmt.client.SCMTMarathon;
 import net.himadri.scmt.client.SortableColumn;
 import net.himadri.scmt.client.SortableTextColumn;
@@ -33,7 +39,8 @@ import java.util.Map;
  */
 public class ResultTable extends Composite
 {
-    public static final int FIX_COLUMN_COUNT = 4;
+    public static final int FIX_COLUMN_COUNT = 5;
+    private MarathonServiceAsync marathonService = GWT.create(MarathonService.class);
     private TavVersenySzam filter;
     private Map<RaceStatusRow, Integer> helyezesMap = new HashMap<RaceStatusRow, Integer>();
     private ListDataProvider<RaceStatusRow> raceStatusRowList = new ListDataProvider<RaceStatusRow>();
@@ -75,6 +82,36 @@ public class ResultTable extends Composite
                         ? Utils.getVersenySzamMegnevezes(scmtMarathon, raceStatusRow.getVersenySzam()) : null;
                 }
             }, "Versenyszám");
+        final CheckboxCell checkboxCell = new CheckboxCell(false, false);
+        Column<RaceStatusRow, Boolean> ellenorzottColumn = new Column<RaceStatusRow, Boolean>(checkboxCell) {
+            @Override
+            public Boolean getValue(RaceStatusRow raceStatusRow) {
+                return raceStatusRow.getVersenyzo() != null && raceStatusRow.getVersenyzo().isEllenorzott();
+            }
+        };
+
+        ellenorzottColumn.setFieldUpdater(new FieldUpdater<RaceStatusRow, Boolean>() {
+            @Override
+            public void update(int i, final RaceStatusRow raceStatusRow, Boolean ellenorzott) {
+                if (raceStatusRow.getVersenyzo() != null) {
+                    marathonService.versenyzoEredmenyEllenorzott(raceStatusRow.getVersenyzo().getId(), ellenorzott, new EmptyFailureHandlingAsyncCallback<Void>() {
+                        @Override
+                        public void onFailure(Throwable throwable) {
+                            super.onFailure(throwable);
+                            undoChanges(raceStatusRow);                            
+                        }
+                    });
+                } else {
+                    undoChanges(raceStatusRow);
+                }
+            }
+
+            private void undoChanges(RaceStatusRow raceStatusRow) {
+                checkboxCell.clearViewData(raceStatusRow);
+                statusTable.redraw();
+            }
+        });
+        statusTable.addColumn(ellenorzottColumn, "Ellenőrzött");
         raceStatusRowList.addDataDisplay(statusTable);
         statusTable.setPageSize(Integer.MAX_VALUE);
         scmtMarathon.getPollingService().getPersonLapSync().addMarathonActionListener(new RefilterMarathonActionListener<PersonLap>());

@@ -10,6 +10,12 @@
     <inherits name="com.google.gwt.appengine.channel.Channel"/>
     <inherits name="com.google.gwt.logging.Logging"/>
 
+    <add-linker name="xsiframe"/>
+
+    <set-configuration-property name="devModeRedirectEnabled" value="true"/>
+
+    <set-property name="compiler.useSourceMaps" value="true" />
+
     <source path='client'/>
     <entry-point class="net.himadri.scmt.client.SCMTMarathon"/>
 

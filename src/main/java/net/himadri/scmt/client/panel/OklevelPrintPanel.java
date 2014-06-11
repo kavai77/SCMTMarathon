@@ -1,9 +1,20 @@
 package net.himadri.scmt.client.panel;
 
 import com.google.gwt.dom.client.FormElement;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.HasName;
+import com.google.gwt.user.client.ui.Hidden;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.StackLayoutPanel;
+import com.google.gwt.user.client.ui.SubmitButton;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
 import net.himadri.scmt.client.SCMTMarathon;
 import net.himadri.scmt.client.TabChangeHandler;
 import net.himadri.scmt.client.Utils;
@@ -32,15 +43,15 @@ public class OklevelPrintPanel extends Composite implements TabChangeHandler {
 
     public OklevelPrintPanel(SCMTMarathon scmtMarathon) {
         this.scmtMarathon = scmtMarathon;
-        AbsolutePanel absolutePanel = new AbsolutePanel();
-        absolutePanel.setSize("100%", "200px");
-        absolutePanel.add(createRedirectPanel("Oklevelek Távra", tavValasztoValaszto, PdfServiceType.TAV), 10, 10);
-        absolutePanel.add(createRedirectPanel("Oklevelek Versenyszámra", versenySzamValaszto, PdfServiceType.VERSENYSZAM), 10, 50);
-        absolutePanel.add(createRedirectPanel("Oklevelek Versenyzőnek Név alapján", versenyzoValaszto, PdfServiceType.VERSENYZO), 10, 90);
+        StackLayoutPanel layoutPanel = new StackLayoutPanel(Style.Unit.EM);
+        layoutPanel.setSize("100%", "260px");
+        layoutPanel.add(createRedirectPanel(tavValasztoValaszto, PdfServiceType.TAV), "Táv", 4);
+        layoutPanel.add(createRedirectPanel(versenySzamValaszto, PdfServiceType.VERSENYSZAM), "Versenyszám", 4);
+        layoutPanel.add(createRedirectPanel(versenyzoValaszto, PdfServiceType.VERSENYZO), "Versenyző Név alapján", 4);
         raceNumberText.setSize("70px", "auto");
         raceNumberText.getElement().setPropertyString("placeholder", "rajtszám");
-        absolutePanel.add(createRedirectPanel("Oklevelek Versenyzőnek Rajtszám alapján", raceNumberText, PdfServiceType.VERSENYZO), 10, 130);
-        initWidget(absolutePanel);
+        layoutPanel.add(createRedirectPanel(raceNumberText, PdfServiceType.VERSENYZO), "Versenyző Rajt alapján", 4);
+        initWidget(layoutPanel);
     }
 
     @Override
@@ -68,27 +79,27 @@ public class OklevelPrintPanel extends Composite implements TabChangeHandler {
         
     }
 
-    private Panel createRedirectPanel(String name, Widget idWidget, PdfServiceType pdfServiceType) {
+    private Panel createRedirectPanel(Widget idWidget, PdfServiceType pdfServiceType) {
         final FormPanel formPanel = new FormPanel();
         formPanel.setAction(PRE_PRINTED_PDFSERVICE);
         formPanel.setMethod(FormPanel.METHOD_GET);
         formPanel.getElement().<FormElement>cast().setTarget("_blank");
-        FlowPanel flowPanel = new FlowPanel();
-        flowPanel.add(new Hidden("type", pdfServiceType.name()));
+        HorizontalPanel panel = new HorizontalPanel();
+        panel.setSpacing(10);
         final Hidden versenyIdHidden = new Hidden("versenyId");
-        flowPanel.add(versenyIdHidden);
         ((HasName)idWidget).setName("id");
-        flowPanel.add(idWidget);
-        SubmitButton submitButton = new SubmitButton(name);
+        panel.add(idWidget);
+        SubmitButton submitButton = new SubmitButton("Nyomtat");
         submitButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent clickEvent) {
                 versenyIdHidden.setValue(scmtMarathon.getVerseny().getId().toString());
             }
         });
-        flowPanel.add(submitButton);
-
-        formPanel.add(flowPanel);
+        panel.add(submitButton);
+        panel.add(new Hidden("type", pdfServiceType.name()));
+        panel.add(versenyIdHidden);
+        formPanel.add(panel);
         return formPanel;
     }
 }

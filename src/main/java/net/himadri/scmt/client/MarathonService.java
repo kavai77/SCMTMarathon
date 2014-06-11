@@ -60,6 +60,8 @@ public interface MarathonService extends RemoteService {
 
     void versenyzoFeladta(Long versenyzoId, boolean feladta) throws NotExistingEntityException;
 
+    void versenyzoEredmenyEllenorzott(Long id, boolean ellenorzott) throws NotExistingEntityException;
+
     PollingResult getPollingResult(Long versenyId, PollingRequest pollingRequest);
 
     String createChannelToken();
