@@ -57,13 +57,21 @@ public class RaceStatusRow implements Comparable<RaceStatusRow> {
 
     @Override
     public int compareTo(RaceStatusRow o) {
-        if (lapTimes.size() != o.lapTimes.size()) {
-            return Integer.valueOf(o.lapTimes.size()).compareTo(lapTimes.size());
-        } else if (lapTimes.isEmpty() && o.lapTimes.isEmpty()) {
+        int lapCount = getLapCount(this);
+        int oLapCount = getLapCount(o);
+        if (lapCount != oLapCount) {
+            return Integer.valueOf(oLapCount).compareTo(lapCount);
+        } else if (lapCount == 0) {
             return raceNumber.compareTo(o.raceNumber);
         } else {
-            return lapTimes.get(lapTimes.size() - 1).compareTo(o.lapTimes.get(o.lapTimes.size() - 1));
+            return lapTimes.get(lapCount - 1).compareTo(o.lapTimes.get(oLapCount - 1));
         }
+    }
+    
+    private int getLapCount(RaceStatusRow raceStatusRow) {
+        return raceStatusRow.getTav() == null || raceStatusRow.getTav().getKorSzam() == null ? 
+                raceStatusRow.getLapTimes().size() : 
+                Math.min(raceStatusRow.getLapTimes().size(), raceStatusRow.getTav().getKorSzam());
     }
 
     @Override
