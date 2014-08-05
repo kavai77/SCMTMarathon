@@ -149,7 +149,8 @@ public class Utils {
     }
 
     public static String getElapsedTimeString(RaceStatusRow raceStatusRow, int lapNumber) {
-        long elapsedTime = raceStatusRow.getLapTimes().get(lapNumber) - raceStatusRow.getTav().getRaceStartDiff();
+        long raceStartDiff = raceStatusRow.getTav() != null ? raceStatusRow.getTav().getRaceStartDiff() : 0;
+        long elapsedTime = raceStatusRow.getLapTimes().get(lapNumber) - raceStartDiff;
         return getElapsedTimeString(elapsedTime);
     }
 

@@ -122,6 +122,7 @@
                     <compileReport>true</compileReport>
                     <appEngineHome>${appEngineSdk}</appEngineHome>
                     <server>com.google.appengine.tools.development.gwt.AppEngineLauncher</server>
+                    <style>PRETTY</style>
                 </configuration>
             </plugin>
 
