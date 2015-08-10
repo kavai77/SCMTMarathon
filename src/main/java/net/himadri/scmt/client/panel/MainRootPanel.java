@@ -2,11 +2,11 @@ package net.himadri.scmt.client.panel;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.storage.client.Storage;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 import net.himadri.scmt.client.SCMTMarathon;
 import net.himadri.scmt.client.UserService;
 import net.himadri.scmt.client.UserServiceAsync;
+import net.himadri.scmt.client.callback.CommonAsyncCallback;
 import net.himadri.scmt.client.entity.Verseny;
 import net.himadri.scmt.client.serializable.MarathonActionListener;
 
@@ -40,12 +40,7 @@ public class MainRootPanel extends Composite {
         foTabPanel.selectTab(0);
 
         UserServiceAsync userService = GWT.create(UserService.class);
-        userService.isAuthorized(new AsyncCallback<Boolean>() {
-            @Override
-            public void onFailure(Throwable throwable) {
-                SCMTMarathon.commonFailureHandling(throwable);
-            }
-
+        userService.isAuthorized(new CommonAsyncCallback<Boolean>() {
             @Override
             public void onSuccess(Boolean authorized) {
                 if (!authorized) {

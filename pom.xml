@@ -12,7 +12,7 @@
 
     <properties>
         <!-- Convenience property to set the GWT version -->
-        <gwtVersion>2.6.0</gwtVersion>
+        <gwtVersion>2.7.0</gwtVersion>
         <appEngineVersion>1.9.19</appEngineVersion>
         <appEngineSdk>
             ${settings.localRepository}/com/google/appengine/appengine-java-sdk/${appEngineVersion}/appengine-java-sdk/appengine-java-sdk-${appEngineVersion}
@@ -100,23 +100,6 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>gwt-maven-plugin</artifactId>
                 <version>${gwtVersion}</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.google.gwt</groupId>
-                        <artifactId>gwt-user</artifactId>
-                        <version>${gwtVersion}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.google.gwt</groupId>
-                        <artifactId>gwt-dev</artifactId>
-                        <version>${gwtVersion}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.google.gwt</groupId>
-                        <artifactId>gwt-servlet</artifactId>
-                        <version>${gwtVersion}</version>
-                    </dependency>
-                </dependencies>
                 <executions>
                     <execution>
                         <phase>prepare-package</phase>
@@ -164,6 +147,7 @@
                 <configuration>
                     <enableJarClasses>false</enableJarClasses>
                     <disableUpdateCheck>true</disableUpdateCheck>
+                    <enableJarSplitting>true</enableJarSplitting>
                 </configuration>
             </plugin>
         </plugins>

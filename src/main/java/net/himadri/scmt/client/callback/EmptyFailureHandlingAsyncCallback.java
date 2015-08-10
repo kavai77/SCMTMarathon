@@ -1,12 +1,13 @@
-package net.himadri.scmt.client;
+package net.himadri.scmt.client.callback;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import net.himadri.scmt.client.SCMTMarathon;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Kavai
  * Date: 2012.09.01. 17:27
  */
-public class EmptyFailureHandlingAsyncCallback<T> implements AsyncCallback<T> {
+public class EmptyFailureHandlingAsyncCallback<T> extends CommonAsyncCallback<T> {
     @Override
     public void onFailure(Throwable throwable) {
             SCMTMarathon.commonFailureHandling(throwable);

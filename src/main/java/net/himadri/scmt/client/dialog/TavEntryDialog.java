@@ -1,24 +1,11 @@
 package net.himadri.scmt.client.dialog;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.*;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.AbsolutePanel;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.IntegerBox;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.TextBox;
-import net.himadri.scmt.client.ImageButton;
-import net.himadri.scmt.client.MarathonService;
-import net.himadri.scmt.client.MarathonServiceAsync;
-import net.himadri.scmt.client.SCMTMarathon;
-import net.himadri.scmt.client.Utils;
+import com.google.gwt.user.client.ui.*;
+import net.himadri.scmt.client.*;
+import net.himadri.scmt.client.callback.CommonAsyncCallback;
 import net.himadri.scmt.client.entity.Tav;
 
 import java.text.ParseException;
@@ -125,24 +112,14 @@ public class TavEntryDialog extends DialogBox {
             }
 
             if (currentId == null) {
-                marathonService.addTav(scmtMarathon.getVerseny().getId(), megnevezes, korokSzama, versenySzamtol, versenySzamig, raceStartDiff, new AsyncCallback<Void>() {
-                    @Override
-                    public void onFailure(Throwable throwable) {
-                        SCMTMarathon.commonFailureHandling(throwable);
-                    }
-
+                marathonService.addTav(scmtMarathon.getVerseny().getId(), megnevezes, korokSzama, versenySzamtol, versenySzamig, raceStartDiff, new CommonAsyncCallback<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         hide();
                     }
                 });
             } else {
-                marathonService.modifyTav(currentId, megnevezes, korokSzama, versenySzamtol, versenySzamig, raceStartDiff, new AsyncCallback<Void>() {
-                    @Override
-                    public void onFailure(Throwable throwable) {
-                        SCMTMarathon.commonFailureHandling(throwable);
-                    }
-
+                marathonService.modifyTav(currentId, megnevezes, korokSzama, versenySzamtol, versenySzamig, raceStartDiff, new CommonAsyncCallback<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         hide();

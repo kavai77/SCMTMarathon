@@ -14,6 +14,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.view.client.ListDataProvider;
 import net.himadri.scmt.client.*;
+import net.himadri.scmt.client.callback.EmptyFailureHandlingAsyncCallback;
 import net.himadri.scmt.client.dialog.VersenySzamEntryDialog;
 import net.himadri.scmt.client.entity.RaceStatus;
 import net.himadri.scmt.client.entity.Tav;

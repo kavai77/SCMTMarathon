@@ -1,6 +1,8 @@
 package net.himadri.scmt.client.panel;
 
 import com.google.gwt.cell.client.ActionCell;
+import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.cell.client.TextButtonCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -9,13 +11,14 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
 import net.himadri.scmt.client.*;
+import net.himadri.scmt.client.callback.CommonAsyncCallback;
+import net.himadri.scmt.client.callback.ReloadAsyncCallback;
 import net.himadri.scmt.client.entity.Verseny;
 
 import java.util.*;
@@ -49,12 +52,7 @@ public class VersenyPanel extends Composite {
         final ListDataProvider<Verseny> currentYearVersenyek = new ListDataProvider<Verseny>();
         final StackPanel stackPanel = new StackPanel();
 
-        marathonService.getVersenyek(new AsyncCallback<List<Verseny>>() {
-            @Override
-            public void onFailure(Throwable throwable) {
-                SCMTMarathon.commonFailureHandling(throwable);
-            }
-
+        marathonService.getVersenyek(new CommonAsyncCallback<List<Verseny>>() {
             @Override
             public void onSuccess(List<Verseny> versenyek) {
                 int currentYear = new Date().getYear();
@@ -86,14 +84,9 @@ public class VersenyPanel extends Composite {
         Button addVersenyButton = new ImageButton("edit_add.png", "Új verseny", new ClickHandler() {
             @Override
             public void onClick(ClickEvent clickEvent) {
-                String versenyNev = Window.prompt("Verseny neve:", null);
+                String versenyNev = Window.prompt("Verseny neve:", "");
                 if (!versenyNev.isEmpty()) {
-                    marathonService.addVerseny(versenyNev, new AsyncCallback<Verseny>() {
-                        @Override
-                        public void onFailure(Throwable throwable) {
-                            SCMTMarathon.commonFailureHandling(throwable);
-                        }
-
+                    marathonService.addVerseny(versenyNev, new CommonAsyncCallback<Verseny>() {
                         @Override
                         public void onSuccess(Verseny verseny) {
                             currentYearVersenyek.getList().add(verseny);
@@ -146,13 +139,9 @@ public class VersenyPanel extends Composite {
                 return Integer.toString(verseny.getVersenyzoSzam());
             }
         }, "Versenyzők");
+        versenyTable.addColumn(new VersenyActionColumn(), "Műveletek");
         UserServiceAsync userService = GWT.create(UserService.class);
-        userService.isSuperUserAuthorized(new AsyncCallback<Boolean>() {
-            @Override
-            public void onFailure(Throwable throwable) {
-                SCMTMarathon.commonFailureHandling(throwable);
-            }
-
+        userService.isSuperUserAuthorized(new CommonAsyncCallback<Boolean>() {
             @Override
             public void onSuccess(Boolean authorized) {
                 if (authorized) {
@@ -161,12 +150,7 @@ public class VersenyPanel extends Composite {
                         @Override
                         public void execute(final Verseny verseny) {
                             if (Window.confirm("Azt a műveletet csak a rendszer adminisztrátor tudja megtenni. Biztos folytatod?")) {
-                                marathonService.deleteRace(verseny.getId(), new AsyncCallback<Void>() {
-                                    @Override
-                                    public void onFailure(Throwable throwable) {
-                                        SCMTMarathon.commonFailureHandling(throwable);
-                                    }
-
+                                marathonService.deleteRace(verseny.getId(), new CommonAsyncCallback<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
                                         versenyList.getList().remove(verseny);
@@ -206,4 +190,41 @@ public class VersenyPanel extends Composite {
             setHorizontalAlignment(ALIGN_RIGHT);
         }
     }
+
+    private class VersenyActionColumn extends Column<Verseny, String> {
+        private VersenyActionColumn() {
+            super(new TextButtonCell());
+            setFieldUpdater(new FieldUpdater<Verseny, String>() {
+                @Override
+                public void update(int i, Verseny verseny, String s) {
+                    switch (verseny.getRaceStatus()) {
+                        case NOT_STARTED:
+                            marathonService.startRace(verseny.getId(), new ReloadAsyncCallback());
+                        case RACING:
+                            marathonService.stopRace(verseny.getId(), new ReloadAsyncCallback());
+                            break;
+                        case FINISHED:
+                            marathonService.restartRace(verseny.getId(), new ReloadAsyncCallback());
+                    }
+
+                }
+            });
+            setHorizontalAlignment(ALIGN_CENTER);
+        }
+
+        @Override
+        public String getValue(Verseny verseny) {
+            switch (verseny.getRaceStatus()) {
+                case NOT_STARTED:
+                    return "Indítás";
+                case RACING:
+                    return "Leállítás";
+                case FINISHED:
+                    return "Újraindítás";
+                default:
+                    return null;
+            }
+        }
+    }
+
 }

@@ -1,16 +1,15 @@
 package net.himadri.scmt.client.entity;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.io.Serializable;
 
 /**
  * Created by IntelliJ IDEA.
  * User: Kavai
  * Date: 2012.06.02. 14:29
  */
-@Entity public class PageProfile implements IsSerializable
+@Entity public class PageProfile implements Serializable
 {
     private int alignment;
     private String fontFamily;

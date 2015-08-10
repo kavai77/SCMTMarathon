@@ -3,9 +3,9 @@ package net.himadri.scmt.client.dialog;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.*;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 import net.himadri.scmt.client.*;
+import net.himadri.scmt.client.callback.CommonAsyncCallback;
 import net.himadri.scmt.client.entity.Tav;
 import net.himadri.scmt.client.entity.VersenySzam;
 import net.himadri.scmt.client.serializable.MarathonActionListener;
@@ -133,24 +133,14 @@ public class VersenySzamEntryDialog extends DialogBox {
         }
 
         if (currentId == null) {
-            marathonService.addVersenySzam(scmtMarathon.getVerseny().getId(), tavId, ferfi, evtol, evig, new AsyncCallback<Void>() {
-                @Override
-                public void onFailure(Throwable throwable) {
-                    SCMTMarathon.commonFailureHandling(throwable);
-                }
-
+            marathonService.addVersenySzam(scmtMarathon.getVerseny().getId(), tavId, ferfi, evtol, evig, new CommonAsyncCallback<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
                     hide();
                 }
             });
         } else {
-            marathonService.modifyVersenySzam(currentId, tavId, ferfi, evtol, evig, new AsyncCallback<Void>() {
-                @Override
-                public void onFailure(Throwable throwable) {
-                    SCMTMarathon.commonFailureHandling(throwable);
-                }
-
+            marathonService.modifyVersenySzam(currentId, tavId, ferfi, evtol, evig, new CommonAsyncCallback<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
                     hide();

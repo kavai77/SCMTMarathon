@@ -1,11 +1,10 @@
 package net.himadri.scmt.client.panel;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
-import net.himadri.scmt.client.SCMTMarathon;
 import net.himadri.scmt.client.UserService;
 import net.himadri.scmt.client.UserServiceAsync;
+import net.himadri.scmt.client.callback.CommonAsyncCallback;
 import net.himadri.scmt.client.serializable.UserResponse;
 
 /**
@@ -28,12 +27,7 @@ public class UserPanel extends Composite {
 
         UserServiceAsync userService = GWT.create(UserService.class);
 
-        userService.getCurrentUserInfo(new AsyncCallback<UserResponse>() {
-            @Override
-            public void onFailure(Throwable throwable) {
-                SCMTMarathon.commonFailureHandling(throwable);
-            }
-
+        userService.getCurrentUserInfo(new CommonAsyncCallback<UserResponse>() {
             @Override
             public void onSuccess(UserResponse userResponse) {
                 StringBuilder htmlBuilder = new StringBuilder();

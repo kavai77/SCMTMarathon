@@ -5,9 +5,9 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
-import net.himadri.scmt.client.EmptyFailureHandlingAsyncCallback;
 import net.himadri.scmt.client.MarathonServiceAsync;
 import net.himadri.scmt.client.Utils;
+import net.himadri.scmt.client.callback.EmptyFailureHandlingAsyncCallback;
 import net.himadri.scmt.client.serializable.RaceStatusRow;
 
 import javax.validation.constraints.NotNull;

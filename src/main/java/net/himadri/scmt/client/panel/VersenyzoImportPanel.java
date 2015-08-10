@@ -3,12 +3,12 @@ package net.himadri.scmt.client.panel;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
-import net.himadri.scmt.client.*;
-
-import java.util.Arrays;
+import net.himadri.scmt.client.SCMTMarathon;
+import net.himadri.scmt.client.VersenyzoCSVUploadService;
+import net.himadri.scmt.client.VersenyzoCSVUploadServiceAsync;
+import net.himadri.scmt.client.callback.CommonAsyncCallback;
 
 /**
  * Created by IntelliJ IDEA.
@@ -38,12 +38,7 @@ public class VersenyzoImportPanel extends Composite {
             @Override
             public void onClick(ClickEvent clickEvent) {
                 uploadServiceAsync.importVersenyzok(scmtMarathon.getVerseny().getId(), nevArea.getText(),
-                        new AsyncCallback<String>() {
-                            @Override
-                            public void onFailure(Throwable throwable) {
-                                SCMTMarathon.commonFailureHandling(throwable);
-                            }
-
+                        new CommonAsyncCallback<String>() {
                             @Override
                             public void onSuccess(String result) {
                                 HTMLPanel htmlPanel = new HTMLPanel(result);

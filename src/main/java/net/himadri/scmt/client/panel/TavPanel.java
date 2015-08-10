@@ -12,6 +12,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import net.himadri.scmt.client.*;
+import net.himadri.scmt.client.callback.EmptyFailureHandlingAsyncCallback;
 import net.himadri.scmt.client.dialog.TavEntryDialog;
 import net.himadri.scmt.client.entity.RaceStatus;
 import net.himadri.scmt.client.entity.Tav;

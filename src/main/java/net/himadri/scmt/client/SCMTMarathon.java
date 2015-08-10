@@ -109,7 +109,7 @@ public class SCMTMarathon implements EntryPoint {
             Window.alert("Nincs jogosultságod erre a műveletre");
         } else {
             if (message == null) {
-                Window.alert("Hálózati hiba történt! Töltsd újra az oldalt!");
+                Window.alert("Hiba történt: " + throwable.getMessage());
             } else {
                 Window.alert(message);
             }

@@ -16,16 +16,7 @@ import com.googlecode.objectify.NotFoundException;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
 import net.himadri.scmt.client.MarathonService;
-import net.himadri.scmt.client.entity.ClientChannel;
-import net.himadri.scmt.client.entity.HasCreationTime;
-import net.himadri.scmt.client.entity.Nev;
-import net.himadri.scmt.client.entity.PageProfile;
-import net.himadri.scmt.client.entity.PersonLap;
-import net.himadri.scmt.client.entity.RaceStatus;
-import net.himadri.scmt.client.entity.Tav;
-import net.himadri.scmt.client.entity.Verseny;
-import net.himadri.scmt.client.entity.VersenySzam;
-import net.himadri.scmt.client.entity.Versenyzo;
+import net.himadri.scmt.client.entity.*;
 import net.himadri.scmt.client.exception.AlreadyExistingEntityException;
 import net.himadri.scmt.client.exception.NotAuthorizedException;
 import net.himadri.scmt.client.exception.NotExistingEntityException;
@@ -33,6 +24,7 @@ import net.himadri.scmt.client.serializable.PollingRequest;
 import net.himadri.scmt.client.serializable.PollingResult;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -242,16 +234,21 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
     }
 
     @Override
-    public void addPersonLap(Long versenyId, String raceNumber, long raceTime) throws AlreadyExistingEntityException {
-        PersonLap personLap = ofy.query(PersonLap.class)
-                .filter("versenyId", versenyId)
-                .filter("raceNumber", raceNumber)
-                .order("-time").get();
-        if (personLap != null && raceTime - personLap.getTime() <= RACE_TIME_THRESHOLD) {
-            throw new AlreadyExistingEntityException();
+    public void addPersonLap(Long versenyId, String raceNumber, long raceTime, boolean withThresholdValidation) throws AlreadyExistingEntityException {
+        if (withThresholdValidation) {
+            PersonLap personLap = ofy.query(PersonLap.class)
+                    .filter("versenyId", versenyId)
+                    .filter("raceNumber", raceNumber)
+                    .order("-time").get();
+            if (personLap != null && raceTime - personLap.getTime() <= RACE_TIME_THRESHOLD) {
+                throw new AlreadyExistingEntityException();
+            }
         }
         PersonLap newPersonLap = new PersonLap(versenyId, raceNumber, raceTime);
         addPersonLap(newPersonLap);
+        if (!withThresholdValidation) {
+            incrementSyncValue(versenyId, SyncValueType.PERSON_LAP);
+        }
         broadcastModification();
     }
 
@@ -493,6 +490,7 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         ofy.put(personLap);
         List<PersonLap> personLapList = getPersonList(personLap.getVersenyId());
         personLapList.add(personLap);
+        Collections.sort(personLapList);
         putPersonLapListIntoCache(personLap.getVersenyId(), personLapList);
     }
 

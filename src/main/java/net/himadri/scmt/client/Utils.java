@@ -6,6 +6,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.*;
 import net.himadri.scmt.client.entity.Tav;
 import net.himadri.scmt.client.entity.VersenySzam;
+import net.himadri.scmt.client.entity.Versenyzo;
 import net.himadri.scmt.client.serializable.RaceStatusRow;
 
 import java.text.ParseException;
@@ -200,6 +201,16 @@ public class Utils {
             lapTime = (longElements[0] * 60 + longElements[1]) * 1000;
         }
         return lapTime;
+    }
+
+    public static long getFutamTimeDiff(SCMTMarathon scmtMarathon, String raceNumber) {
+        Versenyzo versenyzo = scmtMarathon.getVersenyzoMapCache().getVersenyzo(raceNumber);
+        if (versenyzo != null) {
+            VersenySzam versenySzam = scmtMarathon.getVersenyszamMapCache().getVersenySzam(versenyzo.getVersenySzamId());
+            return scmtMarathon.getTavMapCache().getTav(versenySzam.getTavId()).getRaceStartDiff();
+        } else {
+            return 0L;
+        }
     }
 
     public static Button createRedirectButton(AbsolutePanel absolutePanel, String name, String url, Widget... params) {

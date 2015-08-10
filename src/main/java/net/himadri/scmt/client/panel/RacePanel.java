@@ -1,31 +1,17 @@
 package net.himadri.scmt.client.panel;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.dom.client.*;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.AbsolutePanel;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.DeckPanel;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.TextBox;
-import net.himadri.scmt.client.EmptyFailureHandlingAsyncCallback;
-import net.himadri.scmt.client.ImageButton;
-import net.himadri.scmt.client.MarathonService;
-import net.himadri.scmt.client.MarathonServiceAsync;
-import net.himadri.scmt.client.SCMTMarathon;
-import net.himadri.scmt.client.Utils;
+import com.google.gwt.user.client.ui.*;
+import net.himadri.scmt.client.*;
+import net.himadri.scmt.client.callback.CommonAsyncCallback;
+import net.himadri.scmt.client.callback.EmptyFailureHandlingAsyncCallback;
+import net.himadri.scmt.client.callback.ReloadAsyncCallback;
 import net.himadri.scmt.client.dialog.CorrectionDialogBox;
 import net.himadri.scmt.client.entity.PersonLap;
 import net.himadri.scmt.client.entity.RaceStatus;
@@ -157,69 +143,29 @@ public class RacePanel extends Composite {
         });
         raceInProgressBar.add(btnRajtszmJavtsa, 0, 103);
 
-        Button btnStopRace = new ImageButton("player_stop.png", "Verseny leállítása",
-                new ClickHandler() {
-                    @Override
-                    public void onClick(ClickEvent event) {
-                        checkAuthorization();
-                        marathonService.stopRace(scmtMarathon.getVerseny().getId(),
-                                new EmptyFailureHandlingAsyncCallback<Void>());
-                    }
-                });
-        raceInProgressBar.add(btnStopRace, 180, 103);
-
         Button btnShiftRaceStartTime = new ImageButton("clock.png", "Versenyidő állítása",
                 new ClickHandler() {
                     @Override
                     public void onClick(ClickEvent event) {
                         checkAuthorization();
-                        String miliSecStr = Window.prompt("Add meg a csúsztatás idejét ezredmásodpercben", null);
+                        String miliSecStr = Window.prompt("Add meg a csúsztatás idejét ezredmásodpercben", "");
                         try {
                             if (miliSecStr != null) {
                                 long miliSec = Long.parseLong(miliSecStr);
-                                marathonService.shiftRaceTime(scmtMarathon.getVerseny().getId(), miliSec, new AsyncCallback<Void>() {
-                                    @Override
-                                    public void onFailure(Throwable throwable) {
-                                        SCMTMarathon.commonFailureHandling(throwable);
-                                    }
-
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Window.alert("A versenyidő sikeresen megváltozott. Újra kell frissíteni az alkalmazást az összes kliensen!");
-                                    }
-                                });
+                                marathonService.shiftRaceTime(scmtMarathon.getVerseny().getId(), miliSec, new ReloadAsyncCallback());
                             }
                         } catch (NumberFormatException e) {
                             Window.alert("A megadott forma nem megfelelő.");
                         }
                     }
                 });
-        raceInProgressBar.add(btnShiftRaceStartTime, 340, 103);
+        raceInProgressBar.add(btnShiftRaceStartTime, 180, 103);
 
         raceInProgressBar.add(new Label("Utoljára rögzített rajtszámok"),  0, 150);
         raceInProgressBar.add(lastRaceNbList,  0, 180);
 
         AbsolutePanel raceFinishedBar = new AbsolutePanel();
         raceDeckBar.add(raceFinishedBar);
-
-        Button btnVersenyRestart = new ImageButton("player_play.png", "Verseny újraindítása", new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                marathonService.restartRace(scmtMarathon.getVerseny().getId(), new AsyncCallback<Void>() {
-                    @Override
-                    public void onFailure(Throwable throwable) {
-                        SCMTMarathon.commonFailureHandling(throwable);
-                    }
-
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        scmtMarathon.getPollingService().establishChannelConnection();
-                    }
-                });
-            }
-        });
-        btnVersenyRestart.setTitle("Verseny újraindtása időkiesés nélkül (mintha nem lett volna megállítva)");
-        raceFinishedBar.add(btnVersenyRestart, 0, 103);
 
         scmtMarathon.getPollingService().getPersonLapSync().addMarathonActionListener(new LastFivePersonLapActionListener());
         scmtMarathon.getPollingService().getRaceStatusSync().addMarathonActionListener(new RaceStatusActionListener());
@@ -228,7 +174,7 @@ public class RacePanel extends Composite {
     }
 
     private void checkAuthorization() {
-        String password = Window.prompt("Jelszó megadása szükséges:", null);
+        String password = Window.prompt("Jelszó megadása szükséges:", "");
         if (!"scmt".equals(password)) {
             throw new RuntimeException("Permission denied");
         }
@@ -293,12 +239,7 @@ public class RacePanel extends Composite {
         public void itemRefreshed(List<RaceStatus> items) {
             switch (items.get(0)) {
                 case RACING:
-                    marathonService.getRaceTime(scmtMarathon.getVerseny().getId(), new AsyncCallback<Long>() {
-                        @Override
-                        public void onFailure(Throwable throwable) {
-                            SCMTMarathon.commonFailureHandling(throwable);
-                        }
-
+                    marathonService.getRaceTime(scmtMarathon.getVerseny().getId(), new CommonAsyncCallback<Long>() {
                         @Override
                         public void onSuccess(Long raceTime) {
                             raceStartTime = System.currentTimeMillis() - raceTime;
@@ -364,7 +305,7 @@ public class RacePanel extends Composite {
                 versenyzoSuggestionLabel.setVisible(false);
                 Long versenyId = scmtMarathon.getVerseny().getId();
                 long raceTime = System.currentTimeMillis() - raceStartTime;
-                marathonService.addPersonLap(versenyId, raceNb, raceTime, new AsyncCallback<Void>() {
+                marathonService.addPersonLap(versenyId, raceNb, raceTime, true, new AsyncCallback<Void>() {
                     @Override
                     public void onFailure(Throwable throwable) {
                         if (throwable instanceof AlreadyExistingEntityException) {

@@ -30,7 +30,7 @@ public interface MarathonService extends RemoteService {
 
     long getRaceTime(Long versenyId);
 
-    void addPersonLap(Long versenyId, String raceNumber, long raceTime) throws AlreadyExistingEntityException;
+    void addPersonLap(Long versenyId, String raceNumber, long raceTime, boolean withThresholdValidation) throws AlreadyExistingEntityException;
 
     void removePersonLap(Long versenyId, Long personLapId);
 

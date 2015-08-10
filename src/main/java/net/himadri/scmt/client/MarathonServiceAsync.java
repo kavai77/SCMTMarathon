@@ -10,11 +10,7 @@ import net.himadri.scmt.client.serializable.PollingResult;
 
 import java.util.List;
 
-/**
- * The async counterpart of <code>GreetingService</code>.
- */
 public interface MarathonServiceAsync {
-
 
     void startRace(Long versenyId, AsyncCallback<Void> async);
 
@@ -24,7 +20,7 @@ public interface MarathonServiceAsync {
 
     void getRaceTime(Long versenyId, AsyncCallback<Long> async);
 
-    void addPersonLap(Long versenyId, String raceNumber, long raceTime, AsyncCallback<Void> async);
+    void addPersonLap(Long versenyId, String raceNumber, long raceTime, boolean withThresholdValidation, AsyncCallback<Void> async);
 
     void updateRaceNumber(Long personLapId, String raceNumber, AsyncCallback<Void> async);
 

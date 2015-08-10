@@ -9,31 +9,22 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.AbsolutePanel;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.google.gwt.user.client.ui.Hidden;
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import com.itextpdf.text.pdf.BaseFont;
-import net.himadri.scmt.client.EmptyFailureHandlingAsyncCallback;
 import net.himadri.scmt.client.MarathonService;
 import net.himadri.scmt.client.MarathonServiceAsync;
 import net.himadri.scmt.client.SCMTMarathon;
 import net.himadri.scmt.client.Utils;
+import net.himadri.scmt.client.callback.CommonAsyncCallback;
+import net.himadri.scmt.client.callback.EmptyFailureHandlingAsyncCallback;
 import net.himadri.scmt.client.entity.PageProfile;
 import net.himadri.scmt.client.entity.PageProfileId;
 import net.himadri.scmt.client.entity.Verseny;
 import net.himadri.scmt.client.serializable.MarathonActionListener;
 import net.himadri.scmt.client.serializable.PdfServiceType;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class NyomtatoPanel extends Composite {
 
@@ -59,12 +50,7 @@ public class NyomtatoPanel extends Composite {
         final ListDataProvider<PageProfile> cellTableData = new ListDataProvider<PageProfile>();
         cellTableData.addDataDisplay(cellTable);
 
-        marathonService.getAllPageProfiles(new AsyncCallback<List<PageProfile>>() {
-            @Override
-            public void onFailure(Throwable throwable) {
-                SCMTMarathon.commonFailureHandling(throwable);
-            }
-
+        marathonService.getAllPageProfiles(new CommonAsyncCallback<List<PageProfile>>() {
             @Override
             public void onSuccess(List<PageProfile> pageProfiles) {
                 List<PageProfile> sortedProfiles = new ArrayList<PageProfile>(pageProfiles);

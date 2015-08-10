@@ -4,11 +4,10 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 import net.himadri.scmt.client.MarathonService;
 import net.himadri.scmt.client.MarathonServiceAsync;
-import net.himadri.scmt.client.SCMTMarathon;
+import net.himadri.scmt.client.callback.CommonAsyncCallback;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,12 +32,7 @@ public class NevPanel extends Composite {
                 boolean ferfi = nemValaszto.getSelectedIndex() == 0;
                 final String[] nevek = nevArea.getText().split("\n");
                 MarathonServiceAsync marathonService = GWT.create(MarathonService.class);
-                marathonService.saveNev(nevek, ferfi, new AsyncCallback<Void>() {
-                    @Override
-                    public void onFailure(Throwable throwable) {
-                        SCMTMarathon.commonFailureHandling(throwable);
-                    }
-
+                marathonService.saveNev(nevek, ferfi, new CommonAsyncCallback<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Window.alert("Sikeresen elmentve " + nevek.length + " név.");

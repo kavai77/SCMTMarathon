@@ -11,26 +11,17 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.AbsolutePanel;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import net.himadri.scmt.client.MarathonService;
 import net.himadri.scmt.client.MarathonServiceAsync;
 import net.himadri.scmt.client.SCMTMarathon;
 import net.himadri.scmt.client.Utils;
+import net.himadri.scmt.client.callback.CommonAsyncCallback;
 import net.himadri.scmt.client.entity.PersonLap;
-import net.himadri.scmt.client.entity.VersenySzam;
-import net.himadri.scmt.client.entity.Versenyzo;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CorrectionDialogBox extends DialogBox {
 
@@ -64,12 +55,7 @@ public class CorrectionDialogBox extends DialogBox {
                 new Timer() {
                     @Override
                     public void run() {
-                        String filter = szuresText.getText().trim();
-                        if (filter.isEmpty()) {
-                            personLapListDataProvider.setList(allPersonLapList);
-                        } else {
-                            personLapListDataProvider.setList(filterPersonLapMap.get(filter));
-                        }
+                        filter();
                     }
                 }.schedule(100);
             }
@@ -134,22 +120,18 @@ public class CorrectionDialogBox extends DialogBox {
         final Column<PersonLap, String> futamTimeColumn = new Column<PersonLap, String>(futamTimeEditTextCell) {
             @Override
             public String getValue(PersonLap personLap) {
-                return Utils.getElapsedTimeString(personLap.getTime() - getFutamTimeDiff(personLap));
+                return Utils.getElapsedTimeString(personLap.getTime() - Utils.getFutamTimeDiff(scmtMarathon, personLap.getRaceNumber()));
             }
         };
         futamTimeColumn.setFieldUpdater(new TimeFieldUpdater(true));
         cellTable.addColumn(futamTimeColumn, "Futam Idő");
 
-        cellTable.addColumn(new Column<PersonLap, PersonLap>(new ActionCell<PersonLap>("Törlés", new ActionCell.Delegate<PersonLap>() {
+        cellTable.addColumn(new Column<PersonLap, PersonLap>(new ActionCell<>("Törlés", new ActionCell.Delegate<PersonLap>() {
             @Override
             public void execute(final PersonLap personLap) {
                 boolean confirm = Window.confirm("Biztos törölni akarod a kiválasztott kört?");
                 if (confirm) {
-                    marathonService.removePersonLap(scmtMarathon.getVerseny().getId(), personLap.getId(), new AsyncCallback<Void>() {
-                        @Override
-                        public void onFailure(Throwable throwable) {
-                        }
-
+                    marathonService.removePersonLap(scmtMarathon.getVerseny().getId(), personLap.getId(), new CommonAsyncCallback<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             personLapListDataProvider.getList().remove(personLap);
@@ -167,34 +149,36 @@ public class CorrectionDialogBox extends DialogBox {
         personLapListDataProvider.addDataDisplay(cellTable);
     }
 
-    private long getFutamTimeDiff(PersonLap personLap) {
-        Versenyzo versenyzo = scmtMarathon.getVersenyzoMapCache().getVersenyzo(personLap.getRaceNumber());
-        if (versenyzo != null) {
-            VersenySzam versenySzam = scmtMarathon.getVersenyszamMapCache().getVersenySzam(versenyzo.getVersenySzamId());
-            return scmtMarathon.getTavMapCache().getTav(versenySzam.getTavId()).getRaceStartDiff();
+    private void filter() {
+        String filter = szuresText.getText().trim();
+        if (filter.isEmpty()) {
+            personLapListDataProvider.setList(allPersonLapList);
         } else {
-            return 0L;
+            personLapListDataProvider.setList(filterPersonLapMap.get(filter));
         }
     }
 
     public void showDialog() {
-        marathonService.getAllPersonLapList(scmtMarathon.getVerseny().getId(), new AsyncCallback<List<PersonLap>>() {
-            @Override
-            public void onFailure(Throwable throwable) {
-                SCMTMarathon.commonFailureHandling(throwable);
-            }
+        showDialog(null);
+    }
 
+    public void showDialog(final String prefilter) {
+        marathonService.getAllPersonLapList(scmtMarathon.getVerseny().getId(), new CommonAsyncCallback<List<PersonLap>>() {
             @Override
             public void onSuccess(List<PersonLap> personLaps) {
                 Collections.reverse(personLaps);
                 allPersonLapList = personLaps;
-                szuresText.setText(null);
+                szuresText.setText(prefilter);
                 personLapListDataProvider.setList(personLaps);
 
                 // building the map
-                filterPersonLapMap = new HashMap<String, List<PersonLap>>(300);
+                filterPersonLapMap = new HashMap<>(300);
                 for (PersonLap personLap : personLaps) {
                     putPersonLapToFilterMap(personLap);
+                }
+
+                if (prefilter != null) {
+                    filter();
                 }
             }
         });
@@ -202,15 +186,13 @@ public class CorrectionDialogBox extends DialogBox {
     }
 
     private void putPersonLapToFilterMap(PersonLap personLap) {
-        for (int i = 1; i <= personLap.getRaceNumber().length(); i++) {
-            String key = personLap.getRaceNumber().substring(0, i);
-            List<PersonLap> filterPersonLapList = filterPersonLapMap.get(key);
-            if (filterPersonLapList == null) {
-                filterPersonLapList = new ArrayList<PersonLap>();
-                filterPersonLapMap.put(key, filterPersonLapList);
-            }
-            filterPersonLapList.add(personLap);
+        String key = personLap.getRaceNumber();
+        List<PersonLap> filterPersonLapList = filterPersonLapMap.get(key);
+        if (filterPersonLapList == null) {
+            filterPersonLapList = new ArrayList<>();
+            filterPersonLapMap.put(key, filterPersonLapList);
         }
+        filterPersonLapList.add(personLap);
     }
 
     private void removePersonLapFromFilterMap(PersonLap personLap) {
@@ -235,7 +217,7 @@ public class CorrectionDialogBox extends DialogBox {
             try {
                 long diff = 0;
                 if (minusFutamTime) {
-                    diff = getFutamTimeDiff(personLap);
+                    diff = Utils.getFutamTimeDiff(scmtMarathon, personLap.getRaceNumber());
                 }
                 final long lapTime = Utils.parseTime(timeString) + diff;
                 

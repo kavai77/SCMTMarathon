@@ -1,21 +1,19 @@
 package net.himadri.scmt.client.panel;
 
+import com.google.gwt.cell.client.ButtonCell;
+import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.IntegerBox;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
-import net.himadri.scmt.client.ImageButton;
-import net.himadri.scmt.client.SCMTMarathon;
-import net.himadri.scmt.client.Utils;
+import net.himadri.scmt.client.*;
+import net.himadri.scmt.client.callback.CommonAsyncCallback;
+import net.himadri.scmt.client.dialog.CorrectionDialogBox;
 import net.himadri.scmt.client.serializable.RaceStatusRow;
 
 import java.text.ParseException;
@@ -24,14 +22,19 @@ import java.util.List;
 public class ProblemsPanel extends Composite {
     private SCMTMarathon scmtMarathon;
 
+    private MarathonServiceAsync marathonService = GWT.create(MarathonService.class);
     private ListDataProvider<StatusTableType> raceStatusRowList = new ListDataProvider<StatusTableType>();
     private IntegerBox elteresBox = new IntegerBox();
+    private CorrectionDialogBox correctionDialogBox;
 
     private static class StatusTableType {
+        public enum Type {BIG_LAP_DIFFERENCE, SMALL_LAP_DIFFERENCE, EXTRA_LAP}
+        Type type;
         RaceStatusRow raceStatusRow;
         String description;
 
-        private StatusTableType(RaceStatusRow raceStatusRow, String description) {
+        private StatusTableType(Type type, RaceStatusRow raceStatusRow, String description) {
+            this.type = type;
             this.raceStatusRow = raceStatusRow;
             this.description = description;
         }
@@ -81,6 +84,7 @@ public class ProblemsPanel extends Composite {
                 return statusTableType.description;
             }
         }, "Probléma");
+        statusTable.addColumn(new MegoldasColumn(), "Megoldás");
         raceStatusRowList.addDataDisplay(statusTable);
         statusTable.setPageSize(Integer.MAX_VALUE);
 
@@ -127,7 +131,7 @@ public class ProblemsPanel extends Composite {
                     double avgDiffWithoutMax = (sumDiff - maxDiff) / (lapTimes.size() - 1);
                     double avgDiffThreshold = avgDiffWithoutMax * (elteres / 100.0);
                     if (maxDiff >= avgDiffThreshold) {
-                        raceStatusRowList.getList().add(new StatusTableType(raceStatusRow, "Túl lassú kör"));
+                        raceStatusRowList.getList().add(new StatusTableType(StatusTableType.Type.BIG_LAP_DIFFERENCE, raceStatusRow, "Túl lassú kör"));
                     }
                 }
             }
@@ -148,7 +152,7 @@ public class ProblemsPanel extends Composite {
                     double avgDiffWithoutMin = (sumDiff - minDiff) / (lapTimes.size() - 1);
                     double avgDiffThreshold = avgDiffWithoutMin * (elteres / 100.0);
                     if (minDiff <= avgDiffThreshold) {
-                        raceStatusRowList.getList().add(new StatusTableType(raceStatusRow, "Túl gyors kör"));
+                        raceStatusRowList.getList().add(new StatusTableType(StatusTableType.Type.SMALL_LAP_DIFFERENCE, raceStatusRow, "Túl gyors kör"));
                     }
                 }
             }
@@ -185,7 +189,62 @@ public class ProblemsPanel extends Composite {
         List<RaceStatusRow> raceStatusRows = scmtMarathon.getRaceStatusRowCache ().getAllRaceStatusRows();
         for (RaceStatusRow raceStatusRow: raceStatusRows) {
             if (raceStatusRow.getLapTimes().size() > raceStatusRow.getTav().getKorSzam()) {
-                raceStatusRowList.getList().add(new StatusTableType(raceStatusRow, "Extra kör."));
+                raceStatusRowList.getList().add(new StatusTableType(StatusTableType.Type.EXTRA_LAP, raceStatusRow, "Extra kör."));
+            }
+        }
+    }
+
+    private class MegoldasColumn extends Column<StatusTableType, String> {
+        public MegoldasColumn() {
+            super(new ButtonCell());
+            setHorizontalAlignment(ALIGN_CENTER);
+            setFieldUpdater(new FieldUpdater<StatusTableType, String>() {
+                @Override
+                public void update(int i, StatusTableType statusTableType, String s) {
+                    switch (statusTableType.type) {
+                        case BIG_LAP_DIFFERENCE:
+                            addExtraKor(statusTableType.raceStatusRow);
+                            break;
+                        case SMALL_LAP_DIFFERENCE:
+                        case EXTRA_LAP:
+                            showCorrectionDialogBox(statusTableType.raceStatusRow.getRaceNumber());
+                    }
+                }
+            });
+        }
+
+        private void addExtraKor(RaceStatusRow raceStatusRow) {
+            String korido = Window.prompt("Add meg az extra köridőt", "");
+            try {
+                long parseTime = Utils.parseTime(korido.trim()) + Utils.getFutamTimeDiff(scmtMarathon, raceStatusRow.getRaceNumber());
+                marathonService.addPersonLap(scmtMarathon.getVerseny().getId(), raceStatusRow.getRaceNumber(), parseTime, false, new CommonAsyncCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        findAllProblems();
+                    }
+                });
+            } catch (ParseException e) {
+                SCMTMarathon.commonFailureHandling(e);
+            }
+        }
+
+        private void showCorrectionDialogBox(String raceNumber) {
+            if (correctionDialogBox == null) {
+                correctionDialogBox = new CorrectionDialogBox(scmtMarathon);
+            }
+            correctionDialogBox.showDialog(raceNumber);
+        }
+
+        @Override
+        public String getValue(StatusTableType statusTableType) {
+            switch (statusTableType.type) {
+                case BIG_LAP_DIFFERENCE:
+                    return "Extra kör hozzáadása";
+                case SMALL_LAP_DIFFERENCE:
+                    return "Kör módosítása";
+                case EXTRA_LAP:
+                    return "Kör törlése";
+                default: return null;
             }
         }
     }

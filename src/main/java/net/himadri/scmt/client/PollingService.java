@@ -6,12 +6,8 @@ import com.google.gwt.appengine.channel.client.SocketError;
 import com.google.gwt.appengine.channel.client.SocketListener;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.storage.client.Storage;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import net.himadri.scmt.client.entity.PersonLap;
-import net.himadri.scmt.client.entity.RaceStatus;
-import net.himadri.scmt.client.entity.Tav;
-import net.himadri.scmt.client.entity.VersenySzam;
-import net.himadri.scmt.client.entity.Versenyzo;
+import net.himadri.scmt.client.callback.CommonAsyncCallback;
+import net.himadri.scmt.client.entity.*;
 import net.himadri.scmt.client.serializable.PollingRequest;
 import net.himadri.scmt.client.serializable.PollingResult;
 
@@ -46,12 +42,7 @@ public class PollingService {
 
     public void establishChannelConnection() {
         LOGGER.info("establishChannelConnection");
-        marathonService.createChannelToken(new AsyncCallback<String>() {
-            @Override
-            public void onFailure(Throwable throwable) {
-                SCMTMarathon.commonFailureHandling(throwable);
-            }
-
+        marathonService.createChannelToken(new CommonAsyncCallback<String>() {
             @Override
             public void onSuccess(String token) {
                 LOGGER.info("new token: " + token);
@@ -100,12 +91,7 @@ public class PollingService {
                 new PollingRequest.Entity(scmtMarathon.getVersenyszamMapCache().getMaxTime(), versenySzamSync.getSyncId()),
                 new PollingRequest.Entity(scmtMarathon.getTavMapCache().getMaxTime(), tavSync.getSyncId()),
                 new PollingRequest.Entity(scmtMarathon.getVersenyzoMapCache().getMaxTime(), versenyzoSync.getSyncId()));
-        marathonService.getPollingResult(scmtMarathon.getVerseny().getId(), pollingRequest, new AsyncCallback<PollingResult>() {
-            @Override
-            public void onFailure(Throwable throwable) {
-                SCMTMarathon.commonFailureHandling(throwable);
-            }
-
+        marathonService.getPollingResult(scmtMarathon.getVerseny().getId(), pollingRequest, new CommonAsyncCallback<PollingResult>() {
             @Override
             public void onSuccess(PollingResult pollingResult) {
                 if (raceStatusSync.raceStatus != pollingResult.getRaceStatus()) {

@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class ResultTable extends Composite
 {
-    public static final int FIX_COLUMN_COUNT = 5;
+    private final int FIX_COLUMN_COUNT;
     private MarathonServiceAsync marathonService = GWT.create(MarathonService.class);
     private TavVersenySzam filter;
     private Map<RaceStatusRow, Integer> helyezesMap = new HashMap<RaceStatusRow, Integer>();
@@ -73,7 +73,7 @@ public class ResultTable extends Composite
                 }
             }, "Versenyszám");
 
-        statusTable.addColumn(new EllenorzottColumn(marathonService, statusTable, listHandler), "Ellenőrzött");
+//        statusTable.addColumn(new EllenorzottColumn(marathonService, statusTable, listHandler), "Ellenőrzött");
         statusTable.setRowStyles(new RowStyles<RaceStatusRow>() {
             @Override
             public String getStyleNames(RaceStatusRow raceStatusRow, int i) {
@@ -81,6 +81,7 @@ public class ResultTable extends Composite
                         "strikethrough" : null;
             }
         });
+        FIX_COLUMN_COUNT = statusTable.getColumnCount();
         raceStatusRowList.addDataDisplay(statusTable);
         statusTable.setPageSize(Integer.MAX_VALUE);
         scmtMarathon.getPollingService().getPersonLapSync().addMarathonActionListener(new RefilterMarathonActionListener<PersonLap>());

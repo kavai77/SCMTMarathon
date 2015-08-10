@@ -8,6 +8,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 import net.himadri.scmt.client.*;
+import net.himadri.scmt.client.callback.CommonAsyncCallback;
 import net.himadri.scmt.client.entity.Tav;
 import net.himadri.scmt.client.entity.VersenySzam;
 import net.himadri.scmt.client.entity.Versenyzo;
@@ -93,12 +94,7 @@ public class VersenyzoEntryDialog extends DialogBox {
                 if (!nev.isEmpty()) {
                     String[] nevek = nev.split(" ");
                     String keresztNev = nevek[nevek.length - 1];
-                    service.isFerfiNev(keresztNev, new AsyncCallback<Boolean>() {
-                        @Override
-                        public void onFailure(Throwable throwable) {
-                            SCMTMarathon.commonFailureHandling(throwable);
-                        }
-
+                    service.isFerfiNev(keresztNev, new CommonAsyncCallback<Boolean>() {
                         @Override
                         public void onSuccess(Boolean ferfi) {
                             if (Boolean.TRUE.equals(ferfi)) {
