@@ -85,7 +85,7 @@ public class OklevelPDFService extends AbstractPDFService {
     }
 
 
-    public static void main(String[] args) throws Exception {
+//    public static void main(String[] args) throws Exception {
 //        try (FileOutputStream fileOutputStream = new FileOutputStream("oklevel.pdf")) {
 //            Document document = new Document(PageSize.A4);
 //            PdfWriter writer = PdfWriter.getInstance(document, fileOutputStream);
@@ -102,7 +102,7 @@ public class OklevelPDFService extends AbstractPDFService {
 //            );
 //            pdfService.printSinglePage(canvas, pageProfiles, data);
 //            document.close();
-        }
-    }
+//        }
+//    }
 
 }
