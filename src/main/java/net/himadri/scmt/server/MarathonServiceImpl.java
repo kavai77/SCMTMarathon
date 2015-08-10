@@ -256,12 +256,18 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
     }
 
     @Override
-    public void removePersonLap(Long personLapId) {
-        PersonLap personLap = ofy.get(PersonLap.class, personLapId);
-        removePersonLapFromCache(personLap);
-        ofy.delete(PersonLap.class, personLapId);
-        incrementSyncValue(personLap.getVersenyId(), SyncValueType.PERSON_LAP);
-        broadcastModification();
+    public void removePersonLap(Long versenyId, Long personLapId) {
+        try {
+            PersonLap personLap = ofy.get(PersonLap.class, personLapId);
+            removePersonLapFromCache(personLap);
+            ofy.delete(PersonLap.class, personLapId);
+        } catch(NotFoundException e) {
+            memcacheService.delete(getPersonLapListKey(versenyId));
+        } finally {
+            incrementSyncValue(versenyId, SyncValueType.PERSON_LAP);
+            broadcastModification();
+        }
+
     }
 
     @Override

@@ -32,7 +32,7 @@ public interface MarathonService extends RemoteService {
 
     void addPersonLap(Long versenyId, String raceNumber, long raceTime) throws AlreadyExistingEntityException;
 
-    void removePersonLap(Long personLapId);
+    void removePersonLap(Long versenyId, Long personLapId);
 
     void updateRaceNumber(Long personLapId, String raceNumber);
 

@@ -1,10 +1,12 @@
 package net.himadri.scmt.server;
 
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.PageSize;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
+import net.himadri.scmt.client.entity.PageProfile;
+import net.himadri.scmt.client.entity.PageProfileId;
 import net.himadri.scmt.client.entity.VersenySzam;
 import net.himadri.scmt.client.entity.Versenyzo;
 import net.himadri.scmt.client.serializable.PdfServiceType;
@@ -13,6 +15,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Created by IntelliJ IDEA.
@@ -34,20 +38,34 @@ public class PrePrintedPDFService extends AbstractPDFService {
                     printSamplePage(canvas);
                     break;
                 case TAV:
-                    printTav(canvas, document, Long.parseLong(id));
+                    printTav(canvas, document, Long.parseLong(id), false);
+                    break;
+                case DOBOGO:
+                    printTav(canvas, document, Long.parseLong(id), true);
                     break;
                 case VERSENYSZAM:
                     VersenySzam versenySzam = ofy.get(VersenySzam.class, Long.parseLong(id));
-                    printVersenySzam(canvas, document, versenySzam);
+                    int count = ofy.query(Versenyzo.class)
+                            .filter("versenySzamId", versenySzam.getId())
+                            .filter("versenyId", versenySzam.getVersenyId()).count();
+                    if (count > 0) {
+                        printVersenySzam(canvas, document, versenySzam, false);
+                    } else {
+                        printEmptyPage(canvas, "Ebben a versenyszámban nem indult versenyzõ.");
+                    }
                     break;
                 case VERSENYZO:
                     Long versenyId = Long.valueOf(request.getParameter("versenyId"));
                     Versenyzo versenyzo = ofy.query(Versenyzo.class).filter("versenyId", versenyId).filter("raceNumber", id).get();
-                    printVersenyzo(canvas, versenyzo);
+                    if (versenyzo != null) {
+                        printVersenyzo(canvas, versenyzo);
+                    } else {
+                        printEmptyPage(canvas, "Nem található ilyen rajtszámmal versenyzõ");
+                    }
                     break;
                     
             }
-            
+
             document.close();
         } catch (DocumentException e) {
             throw new IOException(e);

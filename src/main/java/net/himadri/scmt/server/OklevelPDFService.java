@@ -2,19 +2,24 @@ package net.himadri.scmt.server;
 
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreInputStream;
+import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.PageSize;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
-import net.himadri.scmt.client.entity.OklevelPdfBlob;
-import net.himadri.scmt.client.entity.PrintOklevelLog;
-import net.himadri.scmt.client.entity.Versenyzo;
+import com.itextpdf.text.pdf.PdfWriter;
+import net.himadri.scmt.client.entity.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class OklevelPDFService extends AbstractPDFService {
     @Override
@@ -97,7 +102,7 @@ public class OklevelPDFService extends AbstractPDFService {
 //            );
 //            pdfService.printSinglePage(canvas, pageProfiles, data);
 //            document.close();
-//        }
+        }
     }
 
 }

@@ -2,11 +2,7 @@ package net.himadri.scmt.server;
 
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Phrase;
+import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfContentByte;
@@ -50,22 +46,23 @@ public class AbstractPDFService extends HttpServlet {
         printSinglePage(canvas, pageProfiles, pageData);
     }
 
-    protected void printVersenySzam(PdfContentByte canvas, Document document, VersenySzam versenySzam) throws IOException, DocumentException {
+    protected void printVersenySzam(PdfContentByte canvas, Document document, VersenySzam versenySzam, boolean csakDobogo) throws IOException, DocumentException {
         List<PageProfile> pageProfiles = new MarathonServiceImpl().getAllPageProfiles();
         Tav tav = ofy.get(Tav.class, versenySzam.getTavId());
         List<VersenyzoResult> versenyzoResults = createVersenySzamResult(versenySzam, tav);
-
-        for (int i = 0; i < versenyzoResults.size(); i++) {
+        int size = versenyzoResults.size();
+        if (csakDobogo) size = Math.min(size, 3);
+        for (int i = 0; i < size; i++) {
             Map<PageProfileId, String> data = createPageData(versenySzam, tav, versenyzoResults, i);
             printSinglePage(canvas, pageProfiles, data);
             document.newPage();
         }
     }
 
-    protected void printTav(PdfContentByte canvas, Document document, long tavId) throws IOException, DocumentException {
+    protected void printTav(PdfContentByte canvas, Document document, long tavId, boolean csakDobogo) throws IOException, DocumentException {
         Query<VersenySzam> versenySzamQuery = ofy.query(VersenySzam.class).filter("tavId", tavId);
         for (VersenySzam versenySzam: versenySzamQuery) {
-            printVersenySzam(canvas, document, versenySzam);
+            printVersenySzam(canvas, document, versenySzam, csakDobogo);
         }
     }
 
@@ -94,11 +91,17 @@ public class AbstractPDFService extends HttpServlet {
                 int size = pageProfile.getSize();
                 if (size == 0) size = 10;
                 ColumnText.showTextAligned(canvas, pageProfile.getAlignment(),
-                        new Phrase(entry, new Font(BaseFont.createFont(fontFamily, BaseFont.CP1250, BaseFont.EMBEDDED), size)),
+                        new Phrase(entry, FontFactory.getFont(fontFamily, BaseFont.CP1250, BaseFont.EMBEDDED, size)),
                         convertCmToPixel(pageProfile.getxAxis()),
                         (int) PageSize.A4.getHeight() - convertCmToPixel(pageProfile.getyAxis()), 0);
             }
         }
+    }
+
+    protected void printEmptyPage(PdfContentByte canvas, String message) throws IOException, DocumentException {
+        printSinglePage(canvas,
+                Collections.singletonList(new PageProfile(PageProfileId.NEV.name(), 0, "Times-Roman", 15, 1, 1, true)),
+                Collections.singletonMap(PageProfileId.NEV, message) );
     }
 
     private int findVersenyzoInResults(List<VersenyzoResult> versenySzamResult, Versenyzo versenyzo) {

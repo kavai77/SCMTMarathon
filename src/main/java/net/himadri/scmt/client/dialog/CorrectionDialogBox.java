@@ -145,7 +145,7 @@ public class CorrectionDialogBox extends DialogBox {
             public void execute(final PersonLap personLap) {
                 boolean confirm = Window.confirm("Biztos törölni akarod a kiválasztott kört?");
                 if (confirm) {
-                    marathonService.removePersonLap(personLap.getId(), new AsyncCallback<Void>() {
+                    marathonService.removePersonLap(scmtMarathon.getVerseny().getId(), personLap.getId(), new AsyncCallback<Void>() {
                         @Override
                         public void onFailure(Throwable throwable) {
                         }

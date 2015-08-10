@@ -1,9 +1,13 @@
 package net.himadri.scmt.client.panel;
 
+import com.google.gwt.cell.client.Cell;
+import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -71,6 +75,7 @@ public class StatisticsPanel extends Composite implements TabChangeHandler {
                 return statisticsTable.gaveup;
             }
         }, "Feladta");
+        statisticsCellTable.addColumn(new DobogoColumn(), "Eredményhirdetés" );
 
         ScrollPanel tableScroll = new ScrollPanel(statisticsCellTable);
         tableScroll.setSize("900px", "350px");
@@ -125,6 +130,23 @@ public class StatisticsPanel extends Composite implements TabChangeHandler {
             }
         }
 
+
+        for (StatisticsTableRow row: versenySzamStatisticsTableRowMap.values()) {
+            row.first3Finished = row.finished.size() >= 3 || row.racing.size() == 0;
+        }
+
+        for (Tav tav: tavok) {
+            boolean isEveryCategoryFinished = true;
+            for (VersenySzam versenySzam: versenySzamok) {
+                if (versenySzam.getTavId().equals(tav.getId()) &&
+                        !versenySzamStatisticsTableRowMap.get(versenySzam.getId()).first3Finished) {
+                    isEveryCategoryFinished = false;
+                    break;
+                }
+            }
+            tavStatisticsTableRowMap.get(tav.getId()).first3Finished = isEveryCategoryFinished;
+        }
+
         for (Versenyzo versenyzo: scmtMarathon.getVersenyzoMapCache().getAllVersenyzo()) {
             VersenySzam versenySzam = scmtMarathon.getVersenyszamMapCache().getVersenySzam(versenyzo.getVersenySzamId());
             tavStatisticsTableRowMap.get(versenySzam.getTavId()).participants.add(versenyzo.getRaceNumber());
@@ -159,6 +181,7 @@ public class StatisticsPanel extends Composite implements TabChangeHandler {
         private ArrayList<String> finished = new ArrayList<String>();
         private ArrayList<String> gaveup = new ArrayList<String>();
         private ArrayList<String> notStarted = new ArrayList<String>();
+        private Boolean first3Finished;
 
         private StatisticsTableRow(String description) {
             this.description = description;
@@ -186,6 +209,30 @@ public class StatisticsPanel extends Composite implements TabChangeHandler {
         @Override
         public String getValue(StatisticsTableRow object) {
             return Integer.toString(getRaceNumberList(object).size());
+        }
+    }
+
+    private class DobogoColumn extends Column<StatisticsTableRow, String> {
+        public DobogoColumn() {
+            super(new ClickableTextCell() {
+                public void render(Context context, SafeHtml value, SafeHtmlBuilder sb)
+                {
+                    String logo = value.asString();
+                    if (!logo.isEmpty()) {
+                        sb.appendHtmlConstant("<img height=\"18\" src=\"images/" + logo + "\">");
+                    }
+                }
+            });
+            setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+        }
+
+        @Override
+        public String getValue(StatisticsTableRow statisticsTableRow) {
+            if (statisticsTableRow.first3Finished == null) {
+                return "";
+            } else {
+                return statisticsTableRow.first3Finished ? "button_ok.png" : "button_cancel.png";
+            }
         }
     }
 

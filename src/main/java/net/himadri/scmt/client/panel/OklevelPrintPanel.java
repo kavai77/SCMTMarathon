@@ -37,6 +37,7 @@ public class OklevelPrintPanel extends Composite implements TabChangeHandler {
     public static final Logger LOGGER = Logger.getLogger(OklevelPrintPanel.class.getName());
     private SCMTMarathon scmtMarathon;
     private ListBox tavValasztoValaszto = new ListBox();
+    private ListBox dobogoValasztoValaszto = new ListBox();
     private ListBox versenySzamValaszto = new ListBox();
     private ListBox versenyzoValaszto = new ListBox();
     private TextBox raceNumberText = new TextBox();
@@ -44,8 +45,9 @@ public class OklevelPrintPanel extends Composite implements TabChangeHandler {
     public OklevelPrintPanel(SCMTMarathon scmtMarathon) {
         this.scmtMarathon = scmtMarathon;
         StackLayoutPanel layoutPanel = new StackLayoutPanel(Style.Unit.EM);
-        layoutPanel.setSize("100%", "260px");
+        layoutPanel.setSize("100%", "320px");
         layoutPanel.add(createRedirectPanel(tavValasztoValaszto, PdfServiceType.TAV), "Táv", 4);
+        layoutPanel.add(createRedirectPanel(dobogoValasztoValaszto, PdfServiceType.DOBOGO), "Dobogósok", 4);
         layoutPanel.add(createRedirectPanel(versenySzamValaszto, PdfServiceType.VERSENYSZAM), "Versenyszám", 4);
         layoutPanel.add(createRedirectPanel(versenyzoValaszto, PdfServiceType.VERSENYZO), "Versenyző Név alapján", 4);
         raceNumberText.setSize("70px", "auto");
@@ -57,11 +59,13 @@ public class OklevelPrintPanel extends Composite implements TabChangeHandler {
     @Override
     public void activated() {
         tavValasztoValaszto.clear();
+        dobogoValasztoValaszto.clear();
         versenySzamValaszto.clear();
         versenyzoValaszto.clear();
         raceNumberText.setText(null);
         for (Tav tav: scmtMarathon.getTavMapCache().getAllTav()) {
             tavValasztoValaszto.addItem(tav.getMegnevezes(), tav.getId().toString());
+            dobogoValasztoValaszto.addItem(tav.getMegnevezes(), tav.getId().toString());
         }
         for (VersenySzam versenySzam: scmtMarathon.getVersenyszamMapCache().getAllVersenySzamSorted()) {
             versenySzamValaszto.addItem(Utils.getVersenySzamMegnevezes(scmtMarathon, versenySzam), versenySzam.getId().toString());
