@@ -5,6 +5,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
+import com.google.gwt.user.cellview.client.RowStyles;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.view.client.ListDataProvider;
@@ -73,6 +74,13 @@ public class ResultTable extends Composite
             }, "Versenyszám");
 
         statusTable.addColumn(new EllenorzottColumn(marathonService, statusTable, listHandler), "Ellenőrzött");
+        statusTable.setRowStyles(new RowStyles<RaceStatusRow>() {
+            @Override
+            public String getStyleNames(RaceStatusRow raceStatusRow, int i) {
+                return raceStatusRow.getVersenyzo() != null && raceStatusRow.getVersenyzo().isFeladta() ?
+                        "strikethrough" : null;
+            }
+        });
         raceStatusRowList.addDataDisplay(statusTable);
         statusTable.setPageSize(Integer.MAX_VALUE);
         scmtMarathon.getPollingService().getPersonLapSync().addMarathonActionListener(new RefilterMarathonActionListener<PersonLap>());

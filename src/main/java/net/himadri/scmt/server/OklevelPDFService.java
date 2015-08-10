@@ -80,19 +80,24 @@ public class OklevelPDFService extends AbstractPDFService {
     }
 
 
-//    public static void main(String[] args) throws Exception {
-//
-//        PdfReader reader = new PdfReader("/home/himadri/Documents/CsabaKavaiCV-en.pdf");
-//        PdfStamper pdfStamper = new PdfStamper(reader, new FileOutputStream("oklevel.pdf"));
-//        PdfContentByte canvas = pdfStamper.getOverContent(1);
-//        OklevelPDFService pdfService = new OklevelPDFService();
-//        Map<PageProfileId, String> data = pdfService.createSampleText();
-//        List<PageProfile> pageProfiles = Arrays.asList(
-//                new PageProfile(PageProfileId.NEV, 5, 5, 0, BaseFont.COURIER, 14)
-//        );
-//        pdfService.printSinglePage(canvas, pageProfiles, data);
-//        pdfStamper.close();
-//        reader.close();
-//    }
+    public static void main(String[] args) throws Exception {
+//        try (FileOutputStream fileOutputStream = new FileOutputStream("oklevel.pdf")) {
+//            Document document = new Document(PageSize.A4);
+//            PdfWriter writer = PdfWriter.getInstance(document, fileOutputStream);
+//            document.open();
+//            PdfContentByte canvas = writer.getDirectContentUnder();
+//            OklevelPDFService pdfService = new OklevelPDFService();
+//            Map<PageProfileId, String> data = pdfService.createSampleText();
+//            List<PageProfile> pageProfiles = Arrays.asList(
+//                    new PageProfile(PageProfileId.EGYESULET.name(), 0, "Times-Roman", 25, 9.2f, 16.1f, true),
+//                    new PageProfile(PageProfileId.HELYEZES.name(), 0, "Helvetica-Bold", 35, 11.2f, 21.8f, true),
+//                    new PageProfile(PageProfileId.IDO.name(), 0, "Helvetica-Bold", 25, 5.5f, 19.5f, true),
+//                    new PageProfile(PageProfileId.NEV.name(), 0, "Times-Bold", 35, 5.5f, 14.33f, true),
+//                    new PageProfile(PageProfileId.VERSENYSZAM.name(), 0, "Times-Roman", 25, 9f, 17.8f, true)
+//            );
+//            pdfService.printSinglePage(canvas, pageProfiles, data);
+//            document.close();
+//        }
+    }
 
 }

@@ -24,6 +24,16 @@ import javax.persistence.Id;
     {
     }
 
+    public PageProfile(String id, int alignment, String fontFamily, int size, float xAxis, float yAxis, boolean printProfile) {
+        this.id = id;
+        this.alignment = alignment;
+        this.fontFamily = fontFamily;
+        this.size = size;
+        this.xAxis = xAxis;
+        this.yAxis = yAxis;
+        this.printProfile = printProfile;
+    }
+
     public int getAlignment()
     {
         return alignment;
