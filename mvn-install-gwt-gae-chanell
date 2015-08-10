@@ -1,1 +1,0 @@
-mvn install:install-file -DgroupId=com.google.gwt.appengine -DartifactId=gwt-gae-channel -Dversion=0.4-alpha -Dpackaging=jar -Dfile=/work/gwt-gae-channel-0.4-alpha.jar -DgeneratePom=true

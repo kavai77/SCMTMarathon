@@ -33,10 +33,8 @@ import net.himadri.scmt.client.serializable.PollingRequest;
 import net.himadri.scmt.client.serializable.PollingResult;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.TreeMap;
 
 /**
  * The server side implementation of the RPC service.
@@ -252,10 +250,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         if (personLap != null && raceTime - personLap.getTime() <= RACE_TIME_THRESHOLD) {
             throw new AlreadyExistingEntityException();
         }
-        TreeMap<Long, PersonLap> personLapTreeMap = getPersonLapMap(versenyId);
-        while (personLapTreeMap.containsKey(raceTime)) {
-            raceTime++;
-        }
         PersonLap newPersonLap = new PersonLap(versenyId, raceNumber, raceTime);
         addPersonLap(newPersonLap);
         broadcastModification();
@@ -329,7 +323,7 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
 
     @Override
     public List<PersonLap> getAllPersonLapList(Long versenyId) {
-        return new ArrayList<PersonLap>(getPersonLapMap(versenyId).values());
+        return getPersonList(versenyId);
     }
 
     @Override
@@ -414,12 +408,19 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         if (pollingRequestEntity == null) {
             return null;
         } else if (pollingRequestEntity.getSync() != syncValue) {
-            List<PersonLap> items = new ArrayList<PersonLap>(getPersonLapMap(versenyId).values());
+            List<PersonLap> items = getPersonList(versenyId);
             return new PollingResult.Entity<PersonLap>(items, syncValue, true);
         } else {
-            Collection<PersonLap> personLapCollection = getPersonLapMap(versenyId)
-                    .tailMap(pollingRequestEntity.getMaxTime(), false).values();
-            return new PollingResult.Entity<PersonLap>(new ArrayList<PersonLap>(personLapCollection),
+            List<PersonLap> personLapCollection = new ArrayList<PersonLap>();
+            List<PersonLap> personLapList = getPersonList(versenyId);
+            for (int i = personLapList.size() - 1; i >= 0; i--) {
+                PersonLap personLap = personLapList.get(i);
+                if (personLap.getTime() > pollingRequestEntity.getMaxTime()) {
+                    personLapCollection.add(personLap);
+                } else break;
+            }
+
+            return new PollingResult.Entity<>(personLapCollection,
                     syncValue, false);
         }
     }
@@ -468,38 +469,34 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
     }
 
     @SuppressWarnings("unchecked")
-    private TreeMap<Long, PersonLap> getPersonLapMap(Long versenyId) {
-        TreeMap<Long, PersonLap> personLapTreeMap = (TreeMap<Long, PersonLap>) memcacheService.get(
-                getPersonLapMapKey(versenyId));
-        if (personLapTreeMap == null) {
-            personLapTreeMap = new TreeMap<Long, PersonLap>();
-            Query<PersonLap> query = ofy.query(PersonLap.class).filter("versenyId", versenyId);
-            for (PersonLap personLap : query) {
-                personLapTreeMap.put(personLap.getTime(), personLap);
-            }
-            putPersonLapTreeIntoCache(versenyId, personLapTreeMap);
+    private List<PersonLap> getPersonList(Long versenyId) {
+        List<PersonLap> personLapList = (List<PersonLap>) memcacheService.get(
+                getPersonLapListKey(versenyId));
+        if (personLapList == null) {
+            personLapList = new ArrayList<>(ofy.query(PersonLap.class).filter("versenyId", versenyId).order("time").list());
+            putPersonLapListIntoCache(versenyId, personLapList);
         }
-        return personLapTreeMap;
+        return personLapList;
     }
 
-    private void putPersonLapTreeIntoCache(Long versenyId, TreeMap<Long, PersonLap> personLapTreeMap) {
-        memcacheService.put(getPersonLapMapKey(versenyId), personLapTreeMap, DEFAULT_CACHE_EXPIRATION);
+    private void putPersonLapListIntoCache(Long versenyId, List<PersonLap> personLapList) {
+        memcacheService.put(getPersonLapListKey(versenyId), personLapList, DEFAULT_CACHE_EXPIRATION);
     }
 
     private void addPersonLap(PersonLap personLap) {
         ofy.put(personLap);
-        TreeMap<Long, PersonLap> personLapTreeMap = getPersonLapMap(personLap.getVersenyId());
-        personLapTreeMap.put(personLap.getTime(), personLap);
-        putPersonLapTreeIntoCache(personLap.getVersenyId(), personLapTreeMap);
+        List<PersonLap> personLapList = getPersonList(personLap.getVersenyId());
+        personLapList.add(personLap);
+        putPersonLapListIntoCache(personLap.getVersenyId(), personLapList);
     }
 
     private void removePersonLapFromCache(PersonLap personLap) {
-        TreeMap<Long, PersonLap> personLapMap = getPersonLapMap(personLap.getVersenyId());
-        personLapMap.remove(personLap.getTime());
-        putPersonLapTreeIntoCache(personLap.getVersenyId(), personLapMap);
+        List<PersonLap> personLapList = getPersonList(personLap.getVersenyId());
+        personLapList.remove(personLap);
+        putPersonLapListIntoCache(personLap.getVersenyId(), personLapList);
     }
 
-    private String getPersonLapMapKey(Long versenyId) {
+    private String getPersonLapListKey(Long versenyId) {
         return versenyId.toString() + "." +
                 PersonLap.class.getName() + ".entryTree";
     }

@@ -13,13 +13,10 @@
     <properties>
         <!-- Convenience property to set the GWT version -->
         <gwtVersion>2.6.0</gwtVersion>
-        <appEngineVersion>1.8.2</appEngineVersion>
+        <appEngineVersion>1.9.19</appEngineVersion>
         <appEngineSdk>
             ${settings.localRepository}/com/google/appengine/appengine-java-sdk/${appEngineVersion}/appengine-java-sdk/appengine-java-sdk-${appEngineVersion}
         </appEngineSdk>
-        <!-- GWT needs at least java 1.6 -->
-        <maven.compiler.source>1.6</maven.compiler.source>
-        <maven.compiler.target>1.6</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -58,6 +55,8 @@
             <groupId>com.google.gwt.appengine</groupId>
             <artifactId>gwt-gae-channel</artifactId>
             <version>0.4-alpha</version>
+			<systemPath>${project.basedir}/lib/gwt-gae-channel-0.4-alpha.jar</systemPath>
+            <scope>system</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
@@ -86,6 +85,15 @@
         <outputDirectory>target/www/WEB-INF/classes</outputDirectory>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
             <!-- GWT Maven Plugin-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -152,6 +160,10 @@
                 <groupId>com.google.appengine</groupId>
                 <artifactId>appengine-maven-plugin</artifactId>
                 <version>${appEngineVersion}</version>
+                <configuration>
+                    <enableJarClasses>false</enableJarClasses>
+                    <disableUpdateCheck>true</disableUpdateCheck>
+                </configuration>
             </plugin>
         </plugins>
     </build>
