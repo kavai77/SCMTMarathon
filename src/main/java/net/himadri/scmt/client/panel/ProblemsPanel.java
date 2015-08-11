@@ -12,7 +12,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import net.himadri.scmt.client.*;
-import net.himadri.scmt.client.callback.CommonAsyncCallback;
+import net.himadri.scmt.client.callback.EmptyFailureHandlingAsyncCallback;
 import net.himadri.scmt.client.dialog.CorrectionDialogBox;
 import net.himadri.scmt.client.serializable.RaceStatusRow;
 
@@ -23,12 +23,12 @@ public class ProblemsPanel extends Composite {
     private SCMTMarathon scmtMarathon;
 
     private MarathonServiceAsync marathonService = GWT.create(MarathonService.class);
-    private ListDataProvider<StatusTableType> raceStatusRowList = new ListDataProvider<StatusTableType>();
+    private ListDataProvider<StatusTableType> problemsList = new ListDataProvider<StatusTableType>();
     private IntegerBox elteresBox = new IntegerBox();
     private CorrectionDialogBox correctionDialogBox;
 
     private static class StatusTableType {
-        public enum Type {BIG_LAP_DIFFERENCE, SMALL_LAP_DIFFERENCE, EXTRA_LAP}
+        public enum Type {BIG_LAP_DIFFERENCE, SMALL_LAP_DIFFERENCE, EXTRA_LAP, UNKNOWN_NUMBER}
         Type type;
         RaceStatusRow raceStatusRow;
         String description;
@@ -85,7 +85,7 @@ public class ProblemsPanel extends Composite {
             }
         }, "Probléma");
         statusTable.addColumn(new MegoldasColumn(), "Megoldás");
-        raceStatusRowList.addDataDisplay(statusTable);
+        problemsList.addDataDisplay(statusTable);
         statusTable.setPageSize(Integer.MAX_VALUE);
 
         HorizontalPanel elteresHorizontal = new HorizontalPanel();
@@ -113,10 +113,11 @@ public class ProblemsPanel extends Composite {
     }
 
     private void findAllProblems() {
-        raceStatusRowList.getList().clear();
+        problemsList.getList().clear();
         findBigLapTimeDifference();
         findSmallLapTimeDifference();
         findExtraLaps();
+        findUnknownNumbers();
     }
 
     private void findBigLapTimeDifference() {
@@ -131,7 +132,7 @@ public class ProblemsPanel extends Composite {
                     double avgDiffWithoutMax = (sumDiff - maxDiff) / (lapTimes.size() - 1);
                     double avgDiffThreshold = avgDiffWithoutMax * (elteres / 100.0);
                     if (maxDiff >= avgDiffThreshold) {
-                        raceStatusRowList.getList().add(new StatusTableType(StatusTableType.Type.BIG_LAP_DIFFERENCE, raceStatusRow, "Túl lassú kör"));
+                        problemsList.getList().add(new StatusTableType(StatusTableType.Type.BIG_LAP_DIFFERENCE, raceStatusRow, "Túl lassú kör"));
                     }
                 }
             }
@@ -152,7 +153,7 @@ public class ProblemsPanel extends Composite {
                     double avgDiffWithoutMin = (sumDiff - minDiff) / (lapTimes.size() - 1);
                     double avgDiffThreshold = avgDiffWithoutMin * (elteres / 100.0);
                     if (minDiff <= avgDiffThreshold) {
-                        raceStatusRowList.getList().add(new StatusTableType(StatusTableType.Type.SMALL_LAP_DIFFERENCE, raceStatusRow, "Túl gyors kör"));
+                        problemsList.getList().add(new StatusTableType(StatusTableType.Type.SMALL_LAP_DIFFERENCE, raceStatusRow, "Túl gyors kör"));
                     }
                 }
             }
@@ -188,8 +189,17 @@ public class ProblemsPanel extends Composite {
     private void findExtraLaps() {
         List<RaceStatusRow> raceStatusRows = scmtMarathon.getRaceStatusRowCache ().getAllRaceStatusRows();
         for (RaceStatusRow raceStatusRow: raceStatusRows) {
-            if (raceStatusRow.getLapTimes().size() > raceStatusRow.getTav().getKorSzam()) {
-                raceStatusRowList.getList().add(new StatusTableType(StatusTableType.Type.EXTRA_LAP, raceStatusRow, "Extra kör."));
+            if (raceStatusRow.getTav() != null && raceStatusRow.getLapTimes().size() > raceStatusRow.getTav().getKorSzam()) {
+                problemsList.getList().add(new StatusTableType(StatusTableType.Type.EXTRA_LAP, raceStatusRow, "Extra kör."));
+            }
+        }
+    }
+
+    private void findUnknownNumbers() {
+        List<RaceStatusRow> raceStatusRows = scmtMarathon.getRaceStatusRowCache ().getAllRaceStatusRows();
+        for (RaceStatusRow raceStatusRow: raceStatusRows) {
+            if (raceStatusRow.getVersenyzo() == null) {
+                problemsList.getList().add(new StatusTableType(StatusTableType.Type.UNKNOWN_NUMBER, raceStatusRow, "Ismeretlen rajtszám"));
             }
         }
     }
@@ -207,6 +217,7 @@ public class ProblemsPanel extends Composite {
                             break;
                         case SMALL_LAP_DIFFERENCE:
                         case EXTRA_LAP:
+                        case UNKNOWN_NUMBER:
                             showCorrectionDialogBox(statusTableType.raceStatusRow.getRaceNumber());
                     }
                 }
@@ -217,12 +228,7 @@ public class ProblemsPanel extends Composite {
             String korido = Window.prompt("Add meg az extra köridőt", "");
             try {
                 long parseTime = Utils.parseTime(korido.trim()) + Utils.getFutamTimeDiff(scmtMarathon, raceStatusRow.getRaceNumber());
-                marathonService.addPersonLap(scmtMarathon.getVerseny().getId(), raceStatusRow.getRaceNumber(), parseTime, false, new CommonAsyncCallback<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        findAllProblems();
-                    }
-                });
+                marathonService.addPersonLap(scmtMarathon.getVerseny().getId(), raceStatusRow.getRaceNumber(), parseTime, false, new EmptyFailureHandlingAsyncCallback<Void>());
             } catch (ParseException e) {
                 SCMTMarathon.commonFailureHandling(e);
             }
@@ -244,6 +250,8 @@ public class ProblemsPanel extends Composite {
                     return "Kör módosítása";
                 case EXTRA_LAP:
                     return "Kör törlése";
+                case UNKNOWN_NUMBER:
+                    return "Felvitel törlése";
                 default: return null;
             }
         }
