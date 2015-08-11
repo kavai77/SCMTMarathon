@@ -1,4 +1,6 @@
-package net.himadri.scmt.client;
+package net.himadri.scmt.client.token;
+
+import net.himadri.scmt.client.TavVersenySzam;
 
 /**
  * Created by IntelliJ IDEA.

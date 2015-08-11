@@ -68,6 +68,8 @@ public interface MarathonService extends RemoteService {
 
     Verseny addVerseny(String versenyMegnevezes);
 
+    Verseny getVerseny(Long id);
+
     List<Verseny> getVersenyek();
 
     List<PersonLap> getAllPersonLapList(Long versenyId);

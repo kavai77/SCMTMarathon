@@ -1,23 +1,27 @@
 package net.himadri.scmt.client;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
+import net.himadri.scmt.client.callback.CommonAsyncCallback;
 import net.himadri.scmt.client.entity.Verseny;
 import net.himadri.scmt.client.exception.NotAuthorizedException;
 import net.himadri.scmt.client.panel.MainRootPanel;
 import net.himadri.scmt.client.panel.PrintAllRunnersRootPanel;
 import net.himadri.scmt.client.panel.PrintResultRootPanel;
 import net.himadri.scmt.client.serializable.MarathonActionListener;
+import net.himadri.scmt.client.token.TavVersenySzamToken;
+import net.himadri.scmt.client.token.VersenyToken;
 
+import java.util.Collections;
 import java.util.List;
 
 @SuppressWarnings({"unchecked"})
 public class SCMTMarathon implements EntryPoint {
-
     private PollingService pollingService = new PollingService(this);
     private SyncSupport<Verseny> versenySyncSupport = new SyncSupport<Verseny>();
 
@@ -25,6 +29,8 @@ public class SCMTMarathon implements EntryPoint {
     private VersenyszamMapCache versenyszamMapCache = new VersenyszamMapCache(this);
     private TavMapCache tavMapCache = new TavMapCache(this);
     private RaceStatusRowCache raceStatusRowCache = new RaceStatusRowCache(this);
+
+    private final MarathonServiceAsync marathonService = GWT.create(MarathonService.class);
 
     private Verseny verseny;
 
@@ -46,8 +52,18 @@ public class SCMTMarathon implements EntryPoint {
                 } else if (PrintAllRunnersRootPanel.HISTORY_TOKEN.equals(historyToken)) {
                     printAllRunnersRootPanel.showAllRunnersPanel();
                     rootPanel.add(printAllRunnersRootPanel);
+                } else if (VersenyToken.isHistoryMatches(historyToken)) {
+                    rootPanel.add(mainRootPanel);
+                    Long versenyId = VersenyToken.decode(historyToken);
+                    marathonService.getVerseny(versenyId, new CommonAsyncCallback<Verseny>() {
+                        @Override
+                        public void onSuccess(Verseny verseny) {
+                            versenySyncSupport.notifyRefreshed(Collections.singletonList(verseny));
+                        }
+                    });
                 } else {
                     rootPanel.add(mainRootPanel);
+                    mainRootPanel.showVersenyPanel();
                 }
             }
         });

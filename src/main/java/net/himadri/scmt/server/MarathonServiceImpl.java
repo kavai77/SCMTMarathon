@@ -314,6 +314,11 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
     }
 
     @Override
+    public Verseny getVerseny(Long id) {
+        return ofy.get(Verseny.class, id);
+    }
+
+    @Override
     public List<Verseny> getVersenyek() {
         List<Verseny> versenyList = ofy.query(Verseny.class).list();
         for (Verseny verseny: versenyList) {

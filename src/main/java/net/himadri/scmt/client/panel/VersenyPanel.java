@@ -1,6 +1,7 @@
 package net.himadri.scmt.client.panel;
 
 import com.google.gwt.cell.client.ActionCell;
+import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.TextButtonCell;
 import com.google.gwt.core.client.GWT;
@@ -9,17 +10,16 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.ProvidesKey;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SingleSelectionModel;
+import com.google.gwt.view.client.NoSelectionModel;
 import net.himadri.scmt.client.*;
 import net.himadri.scmt.client.callback.CommonAsyncCallback;
 import net.himadri.scmt.client.callback.ReloadAsyncCallback;
 import net.himadri.scmt.client.entity.Verseny;
+import net.himadri.scmt.client.token.VersenyToken;
 
 import java.util.*;
 
@@ -38,10 +38,8 @@ public class VersenyPanel extends Composite {
     public VersenyPanel(SCMTMarathon scmtMarathon) {
         this.scmtMarathon = scmtMarathon;
 
-
         VerticalPanel rootPanel = new VerticalPanel();
         rootPanel.setSpacing(10);
-//        rootPanel.setSize("500px", "330px");
         rootPanel.addStyleName("centerWithMargin");
 
         initWidget(rootPanel);
@@ -104,13 +102,13 @@ public class VersenyPanel extends Composite {
         versenyTable.setSize("100%", "100%");
         versenyList.addDataDisplay(versenyTable);
         versenyTable.setPageSize(Integer.MAX_VALUE);
-        versenyTable.addColumn(new TextColumn<Verseny>() {
+        versenyTable.addColumn(new VersenyTextColumn() {
             @Override
             public String getValue(Verseny verseny) {
                 return verseny.getNev();
             }
         }, "Név");
-        versenyTable.addColumn(new TextColumn<Verseny>() {
+        versenyTable.addColumn(new VersenyTextColumn() {
             @Override
             public String getValue(Verseny verseny) {
                 return verseny.getRaceStartTime() != null ?
@@ -118,7 +116,7 @@ public class VersenyPanel extends Composite {
                         : null;
             }
         }, "Dátum");
-        versenyTable.addColumn(new TextColumn<Verseny>() {
+        versenyTable.addColumn(new VersenyTextColumn() {
             @Override
             public String getValue(Verseny verseny) {
                 switch (verseny.getRaceStatus()) {
@@ -133,7 +131,7 @@ public class VersenyPanel extends Composite {
                 }
             }
         }, "Státusz");
-        versenyTable.addColumn(new RightAlignmentTextColumn<Verseny>() {
+        versenyTable.addColumn(new VersenyTextColumn(HasHorizontalAlignment.ALIGN_RIGHT) {
             @Override
             public String getValue(Verseny verseny) {
                 return Integer.toString(verseny.getVersenyzoSzam());
@@ -147,18 +145,18 @@ public class VersenyPanel extends Composite {
                 if (authorized) {
                     versenyTable.addColumn(new Column<Verseny, Verseny>(
                             new ActionCell<Verseny>("Törlés", new ActionCell.Delegate<Verseny>() {
-                        @Override
-                        public void execute(final Verseny verseny) {
-                            if (Window.confirm("Azt a műveletet csak a rendszer adminisztrátor tudja megtenni. Biztos folytatod?")) {
-                                marathonService.deleteRace(verseny.getId(), new CommonAsyncCallback<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        versenyList.getList().remove(verseny);
+                                @Override
+                                public void execute(final Verseny verseny) {
+                                    if (Window.confirm("Azt a műveletet csak a rendszer adminisztrátor tudja megtenni. Biztos folytatod?")) {
+                                        marathonService.deleteRace(verseny.getId(), new CommonAsyncCallback<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                versenyList.getList().remove(verseny);
+                                            }
+                                        });
                                     }
-                                });
-                            }
-                        }
-                    })) {
+                                }
+                            })) {
                         @Override
                         public Verseny getValue(Verseny verseny) {
                             return verseny;
@@ -167,29 +165,28 @@ public class VersenyPanel extends Composite {
                 }
             }
         });
-        final SingleSelectionModel<Verseny> versenySelectionModel = new SingleSelectionModel<Verseny>
-                (new ProvidesKey<Verseny>() {
-            @Override
-            public Object getKey(Verseny verseny) {
-                return verseny.getId();
-            }
-        });
-        versenyTable.setSelectionModel(versenySelectionModel);
-
-        versenySelectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-            @Override
-            public void onSelectionChange(SelectionChangeEvent selectionChangeEvent) {
-                scmtMarathon.getVersenySyncSupport().notifyRefreshed(Collections.singletonList(versenySelectionModel.getSelectedObject()));
-            }
-        });
+        versenyTable.setSelectionModel(new NoSelectionModel<Verseny>());
         return versenyTable;
     }
 
-    private static abstract class RightAlignmentTextColumn<T> extends TextColumn<T> {
-        protected RightAlignmentTextColumn() {
-            setHorizontalAlignment(ALIGN_RIGHT);
+    private abstract class VersenyTextColumn extends Column<Verseny, String> {
+        public VersenyTextColumn() {
+            super(new ClickableTextCell());
+            setFieldUpdater(new FieldUpdater<Verseny, String>() {
+                @Override
+                public void update(int i, Verseny verseny, String s) {
+                    scmtMarathon.getVersenySyncSupport().notifyRefreshed(Collections.singletonList(verseny));
+                    History.newItem(VersenyToken.encode(verseny.getId()), false);
+                }
+            });
+        }
+
+        public VersenyTextColumn(HorizontalAlignmentConstant align) {
+            this();
+            setHorizontalAlignment(align);
         }
     }
+
 
     private class VersenyActionColumn extends Column<Verseny, String> {
         private VersenyActionColumn() {

@@ -7,7 +7,6 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import net.himadri.scmt.client.SCMTMarathon;
 import net.himadri.scmt.client.TavVersenySzam;
-import net.himadri.scmt.client.TavVersenySzamToken;
 import net.himadri.scmt.client.TavVersenyszamFilter;
 import net.himadri.scmt.client.Utils;
 import net.himadri.scmt.client.entity.PersonLap;
@@ -16,6 +15,7 @@ import net.himadri.scmt.client.entity.VersenySzam;
 import net.himadri.scmt.client.entity.Versenyzo;
 import net.himadri.scmt.client.serializable.MarathonActionListener;
 import net.himadri.scmt.client.serializable.RaceStatusRow;
+import net.himadri.scmt.client.token.TavVersenySzamToken;
 
 import java.util.ArrayList;
 import java.util.HashMap;

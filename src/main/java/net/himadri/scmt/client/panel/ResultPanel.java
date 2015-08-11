@@ -1,26 +1,16 @@
 package net.himadri.scmt.client.panel;
 
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.dom.client.*;
 import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.ui.AbsolutePanel;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.TextBox;
-
+import com.google.gwt.user.client.ui.*;
 import net.himadri.scmt.client.ImageButton;
 import net.himadri.scmt.client.SCMTMarathon;
 import net.himadri.scmt.client.TavVersenySzam;
-import net.himadri.scmt.client.TavVersenySzamToken;
 import net.himadri.scmt.client.Utils;
 import net.himadri.scmt.client.entity.Tav;
 import net.himadri.scmt.client.entity.VersenySzam;
 import net.himadri.scmt.client.serializable.MarathonActionListener;
+import net.himadri.scmt.client.token.TavVersenySzamToken;
 
 import java.util.List;
 

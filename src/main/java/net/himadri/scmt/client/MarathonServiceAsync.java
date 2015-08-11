@@ -73,4 +73,6 @@ public interface MarathonServiceAsync {
     void versenyzoEredmenyEllenorzott(Long versenyzoId, boolean ellenorzott, AsyncCallback<Void> async);
 
     void shiftRaceTime(Long versenyId, long offsetInMillis, AsyncCallback<Void> async);
+
+    void getVerseny(Long id, AsyncCallback<Verseny> async);
 }

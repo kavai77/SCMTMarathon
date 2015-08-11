@@ -19,25 +19,33 @@ import java.util.List;
  */
 public class MainRootPanel extends Composite {
 
+    private final AbsolutePanel bodyPanel = new AbsolutePanel();
+    private final TabPanel foTabPanel = new TabPanel();
+    private final VersenyPanel versenyPanel;
+
     public MainRootPanel(final SCMTMarathon scmtMarathon) {
         final AbsolutePanel absolutePanel = new AbsolutePanel();
         absolutePanel.setSize("990px", "auto");
         absolutePanel.addStyleName("centerWithMargin");
 
         Image headerImage = new Image("images/header.jpg");
-        absolutePanel.add(headerImage);
         headerImage.setSize("990px", "auto");
+
+        Anchor anchor = new Anchor();
+        anchor.setHref("/SCMTMarathon.html");
+        anchor.getElement().appendChild(headerImage.getElement());
+
+        absolutePanel.add(anchor);
 
         UserPanel userPanel = new UserPanel();
         absolutePanel.add(userPanel);
 
-        final AbsolutePanel bodyPanel = new AbsolutePanel();
-
-        final TabPanel foTabPanel = new TabPanel();
         foTabPanel.setSize("990px", "600px");
         foTabPanel.add(new RaceDeckPanel(scmtMarathon), "Verseny", false);
         foTabPanel.add(new AdminPanel(scmtMarathon), "Adminisztráció", false);
         foTabPanel.selectTab(0);
+
+        versenyPanel = new VersenyPanel(scmtMarathon);
 
         UserServiceAsync userService = GWT.create(UserService.class);
         userService.isAuthorized(new CommonAsyncCallback<Boolean>() {
@@ -49,7 +57,6 @@ public class MainRootPanel extends Composite {
                 } else if (!Storage.isLocalStorageSupported()) {
                     absolutePanel.add(new Label("A böngésződ elavult ez az alkalmazás futtatásához. Használj modernebb böngésződ!"));
                 } else {
-                    bodyPanel.add(new VersenyPanel(scmtMarathon));
                     absolutePanel.add(bodyPanel);
                 }
             }
@@ -63,11 +70,20 @@ public class MainRootPanel extends Composite {
 
             @Override
             public void itemRefreshed(List<Verseny> items) {
-                bodyPanel.clear();
-                bodyPanel.add(foTabPanel);
+                showFoTabPanel();
             }
         });
 
         initWidget(absolutePanel);
+    }
+
+    public void showFoTabPanel() {
+        bodyPanel.clear();
+        bodyPanel.add(foTabPanel);
+    }
+
+    public void showVersenyPanel() {
+        bodyPanel.clear();
+        bodyPanel.add(versenyPanel);
     }
 }
