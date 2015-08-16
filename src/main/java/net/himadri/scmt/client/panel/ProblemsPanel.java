@@ -5,6 +5,7 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -14,6 +15,8 @@ import com.google.gwt.view.client.ListDataProvider;
 import net.himadri.scmt.client.*;
 import net.himadri.scmt.client.callback.EmptyFailureHandlingAsyncCallback;
 import net.himadri.scmt.client.dialog.CorrectionDialogBox;
+import net.himadri.scmt.client.gwtextras.SafeHtmlColumn;
+import net.himadri.scmt.client.gwtextras.SafeHtmlString;
 import net.himadri.scmt.client.serializable.RaceStatusRow;
 
 import java.text.ParseException;
@@ -32,11 +35,13 @@ public class ProblemsPanel extends Composite {
         Type type;
         RaceStatusRow raceStatusRow;
         String description;
+        int problemLapIndex;
 
-        private StatusTableType(Type type, RaceStatusRow raceStatusRow, String description) {
+        private StatusTableType(Type type, RaceStatusRow raceStatusRow, String description, int problemLapIndex) {
             this.type = type;
             this.raceStatusRow = raceStatusRow;
             this.description = description;
+            this.problemLapIndex = problemLapIndex;
         }
     }
 
@@ -65,17 +70,21 @@ public class ProblemsPanel extends Composite {
                 return statusTableType.raceStatusRow.getVersenySzam() != null ? Utils.getVersenySzamMegnevezes(scmtMarathon, statusTableType.raceStatusRow.getVersenySzam()) : null;
             }
         }, "Versenyszám");
-        statusTable.addColumn(new TextColumn<StatusTableType>() {
+        statusTable.addColumn(new SafeHtmlColumn<StatusTableType>() {
             @Override
-            public String getValue(StatusTableType statusTableType) {
+            public SafeHtml getValue(StatusTableType statusTableType) {
                 StringBuilder stringBuilder = new StringBuilder();
                 List<Long> lapTimes = statusTableType.raceStatusRow.getLapTimes();
+                if (statusTableType.problemLapIndex == 0) stringBuilder.append("<b>");
                 stringBuilder.append("1. kör: ").append(Utils.getElapsedTimeString(statusTableType.raceStatusRow, 0));
+                if (statusTableType.problemLapIndex == 0) stringBuilder.append("</b>");
                 for (int i = 0; i < lapTimes.size() - 1; i++) {
+                    if (statusTableType.problemLapIndex == i + 1) stringBuilder.append("<b>");
                     stringBuilder.append(", ").append(i + 2).append(" kör: ");
                     stringBuilder.append(Utils.getElapsedTimeString(lapTimes.get(i + 1) - lapTimes.get(i)));
+                    if (statusTableType.problemLapIndex == i + 1) stringBuilder.append("</b>");
                 }
-                return stringBuilder.toString();
+                return new SafeHtmlString(stringBuilder.toString());
             }
         }, "Köridők");
         statusTable.addColumn(new TextColumn<StatusTableType>() {
@@ -127,12 +136,12 @@ public class ProblemsPanel extends Composite {
             for (RaceStatusRow raceStatusRow: raceStatusRows) {
                 List<Long> lapTimes = raceStatusRow.getLapTimes();
                 if (lapTimes.size() >= 2) {
-                    long maxDiff = findMaximumDiff(lapTimes);
+                    IndexAndValue maxDiff = findMaximumDiff(lapTimes);
                     long sumDiff = getSumDiff(lapTimes);
-                    double avgDiffWithoutMax = (sumDiff - maxDiff) / (lapTimes.size() - 1);
+                    double avgDiffWithoutMax = (sumDiff - maxDiff.value) / (lapTimes.size() - 1);
                     double avgDiffThreshold = avgDiffWithoutMax * (elteres / 100.0);
-                    if (maxDiff >= avgDiffThreshold) {
-                        problemsList.getList().add(new StatusTableType(StatusTableType.Type.BIG_LAP_DIFFERENCE, raceStatusRow, "Túl lassú kör"));
+                    if (maxDiff.value >= avgDiffThreshold) {
+                        problemsList.getList().add(new StatusTableType(StatusTableType.Type.BIG_LAP_DIFFERENCE, raceStatusRow, "Túl lassú kör", maxDiff.index));
                     }
                 }
             }
@@ -148,12 +157,12 @@ public class ProblemsPanel extends Composite {
             for (RaceStatusRow raceStatusRow: raceStatusRows) {
                 List<Long> lapTimes = raceStatusRow.getLapTimes();
                 if (lapTimes.size() >= 2) {
-                    long minDiff = findMinimumDiff(lapTimes);
+                    IndexAndValue minDiff = findMinimumDiff(lapTimes);
                     long sumDiff = getSumDiff(lapTimes);
-                    double avgDiffWithoutMin = (sumDiff - minDiff) / (lapTimes.size() - 1);
+                    double avgDiffWithoutMin = (sumDiff - minDiff.value) / (lapTimes.size() - 1);
                     double avgDiffThreshold = avgDiffWithoutMin * (elteres / 100.0);
-                    if (minDiff <= avgDiffThreshold) {
-                        problemsList.getList().add(new StatusTableType(StatusTableType.Type.SMALL_LAP_DIFFERENCE, raceStatusRow, "Túl gyors kör"));
+                    if (minDiff.value <= avgDiffThreshold) {
+                        problemsList.getList().add(new StatusTableType(StatusTableType.Type.SMALL_LAP_DIFFERENCE, raceStatusRow, "Túl gyors kör", minDiff.index));
                     }
                 }
             }
@@ -162,20 +171,30 @@ public class ProblemsPanel extends Composite {
         }
     }
 
-    private long findMaximumDiff(List<Long> longList) {
+    private IndexAndValue findMaximumDiff(List<Long> longList) {
         long maxValue = longList.get(0);
+        int index = 0;
         for (int i = 0; i < longList.size() - 1; i++) {
-            maxValue = Math.max(maxValue, longList.get(i + 1) - longList.get(i));
+            long diff = longList.get(i + 1) - longList.get(i);
+            if (diff > maxValue) {
+                index = i + 1;
+                maxValue = diff;
+            }
         }
-        return maxValue;
+        return new IndexAndValue(index, maxValue);
     }
 
-    private long findMinimumDiff(List<Long> longList) {
+    private IndexAndValue findMinimumDiff(List<Long> longList) {
         long minValue = longList.get(0);
+        int index = 0;
         for (int i = 0; i < longList.size() - 1; i++) {
-            minValue = Math.min(minValue, longList.get(i + 1) - longList.get(i));
+            long diff = longList.get(i + 1) - longList.get(i);
+            if (diff < minValue) {
+                index = i + 1;
+                minValue = diff;
+            }
         }
-        return minValue;
+        return new IndexAndValue(index, minValue);
     }
 
     private long getSumDiff(List<Long> longList) {
@@ -190,7 +209,7 @@ public class ProblemsPanel extends Composite {
         List<RaceStatusRow> raceStatusRows = scmtMarathon.getRaceStatusRowCache ().getAllRaceStatusRows();
         for (RaceStatusRow raceStatusRow: raceStatusRows) {
             if (raceStatusRow.getTav() != null && raceStatusRow.getLapTimes().size() > raceStatusRow.getTav().getKorSzam()) {
-                problemsList.getList().add(new StatusTableType(StatusTableType.Type.EXTRA_LAP, raceStatusRow, "Extra kör."));
+                problemsList.getList().add(new StatusTableType(StatusTableType.Type.EXTRA_LAP, raceStatusRow, "Extra kör.", raceStatusRow.getTav().getKorSzam()));
             }
         }
     }
@@ -199,7 +218,7 @@ public class ProblemsPanel extends Composite {
         List<RaceStatusRow> raceStatusRows = scmtMarathon.getRaceStatusRowCache ().getAllRaceStatusRows();
         for (RaceStatusRow raceStatusRow: raceStatusRows) {
             if (raceStatusRow.getVersenyzo() == null) {
-                problemsList.getList().add(new StatusTableType(StatusTableType.Type.UNKNOWN_NUMBER, raceStatusRow, "Ismeretlen rajtszám"));
+                problemsList.getList().add(new StatusTableType(StatusTableType.Type.UNKNOWN_NUMBER, raceStatusRow, "Ismeretlen rajtszám", -1));
             }
         }
     }
@@ -254,6 +273,16 @@ public class ProblemsPanel extends Composite {
                     return "Felvitel törlése";
                 default: return null;
             }
+        }
+    }
+
+    private static class IndexAndValue {
+        int index;
+        long value;
+
+        public IndexAndValue(int index, long value) {
+            this.index = index;
+            this.value = value;
         }
     }
 }
