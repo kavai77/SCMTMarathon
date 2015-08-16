@@ -1,7 +1,8 @@
-package net.himadri.scmt.client;
+package net.himadri.scmt.client.gwtextras;
 
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
+import net.himadri.scmt.client.Utils;
 
 import java.util.Comparator;
 

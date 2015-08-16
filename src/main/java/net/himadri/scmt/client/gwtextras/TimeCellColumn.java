@@ -1,4 +1,4 @@
-package net.himadri.scmt.client.panel;
+package net.himadri.scmt.client.gwtextras;
 
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;

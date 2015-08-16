@@ -24,6 +24,8 @@ import net.himadri.scmt.client.entity.RaceStatus;
 import net.himadri.scmt.client.entity.Tav;
 import net.himadri.scmt.client.entity.VersenySzam;
 import net.himadri.scmt.client.entity.Versenyzo;
+import net.himadri.scmt.client.gwtextras.ImageButton;
+import net.himadri.scmt.client.gwtextras.SortableTextColumn;
 import net.himadri.scmt.client.serializable.MarathonActionListener;
 import net.himadri.scmt.client.token.TavVersenySzamToken;
 

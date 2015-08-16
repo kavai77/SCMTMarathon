@@ -1,4 +1,4 @@
-package net.himadri.scmt.client;
+package net.himadri.scmt.client.gwtextras;
 
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.user.cellview.client.Column;

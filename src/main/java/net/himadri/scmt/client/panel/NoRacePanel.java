@@ -4,11 +4,11 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.*;
-import net.himadri.scmt.client.ImageButton;
 import net.himadri.scmt.client.MarathonService;
 import net.himadri.scmt.client.MarathonServiceAsync;
 import net.himadri.scmt.client.SCMTMarathon;
 import net.himadri.scmt.client.callback.EmptyFailureHandlingAsyncCallback;
+import net.himadri.scmt.client.gwtextras.ImageButton;
 
 /**
  * Created by IntelliJ IDEA.

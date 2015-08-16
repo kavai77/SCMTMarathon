@@ -1,7 +1,5 @@
 package net.himadri.scmt.client.panel;
 
-import com.google.gwt.cell.client.Cell;
-import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -12,13 +10,13 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.*;
-import net.himadri.scmt.client.ImageButton;
 import net.himadri.scmt.client.SCMTMarathon;
 import net.himadri.scmt.client.TabChangeHandler;
 import net.himadri.scmt.client.Utils;
 import net.himadri.scmt.client.entity.Tav;
 import net.himadri.scmt.client.entity.VersenySzam;
 import net.himadri.scmt.client.entity.Versenyzo;
+import net.himadri.scmt.client.gwtextras.ImageButton;
 import net.himadri.scmt.client.serializable.RaceStatusRow;
 
 import java.util.*;

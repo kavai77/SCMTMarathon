@@ -12,9 +12,13 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
-import net.himadri.scmt.client.*;
+import net.himadri.scmt.client.MarathonService;
+import net.himadri.scmt.client.MarathonServiceAsync;
+import net.himadri.scmt.client.SCMTMarathon;
+import net.himadri.scmt.client.Utils;
 import net.himadri.scmt.client.callback.EmptyFailureHandlingAsyncCallback;
 import net.himadri.scmt.client.dialog.CorrectionDialogBox;
+import net.himadri.scmt.client.gwtextras.ImageButton;
 import net.himadri.scmt.client.gwtextras.SafeHtmlColumn;
 import net.himadri.scmt.client.gwtextras.SafeHtmlString;
 import net.himadri.scmt.client.serializable.RaceStatusRow;
@@ -218,7 +222,7 @@ public class ProblemsPanel extends Composite {
         List<RaceStatusRow> raceStatusRows = scmtMarathon.getRaceStatusRowCache ().getAllRaceStatusRows();
         for (RaceStatusRow raceStatusRow: raceStatusRows) {
             if (raceStatusRow.getVersenyzo() == null) {
-                problemsList.getList().add(new StatusTableType(StatusTableType.Type.UNKNOWN_NUMBER, raceStatusRow, "Ismeretlen rajtszám", -1));
+                problemsList.getList().add(new StatusTableType(StatusTableType.Type.UNKNOWN_NUMBER, raceStatusRow, "Ismeretlen rajtszám", 0));
             }
         }
     }

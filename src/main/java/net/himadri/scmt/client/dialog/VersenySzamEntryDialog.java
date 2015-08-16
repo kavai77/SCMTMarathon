@@ -4,10 +4,14 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.*;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
-import net.himadri.scmt.client.*;
+import net.himadri.scmt.client.MarathonService;
+import net.himadri.scmt.client.MarathonServiceAsync;
+import net.himadri.scmt.client.SCMTMarathon;
+import net.himadri.scmt.client.Utils;
 import net.himadri.scmt.client.callback.CommonAsyncCallback;
 import net.himadri.scmt.client.entity.Tav;
 import net.himadri.scmt.client.entity.VersenySzam;
+import net.himadri.scmt.client.gwtextras.ImageButton;
 import net.himadri.scmt.client.serializable.MarathonActionListener;
 
 import java.text.ParseException;

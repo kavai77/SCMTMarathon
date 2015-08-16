@@ -1,4 +1,4 @@
-package net.himadri.scmt.client.panel;
+package net.himadri.scmt.client.gwtextras;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;

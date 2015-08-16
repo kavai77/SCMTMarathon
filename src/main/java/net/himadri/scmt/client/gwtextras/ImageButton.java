@@ -1,4 +1,4 @@
-package net.himadri.scmt.client;
+package net.himadri.scmt.client.gwtextras;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;

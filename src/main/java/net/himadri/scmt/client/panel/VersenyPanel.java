@@ -19,6 +19,7 @@ import net.himadri.scmt.client.*;
 import net.himadri.scmt.client.callback.CommonAsyncCallback;
 import net.himadri.scmt.client.callback.ReloadAsyncCallback;
 import net.himadri.scmt.client.entity.Verseny;
+import net.himadri.scmt.client.gwtextras.ImageButton;
 import net.himadri.scmt.client.token.VersenyToken;
 
 import java.util.*;
