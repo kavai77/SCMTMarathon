@@ -2,16 +2,7 @@ package net.himadri.scmt.server;
 
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyService;
-import net.himadri.scmt.client.entity.ClientChannel;
-import net.himadri.scmt.client.entity.Nev;
-import net.himadri.scmt.client.entity.OklevelPdfBlob;
-import net.himadri.scmt.client.entity.PageProfile;
-import net.himadri.scmt.client.entity.PersonLap;
-import net.himadri.scmt.client.entity.PrintOklevelLog;
-import net.himadri.scmt.client.entity.Tav;
-import net.himadri.scmt.client.entity.Verseny;
-import net.himadri.scmt.client.entity.VersenySzam;
-import net.himadri.scmt.client.entity.Versenyzo;
+import net.himadri.scmt.client.entity.*;
 
 /**
  * Created with IntelliJ IDEA.

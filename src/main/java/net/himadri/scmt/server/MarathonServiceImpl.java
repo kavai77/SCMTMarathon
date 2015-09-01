@@ -126,8 +126,8 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
     }
 
     @Override
-    public void addTav(Long versenyId, String megnevezes, Integer korszam, Integer versenySzamtol, Integer versenySzamig, long raceStartDiff) {
-        Tav tav = new Tav(versenyId, megnevezes, korszam, versenySzamtol, versenySzamig, raceStartDiff);
+    public void addTav(Long versenyId, String megnevezes, Integer korszam, Integer versenySzamtol, Integer versenySzamig, long raceStartDiff, String[] korNevArray) {
+        Tav tav = new Tav(versenyId, megnevezes, korszam, versenySzamtol, versenySzamig, raceStartDiff, korNevArray);
         ofy.put(tav);
         memcacheService.put(getMaxCreationTimeCacheKey(Tav.class, versenyId),
                 tav.getCreationTime(), DEFAULT_CACHE_EXPIRATION);
@@ -146,7 +146,7 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
     }
 
     @Override
-    public void modifyTav(Long tavId, String megnevezes, Integer korszam, Integer versenySzamtol, Integer versenySzamig, long raceStartDiff) {
+    public void modifyTav(Long tavId, String megnevezes, Integer korszam, Integer versenySzamtol, Integer versenySzamig, long raceStartDiff, String[] korNevArray) {
         Tav tav = ofy.get(Tav.class, tavId);
         tav.setMegnevezes(megnevezes);
         tav.setKorSzam(korszam);
@@ -154,6 +154,7 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         tav.setVersenySzamig(versenySzamig);
         tav.setVersenySzamig(versenySzamig);
         tav.setRaceStartDiff(raceStartDiff);
+        tav.setKorNevArray(korNevArray);
         ofy.put(tav);
         incrementSyncValue(tav.getVersenyId(), SyncValueType.TAV);
         broadcastModification();

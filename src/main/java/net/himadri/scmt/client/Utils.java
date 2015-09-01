@@ -90,6 +90,10 @@ public class Utils {
         return o1Boolean.compareTo(o2Boolean);
     }
 
+    public static String defaultString(String str) {
+        return str == null ? "" : str;
+    }
+
     public static boolean isEmpty(String str) {
         return str == null || str.isEmpty();
     }

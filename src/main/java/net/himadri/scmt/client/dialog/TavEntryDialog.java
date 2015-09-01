@@ -1,9 +1,17 @@
 package net.himadri.scmt.client.dialog;
 
+import com.google.gwt.cell.client.CheckboxCell;
+import com.google.gwt.cell.client.EditTextCell;
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.*;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
+import com.google.gwt.view.client.ListDataProvider;
 import net.himadri.scmt.client.MarathonService;
 import net.himadri.scmt.client.MarathonServiceAsync;
 import net.himadri.scmt.client.SCMTMarathon;
@@ -13,6 +21,8 @@ import net.himadri.scmt.client.entity.Tav;
 import net.himadri.scmt.client.gwtextras.ImageButton;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TavEntryDialog extends DialogBox {
     private MarathonServiceAsync marathonService = GWT.create(MarathonService.class);
@@ -25,6 +35,7 @@ public class TavEntryDialog extends DialogBox {
     private IntegerBox versenySzamtolText = new IntegerBox();
     private IntegerBox versenySzamigText = new IntegerBox();
     private TextBox futamIdoText = new TextBox();
+    private ListDataProvider<TavKorNev> tavKorListDataProvider = new ListDataProvider<>();
 
     public TavEntryDialog(SCMTMarathon scmtMarathon) {
         this.scmtMarathon = scmtMarathon;
@@ -33,7 +44,7 @@ public class TavEntryDialog extends DialogBox {
         
         AbsolutePanel absolutePanel = new AbsolutePanel();
         setWidget(absolutePanel);
-        absolutePanel.setSize("335px", "358px");
+        absolutePanel.setSize("335px", "458px");
         
         tavMuveletLabel = new Label("Táv művelet");
         absolutePanel.add(tavMuveletLabel, 10, 10);
@@ -60,6 +71,17 @@ public class TavEntryDialog extends DialogBox {
         absolutePanel.add(korokSzamaText, 10, 135);
         korokSzamaText.setSize("48px", "18px");
         korokSzamaText.addKeyPressHandler(enterOkKeyPressHandler);
+        korokSzamaText.addKeyUpHandler(new KeyUpHandler() {
+            @Override
+            public void onKeyUp(KeyUpEvent keyPressEvent) {
+                new Timer() {
+                    @Override
+                    public void run() {
+                        adjustTavKorList();
+                    }
+                }.schedule(1000);
+            }
+        });
 
         Label lblVersenyszm = new Label("Versenyszám kiosztás");
         absolutePanel.add(lblVersenyszm, 10, 177);
@@ -88,7 +110,7 @@ public class TavEntryDialog extends DialogBox {
                 ok();
             }
         });
-        absolutePanel.add(btnOk, 57, 318);
+        absolutePanel.add(btnOk, 57, 418);
         btnOk.setSize("100px", "33px");
         
         Button btnMgsem = new ImageButton("button_cancel.png", "Mégsem", new ClickHandler() {
@@ -97,8 +119,51 @@ public class TavEntryDialog extends DialogBox {
                 hide();
             }
         });
-        absolutePanel.add(btnMgsem, 187, 318);
+        absolutePanel.add(btnMgsem, 187, 418);
         btnMgsem.setSize("100px", "33px");
+
+        ScrollPanel scrollPanel = new ScrollPanel();
+        absolutePanel.add(scrollPanel, 0, 74);
+        scrollPanel.setSize("315px", "100px");
+
+        CellTable<TavKorNev> tavKorTable = new CellTable<>();
+        scrollPanel.setWidget(tavKorTable);
+        tavKorTable.setSize("100%", "100%");
+
+        absolutePanel.add(scrollPanel, 10, 310);
+        tavKorListDataProvider.addDataDisplay(tavKorTable);
+        tavKorTable.addColumn(new TextColumn<TavKorNev>() {
+            @Override
+            public String getValue(TavKorNev tavKorNev) {
+                return Integer.toString(tavKorNev.korSzam + 1);
+            }
+        }, "Kör");
+        Column<TavKorNev, Boolean>  enabledColumn = new Column<TavKorNev, Boolean>(new CheckboxCell()) {
+            @Override
+            public Boolean getValue(TavKorNev tavKorNev) {
+                return tavKorNev.enabled;
+            }
+        };
+        enabledColumn.setFieldUpdater(new FieldUpdater<TavKorNev, Boolean>() {
+            @Override
+            public void update(int i, TavKorNev tavKorNev, Boolean enabled) {
+                tavKorNev.enabled = enabled;
+            }
+        });
+        tavKorTable.addColumn(enabledColumn, "Nyomtat");
+        Column<TavKorNev, String>  korNevColumn = new Column<TavKorNev, String>(new EditTextCell()) {
+            @Override
+            public String getValue(TavKorNev tavKorNev) {
+                return tavKorNev.nev;
+            }
+        };
+        korNevColumn.setFieldUpdater(new FieldUpdater<TavKorNev, String>() {
+            @Override
+            public void update(int i, TavKorNev tavKorNev, String nev) {
+                tavKorNev.nev = nev;
+            }
+        });
+        tavKorTable.addColumn(korNevColumn, "Kör név");
     }
 
     private void ok() {
@@ -116,14 +181,14 @@ public class TavEntryDialog extends DialogBox {
             }
 
             if (currentId == null) {
-                marathonService.addTav(scmtMarathon.getVerseny().getId(), megnevezes, korokSzama, versenySzamtol, versenySzamig, raceStartDiff, new CommonAsyncCallback<Void>() {
+                marathonService.addTav(scmtMarathon.getVerseny().getId(), megnevezes, korokSzama, versenySzamtol, versenySzamig, raceStartDiff, convertTavKorNevToArray(tavKorListDataProvider.getList()), new CommonAsyncCallback<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         hide();
                     }
                 });
             } else {
-                marathonService.modifyTav(currentId, megnevezes, korokSzama, versenySzamtol, versenySzamig, raceStartDiff, new CommonAsyncCallback<Void>() {
+                marathonService.modifyTav(currentId, megnevezes, korokSzama, versenySzamtol, versenySzamig, raceStartDiff, convertTavKorNevToArray(tavKorListDataProvider.getList()), new CommonAsyncCallback<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         hide();
@@ -141,6 +206,8 @@ public class TavEntryDialog extends DialogBox {
         versenySzamtolText.setText(null);
         versenySzamigText.setText(null);
         futamIdoText.setText(null);
+        tavKorListDataProvider.setList(new ArrayList<TavKorNev>());
+        adjustTavKorList();
         center();
         megnevezesText.setFocus(true);
     }
@@ -153,6 +220,8 @@ public class TavEntryDialog extends DialogBox {
         versenySzamtolText.setValue(tav.getVersenySzamtol());
         versenySzamigText.setValue(tav.getVersenySzamig());
         futamIdoText.setText(tav.getRaceStartDiff() == 0 ? null : Utils.getElapsedTimeString(tav.getRaceStartDiff()));
+        tavKorListDataProvider.setList(convertArrayToTavKorNev(tav.getKorNevArray()));
+        adjustTavKorList();
         center();
         megnevezesText.setFocus(true);
     }
@@ -196,6 +265,63 @@ public class TavEntryDialog extends DialogBox {
             Window.alert("Az időt ilyen formátumba írhatod be: 12:32 vagy 1:12:32");
             return false;
         }
+        for (TavKorNev tavKorNev: tavKorListDataProvider.getList()) {
+            if (tavKorNev.enabled && Utils.isEmpty(tavKorNev.nev)) {
+                Window.alert("Ha egy kör nyomtatása engedélyezett, akkor kötelező megnevezés adása.");
+                return false;
+            }
+        }
         return true;
+    }
+
+    private void adjustTavKorList() {
+        Integer korSzam = korokSzamaText.getValue();
+        if (korSzam == null) return;
+        List<TavKorNev> newList = new ArrayList<>(korSzam);
+        for (int i = 0; i < korSzam; i++) {
+            newList.add(null);
+        }
+        for (TavKorNev tavKorNev: tavKorListDataProvider.getList()) {
+            if (tavKorNev.korSzam < korSzam) {
+                tavKorNev.nev = Utils.defaultString(tavKorNev.nev);
+                newList.set(tavKorNev.korSzam, tavKorNev);
+            }
+        }
+        for (int i = 0; i < korSzam; i++) {
+            if (newList.get(i) == null) {
+                newList.set(i, new TavKorNev(i, false, ""));
+            }
+        }
+        tavKorListDataProvider.setList(newList);
+    }
+
+    private static class TavKorNev {
+        int korSzam;
+        boolean enabled;
+        String nev;
+
+        public TavKorNev(int korSzam, boolean enabled, String nev) {
+            this.korSzam = korSzam;
+            this.enabled = enabled;
+            this.nev = nev;
+        }
+
+    }
+
+    private static String[] convertTavKorNevToArray(List<TavKorNev> tavKorNevList) {
+        String[] korNevArrayArray = new String[tavKorNevList.size()];
+        for (int i = 0; i < tavKorNevList.size(); i++) {
+            TavKorNev tavKorNev = tavKorNevList.get(i);
+            korNevArrayArray[i] = tavKorNev.enabled ? tavKorNev.nev : null;
+        }
+        return korNevArrayArray;
+    }
+
+    private static List<TavKorNev> convertArrayToTavKorNev(String[] korNevArray) {
+        ArrayList<TavKorNev> tavKorNevArrayList = new ArrayList<>(korNevArray.length);
+        for (int i = 0; i < korNevArray.length; i++) {
+            tavKorNevArrayList.add(new TavKorNev(i, korNevArray[i] != null, korNevArray[i]));
+        }
+        return tavKorNevArrayList;
     }
 }

@@ -9,6 +9,7 @@ import java.io.Serializable;
  * User: Kavai
  * Date: 2012.05.13. 7:09
  */
+
 @Entity
 public class Tav implements Serializable, HasCreationTime {
     @SuppressWarnings({"UnusedDeclaration"})
@@ -20,18 +21,20 @@ public class Tav implements Serializable, HasCreationTime {
     private Integer versenySzamtol, versenySzamig;
     private long raceStartDiff;
     private long creationTime;
+    private String[] korNevArray = new String[]{};
 
     @SuppressWarnings({"UnusedDeclaration"})
     public Tav() {
     }
 
-    public Tav(Long versenyId, String megnevezes, Integer korSzam, Integer versenySzamtol, Integer versenySzamig, long raceStartDiff) {
+    public Tav(Long versenyId, String megnevezes, Integer korSzam, Integer versenySzamtol, Integer versenySzamig, long raceStartDiff, String[] korNevArray) {
         this.versenyId = versenyId;
         this.megnevezes = megnevezes;
         this.korSzam = korSzam;
         this.versenySzamtol = versenySzamtol;
         this.versenySzamig = versenySzamig;
         this.raceStartDiff = raceStartDiff;
+        this.korNevArray = korNevArray;
         creationTime = System.currentTimeMillis();
     }
 
@@ -81,6 +84,14 @@ public class Tav implements Serializable, HasCreationTime {
 
     public void setRaceStartDiff(long raceStartDiff) {
         this.raceStartDiff = raceStartDiff;
+    }
+
+    public String[] getKorNevArray() {
+        return korNevArray;
+    }
+
+    public void setKorNevArray(String[] korNevArray) {
+        this.korNevArray = korNevArray;
     }
 
     public long getCreationTime() {

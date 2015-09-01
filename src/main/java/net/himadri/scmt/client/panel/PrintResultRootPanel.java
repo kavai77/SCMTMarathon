@@ -117,7 +117,8 @@ public class PrintResultRootPanel extends Composite
         flexTable.setText(0, 5, "Kategória");
         flexTable.setText(0, 6, "Kat. hely");
         flexTable.setText(0, 7, "Idő");
-        ArrayList<RaceStatusRow> acceptedRows = new ArrayList<RaceStatusRow>();
+        addKorNevek(flexTable, 8);
+        ArrayList<RaceStatusRow> acceptedRows = new ArrayList<>();
 
         for (RaceStatusRow raceStatusRow : scmtMarathon.getRaceStatusRowCache().getAllRaceStatusRows())
         {
@@ -128,8 +129,8 @@ public class PrintResultRootPanel extends Composite
             }
         }
 
-        Map<Long, Integer> tavHelyCounter = new HashMap<Long, Integer>();
-        Map<Long, Integer> kategoriaHelyCounter = new HashMap<Long, Integer>();
+        Map<Long, Integer> tavHelyCounter = new HashMap<>();
+        Map<Long, Integer> kategoriaHelyCounter = new HashMap<>();
         int rowIndex = 0;
 
         for (RaceStatusRow raceStatusRow : acceptedRows)
@@ -156,9 +157,36 @@ public class PrintResultRootPanel extends Composite
 
             flexTable.setText(rowIndex, 7,
                 Utils.getElapsedTimeString(raceStatusRow, raceStatusRow.getTav().getKorSzam() - 1));
+
+            addKorIdok(flexTable, raceStatusRow, rowIndex, 8);
         }
 
         return flexTable;
+    }
+
+    private void addKorIdok(FlexTable flexTable, RaceStatusRow raceStatusRow, int rowIndex, int columnIndex) {
+        if (filter.getMode() == TavVersenySzam.Mode.TAV) {
+            Tav tav = scmtMarathon.getTavMapCache().getTav(filter.getTavId());
+            int previousLap = -1;
+            String[] korNevArray = tav.getKorNevArray();
+            for (int i = 0; i < korNevArray.length; i++) {
+                if (!Utils.isEmpty(korNevArray[i])) {
+                    String elapsedTime = previousLap == -1 ? Utils.getElapsedTimeString(raceStatusRow, i) :
+                            Utils.getElapsedTimeString(raceStatusRow.getLapTimes().get(i) - raceStatusRow.getLapTimes().get(previousLap));
+                    flexTable.setText(rowIndex, columnIndex++, elapsedTime);
+                    previousLap = i;
+                }
+            }
+        }
+    }
+
+    private void addKorNevek(FlexTable flexTable, int columnIndex) {
+        if (filter.getMode() == TavVersenySzam.Mode.TAV) {
+            Tav tav = scmtMarathon.getTavMapCache().getTav(filter.getTavId());
+            for (String korNev: tav.getKorNevArray()) {
+                if (!Utils.isEmpty(korNev)) flexTable.setText(0, columnIndex++, korNev);
+            }
+        }
     }
 
     private class RefreshSyncRequest<T> implements MarathonActionListener<T>
