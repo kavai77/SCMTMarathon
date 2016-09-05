@@ -17,7 +17,7 @@ public class AdminPanel extends Composite {
         tabPanel.setSize("100%", "600px");
         tabPanel.add(new VersenyzoPanel(scmtMarathon), "Versenyzők", false);
         tabPanel.add(new TavPanel(scmtMarathon), "Távok", false);
-        tabPanel.add(new VersenySzamPanel(scmtMarathon), "Versenyszámok", false);
+        tabPanel.add(new VersenySzamPanel(scmtMarathon), "Korcsoportok", false);
         tabPanel.add(new NyomtatoPanel(scmtMarathon), "Nyomtatóbeállítások", false);
         tabPanel.add(new VersenyzoImportPanel(scmtMarathon), "Versenyzők feltöltése", false);
 //        tabPanel.add(new NevPanel(), "Nevek feltöltése", false);

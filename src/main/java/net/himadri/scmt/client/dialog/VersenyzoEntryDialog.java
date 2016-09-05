@@ -38,7 +38,7 @@ public class VersenyzoEntryDialog extends DialogBox {
     private IntegerBox szuletesiEvText = new IntegerBox();
     private RadioButton ferfiRadio = new RadioButton("nemRadio", "Férfi");
     private RadioButton noRadio = new RadioButton("nemRadio", "Nő");
-    private CheckBox versenyszamSzuresKikapcs = new CheckBox("Versenyszámok szűrésének kikapcsolása");
+    private CheckBox versenyszamSzuresKikapcs = new CheckBox("Korcsoportok szűrésének kikapcsolása");
 
     private ListBox versenySzamComboBox = new ListBox();
     private Versenyzo versenyzo;

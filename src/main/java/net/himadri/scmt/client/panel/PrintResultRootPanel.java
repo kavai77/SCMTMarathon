@@ -105,19 +105,22 @@ public class PrintResultRootPanel extends Composite
     private FlexTable createFlexTable(Boolean ferfi)
     {
         FlexTable flexTable = new FlexTable();
+        int colIndex = 0;
 
         flexTable.setBorderWidth(1);
         flexTable.setCellPadding(5);
         flexTable.addStyleName("collapse");
-        flexTable.setText(0, 0, "Hely");
-        flexTable.setText(0, 1, "Rajtszám");
-        flexTable.setText(0, 2, "Név");
-        flexTable.setText(0, 3, "Szül.év");
-        flexTable.setText(0, 4, "Egyesület");
-        flexTable.setText(0, 5, "Kategória");
-        flexTable.setText(0, 6, "Kat. hely");
-        flexTable.setText(0, 7, "Idő");
-        addKorNevek(flexTable, 8);
+        flexTable.setText(0, colIndex++, "Hely");
+        flexTable.setText(0, colIndex++, "Rajtszám");
+        flexTable.setText(0, colIndex++, "Név");
+        flexTable.setText(0, colIndex++, "Szül.év");
+        flexTable.setText(0, colIndex++, "Egyesület");
+        if (filter.getMode() == TavVersenySzam.Mode.TAV) {
+            flexTable.setText(0, colIndex++, "Korcsoport");
+            flexTable.setText(0, colIndex++, "KCS. hely");
+        }
+        flexTable.setText(0, colIndex++, "Idő");
+        addKorNevek(flexTable, colIndex++);
         ArrayList<RaceStatusRow> acceptedRows = new ArrayList<>();
 
         for (RaceStatusRow raceStatusRow : scmtMarathon.getRaceStatusRowCache().getAllRaceStatusRows())
@@ -136,37 +139,40 @@ public class PrintResultRootPanel extends Composite
         for (RaceStatusRow raceStatusRow : acceptedRows)
         {
             rowIndex++;
+            colIndex = 0;
             Integer tavHely = getHelyezes(tavHelyCounter, raceStatusRow.getTav().getId());
 
-            flexTable.setText(rowIndex, 0, tavHely + ".");
-            flexTable.setText(rowIndex, 1, raceStatusRow.getRaceNumber());
+            flexTable.setText(rowIndex, colIndex++, tavHely + ".");
+            flexTable.setText(rowIndex, colIndex++, raceStatusRow.getRaceNumber());
             if (raceStatusRow.getVersenyzo() != null)
             {
-                flexTable.setText(rowIndex, 2, raceStatusRow.getVersenyzo().getName());
-                flexTable.setText(rowIndex, 3, raceStatusRow.getVersenyzo().getSzuletesiEv().toString());
-                flexTable.setText(rowIndex, 4, raceStatusRow.getVersenyzo().getEgyesulet());
-            }
+                flexTable.setText(rowIndex, colIndex++, raceStatusRow.getVersenyzo().getName());
+                flexTable.setText(rowIndex, colIndex++, raceStatusRow.getVersenyzo().getSzuletesiEv().toString());
+                flexTable.setText(rowIndex, colIndex++, raceStatusRow.getVersenyzo().getEgyesulet());
+            } else colIndex += 3;
 
             if (raceStatusRow.getVersenySzam() != null)
             {
-                flexTable.setText(rowIndex, 5, Utils.getVersenySzamMegnevezes(scmtMarathon, raceStatusRow.getVersenySzam()));
-                Integer katHely = getHelyezes(kategoriaHelyCounter, raceStatusRow.getVersenySzam().getId());
+                if (filter.getMode() == TavVersenySzam.Mode.TAV) {
+                    flexTable.setText(rowIndex, colIndex++, Utils.getVersenySzamMegnevezes(scmtMarathon, raceStatusRow.getVersenySzam()));
+                    Integer katHely = getHelyezes(kategoriaHelyCounter, raceStatusRow.getVersenySzam().getId());
 
-                flexTable.setText(rowIndex, 6, katHely + ".");
-            }
+                    flexTable.setText(rowIndex, colIndex++, katHely + ".");
+                }
+            } else colIndex += 2;
 
-            flexTable.setText(rowIndex, 7,
+            flexTable.setText(rowIndex, colIndex++,
                 Utils.getElapsedTimeString(raceStatusRow, raceStatusRow.getTav().getKorSzam() - 1));
 
-            addKorIdok(flexTable, raceStatusRow, rowIndex, 8);
+            addKorIdok(flexTable, raceStatusRow, rowIndex, colIndex++);
         }
 
         return flexTable;
     }
 
     private void addKorIdok(FlexTable flexTable, RaceStatusRow raceStatusRow, int rowIndex, int columnIndex) {
-        if (filter.getMode() == TavVersenySzam.Mode.TAV) {
-            Tav tav = scmtMarathon.getTavMapCache().getTav(filter.getTavId());
+        Tav tav = getTavFromFilter();
+        if (tav != null) {
             int previousLap = -1;
             String[] korNevArray = tav.getKorNevArray();
             for (int i = 0; i < korNevArray.length; i++) {
@@ -181,12 +187,28 @@ public class PrintResultRootPanel extends Composite
     }
 
     private void addKorNevek(FlexTable flexTable, int columnIndex) {
-        if (filter.getMode() == TavVersenySzam.Mode.TAV) {
-            Tav tav = scmtMarathon.getTavMapCache().getTav(filter.getTavId());
-            for (String korNev: tav.getKorNevArray()) {
+        Tav tav = getTavFromFilter();
+        if (tav != null) {
+            for (String korNev : tav.getKorNevArray()) {
                 if (!Utils.isEmpty(korNev)) flexTable.setText(0, columnIndex++, korNev);
             }
         }
+    }
+
+    private Tav getTavFromFilter() {
+        Tav tav;
+        switch (filter.getMode()) {
+            case TAV:
+                tav = scmtMarathon.getTavMapCache().getTav(filter.getTavId());
+                break;
+            case VERSENYSZAM:
+                VersenySzam versenySzam = scmtMarathon.getVersenyszamMapCache().getVersenySzam(filter.getVersenySzamId());
+                tav = scmtMarathon.getTavMapCache().getTav(versenySzam.getTavId());
+                break;
+            default:
+                tav = null;
+        }
+        return tav;
     }
 
     private class RefreshSyncRequest<T> implements MarathonActionListener<T>

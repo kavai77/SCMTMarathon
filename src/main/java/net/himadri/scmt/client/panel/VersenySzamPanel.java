@@ -78,7 +78,7 @@ public class VersenySzamPanel extends Composite {
             public String getValue(VersenySzam versenySzam) {
                 return Utils.getKorosztalyMegnevezes(versenySzam.getKorTol(), versenySzam.getKorIg());
             }
-        }, "Korosztály");
+        }, "Korcsoport");
         versenySzamTable.addColumn(new SortableTextColumn<VersenySzam>(listHandler) {
             @Override
             public String getValue(VersenySzam versenySzam) {

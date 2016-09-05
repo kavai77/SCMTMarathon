@@ -58,7 +58,7 @@ public class PrintAllRunnersRootPanel extends Composite {
         flexTable.setText(0, 0, "Rajtszám");
         flexTable.setText(0, 1, "Név");
         flexTable.setText(0, 2, "Szül.év");
-        flexTable.setText(0, 3, "Kategória");
+        flexTable.setText(0, 3, "Korcsoport");
         flexTable.setText(0, 4, "Egyesület");
         int rowIndex = 1;
         VersenyszamMapCache versenyszamMapCache = scmtMarathon.getVersenyszamMapCache();

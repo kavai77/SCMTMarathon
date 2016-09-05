@@ -58,7 +58,7 @@ public class VersenySzamEntryDialog extends DialogBox {
         noiButton = new RadioButton("nemRadio", "Női");
         absolutePanel.add(noiButton, 70, 137);
 
-        Label lblKorosztly = new Label("Korosztály");
+        Label lblKorosztly = new Label("Korcsoport");
         absolutePanel.add(lblKorosztly, 10, 176);
 
         evtolBox = new IntegerBox();
