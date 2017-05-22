@@ -356,8 +356,14 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
 
     @Override
     public Boolean isFerfiNev(String nev) {
-        Nev foundNev = ofy.find(Nev.class, nev.trim().toUpperCase());
-        return foundNev != null ? foundNev.isFerfi() : null;
+        String normalisedNev = nev.trim().toUpperCase();
+        final Nev foundNev = ofy.find(Nev.class, normalisedNev);
+        if (foundNev == null && normalisedNev.length() > 2 && normalisedNev.endsWith("NÉ")) {
+            final Nev neQueryNev = ofy.find(Nev.class, normalisedNev.substring(0, normalisedNev.length() - 2));
+            return neQueryNev != null && neQueryNev.isFerfi() ? false : null;
+        } else {
+            return foundNev != null ? foundNev.isFerfi() : null;
+        }
     }
 
     private int getVersenyzoSzam(Long versenyId) {
