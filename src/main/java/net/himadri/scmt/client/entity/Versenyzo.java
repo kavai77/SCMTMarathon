@@ -26,6 +26,7 @@ public class Versenyzo implements Serializable, HasCreationTime {
     private Long versenyId;
     private boolean feladta;
     private boolean ellenorzott;
+    private boolean fizetett;
     private long creationTime;
 
     @SuppressWarnings({"UnusedDeclaration"})
@@ -92,6 +93,10 @@ public class Versenyzo implements Serializable, HasCreationTime {
         return feladta;
     }
 
+    public boolean isFizetett() {
+        return fizetett;
+    }
+
     public long getCreationTime() {
         return creationTime;
     }
@@ -134,6 +139,10 @@ public class Versenyzo implements Serializable, HasCreationTime {
 
     public boolean isEllenorzott() {
         return ellenorzott;
+    }
+
+    public void setFizetett(boolean fizetett) {
+        this.fizetett = fizetett;
     }
 
     public void setEllenorzott(boolean ellenorzott) {

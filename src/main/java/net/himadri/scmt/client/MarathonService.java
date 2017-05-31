@@ -2,10 +2,7 @@ package net.himadri.scmt.client;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
-import net.himadri.scmt.client.entity.PageProfile;
-import net.himadri.scmt.client.entity.PersonLap;
-import net.himadri.scmt.client.entity.Verseny;
-import net.himadri.scmt.client.entity.Versenyzo;
+import net.himadri.scmt.client.entity.*;
 import net.himadri.scmt.client.exception.AlreadyExistingEntityException;
 import net.himadri.scmt.client.exception.NotExistingEntityException;
 import net.himadri.scmt.client.serializable.PollingRequest;
@@ -25,6 +22,8 @@ public interface MarathonService extends RemoteService {
     void stopRace(Long versenyId);
 
     void restartRace(Long versenyId);
+
+    void setNevezesDatum(Long versenyId, Long nevezesBegin, Long nevezesEnd, String emailSubject, String emailText);
 
     void deleteRace(Long versenyId);
 
@@ -81,4 +80,10 @@ public interface MarathonService extends RemoteService {
     void saveNev(String[] nevek, boolean ferfi);
 
     Boolean isFerfiNev(String nev);
+
+    String getConfiguration(String key);
+
+    List<Configuration> getConfigurations();
+
+    void saveConfigurations(List<Configuration> configurations);
 }

@@ -22,6 +22,10 @@ public class Verseny implements Serializable {
     private int versenyzoSyncValue = 1;
     private int versenySzamSyncValue = 1;
     private int tavSyncValue = 1;
+    private Long nevezesBegin;
+    private Long nevezesEnd;
+    private String nevezesEmailSubject;
+    private String nevezesEmailText;
 
     @SuppressWarnings({"UnusedDeclaration"})
     public Verseny() {
@@ -83,6 +87,14 @@ public class Verseny implements Serializable {
         return tavSyncValue;
     }
 
+    public Long getNevezesBegin() {
+        return nevezesBegin;
+    }
+
+    public Long getNevezesEnd() {
+        return nevezesEnd;
+    }
+
     public void setPersonLapSyncValue(int personLapSyncValue) {
         this.personLapSyncValue = personLapSyncValue;
     }
@@ -97,6 +109,30 @@ public class Verseny implements Serializable {
 
     public void setTavSyncValue(int tavSyncValue) {
         this.tavSyncValue = tavSyncValue;
+    }
+
+    public void setNevezesBegin(Long nevezesBegin) {
+        this.nevezesBegin = nevezesBegin;
+    }
+
+    public void setNevezesEnd(Long nevezesEnd) {
+        this.nevezesEnd = nevezesEnd;
+    }
+
+    public String getNevezesEmailSubject() {
+        return nevezesEmailSubject;
+    }
+
+    public void setNevezesEmailSubject(String nevezesEmailSubject) {
+        this.nevezesEmailSubject = nevezesEmailSubject;
+    }
+
+    public String getNevezesEmailText() {
+        return nevezesEmailText;
+    }
+
+    public void setNevezesEmailText(String nevezesEmailText) {
+        this.nevezesEmailText = nevezesEmailText;
     }
 
     @Override

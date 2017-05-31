@@ -5,7 +5,6 @@ import com.google.gwt.appengine.channel.client.ChannelFactory;
 import com.google.gwt.appengine.channel.client.SocketError;
 import com.google.gwt.appengine.channel.client.SocketListener;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.storage.client.Storage;
 import net.himadri.scmt.client.callback.CommonAsyncCallback;
 import net.himadri.scmt.client.entity.*;
 import net.himadri.scmt.client.serializable.PollingRequest;
@@ -22,7 +21,6 @@ import java.util.logging.Logger;
 public class PollingService {
     public static final Logger LOGGER = Logger.getLogger(PollingService.class.getName());
     private MarathonServiceAsync marathonService = GWT.create(MarathonService.class);
-    private static Storage localStorage = Storage.getLocalStorageIfSupported();
 
     public static class RaceStatusSyncSupport extends SyncSupport<RaceStatus> {
         private RaceStatus raceStatus;

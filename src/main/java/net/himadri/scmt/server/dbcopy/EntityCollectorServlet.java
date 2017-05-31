@@ -1,13 +1,7 @@
 package net.himadri.scmt.server.dbcopy;
 
 import com.googlecode.objectify.Objectify;
-import net.himadri.scmt.client.entity.Nev;
-import net.himadri.scmt.client.entity.PageProfile;
-import net.himadri.scmt.client.entity.PersonLap;
-import net.himadri.scmt.client.entity.Tav;
-import net.himadri.scmt.client.entity.Verseny;
-import net.himadri.scmt.client.entity.VersenySzam;
-import net.himadri.scmt.client.entity.Versenyzo;
+import net.himadri.scmt.client.entity.*;
 import net.himadri.scmt.client.serializable.EntityCollector;
 import net.himadri.scmt.server.ObjectifyUtils;
 
@@ -35,7 +29,8 @@ public class EntityCollectorServlet extends HttpServlet {
         entityCollector.setVersenyList(obj.query(Verseny.class).list());
         entityCollector.setVersenySzamList(obj.query(VersenySzam.class).list());
         entityCollector.setVersenyzoList(obj.query(Versenyzo.class).list());
-        
+        entityCollector.setConfigurationList(obj.query(Configuration.class).list());
+
         response.setContentType("application/octet-stream");
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(response.getOutputStream());
         objectOutputStream.writeObject(entityCollector);

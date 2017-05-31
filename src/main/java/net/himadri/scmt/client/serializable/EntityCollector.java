@@ -1,12 +1,6 @@
 package net.himadri.scmt.client.serializable;
 
-import net.himadri.scmt.client.entity.Nev;
-import net.himadri.scmt.client.entity.PageProfile;
-import net.himadri.scmt.client.entity.PersonLap;
-import net.himadri.scmt.client.entity.Tav;
-import net.himadri.scmt.client.entity.Verseny;
-import net.himadri.scmt.client.entity.VersenySzam;
-import net.himadri.scmt.client.entity.Versenyzo;
+import net.himadri.scmt.client.entity.*;
 
 import java.io.Serializable;
 import java.util.List;
@@ -19,6 +13,7 @@ public class EntityCollector implements Serializable {
     private List<Verseny> versenyList;
     private List<VersenySzam> versenySzamList;
     private List<Versenyzo> versenyzoList;
+    private List<Configuration> configurationList;
 
     public List<Nev> getNevList() {
         return nevList;
@@ -74,5 +69,13 @@ public class EntityCollector implements Serializable {
 
     public void setVersenyzoList(List<Versenyzo> versenyzoList) {
         this.versenyzoList = versenyzoList;
+    }
+
+    public List<Configuration> getConfigurationList() {
+        return configurationList;
+    }
+
+    public void setConfigurationList(List<Configuration> configurationList) {
+        this.configurationList = configurationList;
     }
 }

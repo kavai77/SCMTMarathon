@@ -1,35 +1,24 @@
 package net.himadri.scmt.server.dbcopy;
 
 import com.google.appengine.api.utils.SystemProperty;
-
 import com.googlecode.objectify.Objectify;
-
-import net.himadri.scmt.client.entity.Nev;
-import net.himadri.scmt.client.entity.PageProfile;
-import net.himadri.scmt.client.entity.PersonLap;
-import net.himadri.scmt.client.entity.Tav;
-import net.himadri.scmt.client.entity.Verseny;
-import net.himadri.scmt.client.entity.VersenySzam;
-import net.himadri.scmt.client.entity.Versenyzo;
+import net.himadri.scmt.client.entity.*;
 import net.himadri.scmt.client.serializable.EntityCollector;
 import net.himadri.scmt.server.ObjectifyUtils;
-
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PrintWriter;
-
-import java.util.List;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.PrintWriter;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -76,6 +65,7 @@ public class EntityFetcherServlet extends HttpServlet
             replaceEntities(ofy, Verseny.class, entityCollector.getVersenyList(), printWriter);
             replaceEntities(ofy, VersenySzam.class, entityCollector.getVersenySzamList(), printWriter);
             replaceEntities(ofy, Versenyzo.class, entityCollector.getVersenyzoList(), printWriter);
+            replaceEntities(ofy, Configuration.class, entityCollector.getConfigurationList(), printWriter);
         }
         catch (ClassNotFoundException e)
         {

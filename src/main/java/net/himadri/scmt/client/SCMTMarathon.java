@@ -33,10 +33,11 @@ public class SCMTMarathon implements EntryPoint {
     private final MarathonServiceAsync marathonService = GWT.create(MarathonService.class);
 
     private Verseny verseny;
+    private MainRootPanel mainRootPanel;
 
     public void onModuleLoad() {
         final RootPanel rootPanel = RootPanel.get();
-        final MainRootPanel mainRootPanel = new MainRootPanel(this);
+        mainRootPanel = new MainRootPanel(this);
         final PrintResultRootPanel printResultRootPanel = new PrintResultRootPanel(this);
         final PrintAllRunnersRootPanel printAllRunnersRootPanel = new PrintAllRunnersRootPanel(this);
 
@@ -114,6 +115,10 @@ public class SCMTMarathon implements EntryPoint {
 
     public Verseny getVerseny() {
         return verseny;
+    }
+
+    public MainRootPanel getMainRootPanel() {
+        return mainRootPanel;
     }
 
     public static void commonFailureHandling(Throwable throwable) {

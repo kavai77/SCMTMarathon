@@ -22,6 +22,7 @@ public class MainRootPanel extends Composite {
     private final AbsolutePanel bodyPanel = new AbsolutePanel();
     private final TabPanel foTabPanel = new TabPanel();
     private final VersenyPanel versenyPanel;
+    private final ConfigurationPanel configurationPanel = new ConfigurationPanel();
 
     public MainRootPanel(final SCMTMarathon scmtMarathon) {
         final AbsolutePanel absolutePanel = new AbsolutePanel();
@@ -77,7 +78,7 @@ public class MainRootPanel extends Composite {
         initWidget(absolutePanel);
     }
 
-    public void showFoTabPanel() {
+    private void showFoTabPanel() {
         bodyPanel.clear();
         bodyPanel.add(foTabPanel);
     }
@@ -85,5 +86,11 @@ public class MainRootPanel extends Composite {
     public void showVersenyPanel() {
         bodyPanel.clear();
         bodyPanel.add(versenyPanel);
+    }
+
+    public void showConfigurationPanel() {
+        bodyPanel.clear();
+        bodyPanel.add(configurationPanel);
+        configurationPanel.showPanel();
     }
 }

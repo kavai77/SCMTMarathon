@@ -35,8 +35,9 @@ public class VersenyPanel extends Composite {
 
     private final SCMTMarathon scmtMarathon;
     private final MarathonServiceAsync marathonService = GWT.create(MarathonService.class);
+    private final UserServiceAsync userService = GWT.create(UserService.class);
 
-    public VersenyPanel(SCMTMarathon scmtMarathon) {
+    public VersenyPanel(final SCMTMarathon scmtMarathon) {
         this.scmtMarathon = scmtMarathon;
 
         VerticalPanel rootPanel = new VerticalPanel();
@@ -95,7 +96,26 @@ public class VersenyPanel extends Composite {
             }
         });
 
-        rootPanel.add(addVersenyButton);
+
+        final HorizontalPanel horizontalPanel = new HorizontalPanel();
+        horizontalPanel.setSpacing(10);
+        horizontalPanel.add(addVersenyButton);
+        userService.isSuperUserAuthorized(new CommonAsyncCallback<Boolean>() {
+            @Override
+            public void onSuccess(Boolean authorized) {
+                if (authorized) {
+                    Button configButton = new ImageButton( "settings.png", "Konfiguráció", new ClickHandler() {
+                        @Override
+                        public void onClick(ClickEvent clickEvent) {
+                            scmtMarathon.getMainRootPanel().showConfigurationPanel();
+                        }
+                    });
+                    horizontalPanel.add(configButton);
+                }
+            }
+        });
+
+        rootPanel.add(horizontalPanel);
     }
 
     private CellTable<Verseny> createVersenyTable(final ListDataProvider<Verseny> versenyList) {

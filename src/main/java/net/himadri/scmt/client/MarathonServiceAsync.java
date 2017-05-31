@@ -1,10 +1,7 @@
 package net.himadri.scmt.client;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import net.himadri.scmt.client.entity.PageProfile;
-import net.himadri.scmt.client.entity.PersonLap;
-import net.himadri.scmt.client.entity.Verseny;
-import net.himadri.scmt.client.entity.Versenyzo;
+import net.himadri.scmt.client.entity.*;
 import net.himadri.scmt.client.serializable.PollingRequest;
 import net.himadri.scmt.client.serializable.PollingResult;
 
@@ -21,6 +18,8 @@ public interface MarathonServiceAsync {
     void getRaceTime(Long versenyId, AsyncCallback<Long> async);
 
     void addPersonLap(Long versenyId, String raceNumber, long raceTime, boolean withThresholdValidation, AsyncCallback<Void> async);
+
+    void setNevezesDatum(Long versenyId, Long nevezesBegin, Long nevezesEnd, String emailSubject, String emailText, AsyncCallback<Void> async);
 
     void updateRaceNumber(Long personLapId, String raceNumber, AsyncCallback<Void> async);
 
@@ -75,4 +74,10 @@ public interface MarathonServiceAsync {
     void shiftRaceTime(Long versenyId, long offsetInMillis, AsyncCallback<Void> async);
 
     void getVerseny(Long id, AsyncCallback<Verseny> async);
+
+    void getConfiguration(String key, AsyncCallback<String> async);
+
+    void getConfigurations(AsyncCallback<List<Configuration>> async);
+
+    void saveConfigurations(List<Configuration> configurations, AsyncCallback<Void> async);
 }

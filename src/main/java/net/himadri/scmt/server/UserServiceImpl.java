@@ -2,6 +2,7 @@ package net.himadri.scmt.server;
 
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import net.himadri.scmt.client.MarathonService;
 import net.himadri.scmt.client.UserService;
 import net.himadri.scmt.client.serializable.UserResponse;
 
@@ -11,7 +12,9 @@ import net.himadri.scmt.client.serializable.UserResponse;
  * Date: 2012.04.23. 23:07
  */
 public class UserServiceImpl extends RemoteServiceServlet implements UserService {
-    static final String SUPER_USER_NAME = "kavai.csaba@gmail.com";
+    public static final String SUPER_USER_KEY = "SUPER_USER";
+    private final MarathonService marathonService = new MarathonServiceImpl();
+
 
     @Override
     public boolean isAuthorized() {
@@ -20,7 +23,8 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 
     @Override
     public boolean isSuperUserAuthorized() {
-        return isSuperUserAuthorizedStatic();
+        String superUser = marathonService.getConfiguration(SUPER_USER_KEY);
+        return superUser.equals(UserServiceFactory.getUserService().getCurrentUser().getEmail());
     }
 
     @Override
@@ -32,7 +36,5 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
         return userResponse;
     }
 
-    static boolean isSuperUserAuthorizedStatic() {
-        return SUPER_USER_NAME.equals(UserServiceFactory.getUserService().getCurrentUser().getEmail());
-    }
+
 }

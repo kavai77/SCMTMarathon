@@ -10,6 +10,7 @@ import com.google.appengine.api.datastore.PropertyProjection;
 import com.google.appengine.api.memcache.Expiration;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.NotFoundException;
@@ -35,14 +36,15 @@ import java.util.List;
 public class MarathonServiceImpl extends RemoteServiceServlet implements
         MarathonService {
 
-    public static final Expiration DEFAULT_CACHE_EXPIRATION = Expiration.byDeltaSeconds(60 * 60);
-    public static final long CHANNEL_EXPIRATION = 24 * 60 * 60 * 1000;
+    private static final Expiration DEFAULT_CACHE_EXPIRATION = Expiration.byDeltaSeconds(60 * 60);
+    private static final long CHANNEL_EXPIRATION = 24 * 60 * 60 * 1000;
 
     private enum SyncValueType {PERSON_LAP, VERSENYZO, VERSENYSZAM, TAV}
 
-    public static final long RACE_TIME_THRESHOLD = 60000;
+    private static final long RACE_TIME_THRESHOLD = 60000;
     private static Objectify ofy = ObjectifyUtils.beginObjectify();
     private static MemcacheService memcacheService = MemcacheServiceFactory.getMemcacheService();
+    private static MemcacheService configMemcacheService = MemcacheServiceFactory.getMemcacheService("config");
 
     @Override
     public void startRace(Long versenyId) {
@@ -53,6 +55,7 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         broadcastModification();
     }
 
+    @Override
     public void shiftRaceTime(Long versenyId, long offsetInMillis) {
         Verseny verseny = getVersenyFromCache(versenyId);
         if (verseny.getRaceStatus() == RaceStatus.RACING) {
@@ -86,8 +89,19 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
     }
 
     @Override
+    public void setNevezesDatum(Long versenyId, Long nevezesBegin, Long nevezesEnd, String emailSubject, String emailText) {
+        Verseny verseny = getVersenyFromCache(versenyId);
+        verseny.setNevezesBegin(nevezesBegin);
+        verseny.setNevezesEnd(nevezesEnd);
+        verseny.setNevezesEmailSubject(emailSubject);
+        verseny.setNevezesEmailText(emailText);
+        updateVerseny(verseny);
+        broadcastModification();
+    }
+
+    @Override
     public void deleteRace(Long versenyId) {
-        if (!UserServiceImpl.isSuperUserAuthorizedStatic()) throw new NotAuthorizedException();
+        if (!isSuperUserAuthorized()) throw new NotAuthorizedException();
         ofy.delete(ofy.query(PersonLap.class).filter("versenyId", versenyId));
         ofy.delete(ofy.query(Versenyzo.class).filter("versenyId", versenyId));
         ofy.delete(ofy.query(VersenySzam.class).filter("versenyId", versenyId));
@@ -364,6 +378,36 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         } else {
             return foundNev != null ? foundNev.isFerfi() : null;
         }
+    }
+
+    @Override
+    public String getConfiguration(String key) {
+        if (configMemcacheService.contains(key)) {
+            return (String) configMemcacheService.get(key);
+        } else {
+            String value = ofy.get(Configuration.class, key).getValue();
+            configMemcacheService.put(key, value, DEFAULT_CACHE_EXPIRATION);
+            return value;
+        }
+    }
+
+    @Override
+    public List<Configuration> getConfigurations() {
+        return ofy.query(Configuration.class).list();
+    }
+
+    @Override
+    public void saveConfigurations(List<Configuration> configurations) {
+        if (!isSuperUserAuthorized()) throw new NotAuthorizedException();
+        configMemcacheService.clearAll();
+        for (Configuration conf: configurations) {
+            ofy.put(conf);
+        }
+    }
+
+    private boolean isSuperUserAuthorized() {
+        String superUser = getConfiguration(UserServiceImpl.SUPER_USER_KEY);
+        return superUser.equals(UserServiceFactory.getUserService().getCurrentUser().getEmail());
     }
 
     private int getVersenyzoSzam(Long versenyId) {

@@ -47,6 +47,10 @@
         <servlet-name>ServeEmptyOklevelPdf</servlet-name>
         <servlet-class>net.himadri.scmt.server.ServeEmptyOklevelPdf</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>NevezesServlet</servlet-name>
+        <servlet-class>net.himadri.scmt.server.NevezesServlet</servlet-class>
+    </servlet>
 
     <servlet-mapping>
         <servlet-name>marathonServlet</servlet-name>
@@ -93,6 +97,14 @@
     <servlet-mapping>
         <servlet-name>ServeEmptyOklevelPdf</servlet-name>
         <url-pattern>/scmtmarathon/serveemptyoklevelpdf</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>NevezesServlet</servlet-name>
+        <url-pattern>/public/nevezes/get</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>NevezesServlet</servlet-name>
+        <url-pattern>/public/nevezes/store</url-pattern>
     </servlet-mapping>
 
     <!-- Default page to serve -->

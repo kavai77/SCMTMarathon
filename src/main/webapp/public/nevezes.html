@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nevezés - Sri Chinmoy Marathon Team</title>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script type="text/javascript" src="js/angular.min.js"></script>
+    <script type="text/javascript" src="js/angular-resource.min.js"></script>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/resources.js"></script>
+    <script type="text/javascript" src="js/nevezes-controller.js"></script>
+    <script src='https://www.google.com/recaptcha/api.js'></script>
+
+</head>
+<body ng-controller="ctrl">
+
+<ng-include src="'header.html'"></ng-include>
+<div class="container">
+    <div ng-show="!nevezes.$resolved">
+        <p><img src="image/ajax-loader.gif" class="center-block"></p>
+    </div>
+    <div class="jumbotron" ng-show="nevezes.$resolved">
+        <img src="/images/header.jpg" class="img-responsive center-block" alt="SCMT Logo">
+        <div ng-repeat="errorMessage in errorMessages">
+            <div class="alert alert-danger" role="alert">
+                {{errorMessage}}
+            </div>
+        </div>
+        <div ng-show="!nevezes.aktiv">
+            <h1>Jelenleg nincs aktív nevezésünk</h1>
+        </div>
+        <div ng-show="nevezes.aktiv">
+            <h1>{{nevezes.nev}} Nevezés</h1>
+            <form>
+                <div class="form-group" ng-class="tavClass">
+                    <label for="tav">Táv *</label>
+                    <select id="tav" class="form-control" ng-model="tav">
+                        <option value="">(válassz)</option>
+                        <option ng-repeat="(key, value) in nevezes.tavok" value="{{key}}">{{value}}</option>
+                    </select>
+                </div>
+                <div class="form-group" ng-class="nevClass">
+                    <label for="nev">Név *</label>
+                    <input type="text" class="form-control" id="nev" placeholder="Név" ng-model="nev">
+                </div>
+                <div class="form-group" ng-class="nemClass">
+                    <label>Nem *</label>
+                    <label class="radio-inline">
+                        <input type="radio" name="nemOptions" id="ferfiRadio" value="ferfi" ng-model="nem"> Férfi
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="nemOptions" id="noRadio" value="no" ng-model="nem"> Nő
+                    </label>
+                </div>
+                <div class="form-group" ng-class="evClass">
+                    <label for="szuletesiev">Születési év *</label>
+                    <input type="number" class="form-control" id="szuletesiev" placeholder="Év" maxlength="4" ng-model="ev">
+                </div>
+                <div class="form-group">
+                    <label for="egyesulet">Egyesület</label>
+                    <input type="text" class="form-control" id="egyesulet" placeholder="Egyesület" ng-model="egyesulet">
+                </div>
+                <div class="form-group" ng-class="emailClass">
+                    <label for="email">Email cím *</label>
+                    <input type="email" class="form-control" id="email" placeholder="Email" ng-model="email">
+                </div>
+                <div class="form-group" ng-class="checkClass">
+                    <label>
+                        <input type="checkbox" ng-model="check">
+                        Elolvastam és megértettem a versenyszabályzatot. A versenyen felkészült fizikummal indulok.
+                    </label>
+                </div>
+                <div class="g-recaptcha" data-sitekey="6LfODiMUAAAAAIdzUqTi0tEopIgeqILqG3GKj2nb" hl="hu"></div>
+                <button type="submit" class="btn btn-primary btn-lg" ng-click="nevezesDone()">
+                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                    Nevezés
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
