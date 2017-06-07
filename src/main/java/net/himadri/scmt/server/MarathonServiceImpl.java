@@ -382,6 +382,10 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
 
     @Override
     public String getConfiguration(String key) {
+        return getConfigurationStatic(key);
+    }
+
+    public static String getConfigurationStatic(String key) {
         if (configMemcacheService.contains(key)) {
             return (String) configMemcacheService.get(key);
         } else {

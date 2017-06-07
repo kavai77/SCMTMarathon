@@ -38,56 +38,75 @@
                 {{errorMessage}}
             </div>
         </div>
-        <div ng-show="!nevezes.aktiv">
-            <h1>Jelenleg nincs aktív nevezésünk</h1>
+        <div ng-show="nevezett">
+            <h1>Köszönjük, sikeres nevezés!</h1>
+            <p>Hamarosan kapsz egy visszaigazoló emailt a(z) <b>{{email}}</b> címre a következő tartalommal:</p>
+            <pre>{{nevezes.emailText}}</pre>
         </div>
-        <div ng-show="nevezes.aktiv">
-            <h1>{{nevezes.nev}} Nevezés</h1>
-            <form>
-                <div class="form-group" ng-class="tavClass">
-                    <label for="tav">Táv *</label>
-                    <select id="tav" class="form-control" ng-model="tav">
-                        <option value="">(válassz)</option>
-                        <option ng-repeat="(key, value) in nevezes.tavok" value="{{key}}">{{value}}</option>
-                    </select>
-                </div>
-                <div class="form-group" ng-class="nevClass">
-                    <label for="nev">Név *</label>
-                    <input type="text" class="form-control" id="nev" placeholder="Név" ng-model="nev">
-                </div>
-                <div class="form-group" ng-class="nemClass">
-                    <label>Nem *</label>
-                    <label class="radio-inline">
-                        <input type="radio" name="nemOptions" id="ferfiRadio" value="ferfi" ng-model="nem"> Férfi
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="nemOptions" id="noRadio" value="no" ng-model="nem"> Nő
-                    </label>
-                </div>
-                <div class="form-group" ng-class="evClass">
-                    <label for="szuletesiev">Születési év *</label>
-                    <input type="number" class="form-control" id="szuletesiev" placeholder="Év" maxlength="4" ng-model="ev">
-                </div>
-                <div class="form-group">
-                    <label for="egyesulet">Egyesület</label>
-                    <input type="text" class="form-control" id="egyesulet" placeholder="Egyesület" ng-model="egyesulet">
-                </div>
-                <div class="form-group" ng-class="emailClass">
-                    <label for="email">Email cím *</label>
-                    <input type="email" class="form-control" id="email" placeholder="Email" ng-model="email">
-                </div>
-                <div class="form-group" ng-class="checkClass">
-                    <label>
-                        <input type="checkbox" ng-model="check">
-                        Elolvastam és megértettem a versenyszabályzatot. A versenyen felkészült fizikummal indulok.
-                    </label>
-                </div>
-                <div class="g-recaptcha" data-sitekey="6LfODiMUAAAAAIdzUqTi0tEopIgeqILqG3GKj2nb" hl="hu"></div>
-                <button type="submit" class="btn btn-primary btn-lg" ng-click="nevezesDone()">
-                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-                    Nevezés
-                </button>
-            </form>
+        <div ng-show="!nevezett">
+            <div ng-show="!nevezes.aktiv">
+                <h1>Jelenleg nincs aktív nevezésünk</h1>
+            </div>
+            <div ng-show="nevezes.aktiv">
+                <h1>{{nevezes.nev}} Nevezés</h1>
+                <form>
+                    <div class="form-group" ng-class="tavClass">
+                        <label for="tav">Táv *</label>
+                        <select id="tav" class="form-control" ng-model="tav">
+                            <option value="">(válassz)</option>
+                            <option ng-repeat="(key, value) in nevezes.tavok" value="{{key}}">{{value}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group" ng-class="nevClass">
+                        <label for="nev">Név *</label>
+                        <input type="text" class="form-control" id="nev" placeholder="Név" ng-model="nev">
+                    </div>
+                    <div class="form-group" ng-class="nemClass">
+                        <label>Nem *</label>
+                        <label class="radio-inline">
+                            <input type="radio" name="nemOptions" id="ferfiRadio" value="ferfi" ng-model="nem"> Férfi
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="nemOptions" id="noRadio" value="no" ng-model="nem"> Nő
+                        </label>
+                    </div>
+                    <div class="form-group" ng-class="evClass">
+                        <label for="szuletesiev">Születési év *</label>
+                        <input type="number" class="form-control" id="szuletesiev" placeholder="Év" maxlength="4" ng-model="ev">
+                    </div>
+                    <div class="form-group">
+                        <label for="egyesulet">Egyesület</label>
+                        <input type="text" class="form-control" id="egyesulet" placeholder="Egyesület" ng-model="egyesulet">
+                    </div>
+                    <div class="form-group" ng-class="emailClass">
+                        <label for="email">Email cím *</label>
+                        <input type="email" class="form-control" id="email" placeholder="Email" ng-model="email">
+                    </div>
+                    <div class="form-group" ng-class="poloClass">
+                        <label for="polo">Pólóméret *</label>
+                        <select id="polo" class="form-control" ng-model="poloMeret">
+                            <option value="">(válassz)</option>
+                            <option value="Nem kér pólót">Nem kérek pólót</option>
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                            <option value="XL">XL</option>
+                            <option value="XXL">XXL</option>
+                        </select>
+                    </div>
+                    <div class="form-group" ng-class="checkClass">
+                        <label>
+                            <input type="checkbox" ng-model="check">
+                            Elolvastam és megértettem a versenyszabályzatot. A versenyen felkészült fizikummal indulok.
+                        </label>
+                    </div>
+                    <div class="g-recaptcha" data-sitekey="6LfODiMUAAAAAIdzUqTi0tEopIgeqILqG3GKj2nb" hl="hu"></div>
+                    <button type="submit" class="btn btn-primary btn-lg" ng-click="nevezesDone()">
+                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                        Nevezés
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>

@@ -26,7 +26,8 @@ public class Versenyzo implements Serializable, HasCreationTime {
     private Long versenyId;
     private boolean feladta;
     private boolean ellenorzott;
-    private boolean fizetett;
+    private Integer fizetettDij;
+    private String poloMeret;
     private long creationTime;
 
     @SuppressWarnings({"UnusedDeclaration"})
@@ -93,8 +94,12 @@ public class Versenyzo implements Serializable, HasCreationTime {
         return feladta;
     }
 
-    public boolean isFizetett() {
-        return fizetett;
+    public Integer getFizetettDij() {
+        return fizetettDij;
+    }
+
+    public String getPoloMeret() {
+        return poloMeret;
     }
 
     public long getCreationTime() {
@@ -141,11 +146,35 @@ public class Versenyzo implements Serializable, HasCreationTime {
         return ellenorzott;
     }
 
-    public void setFizetett(boolean fizetett) {
-        this.fizetett = fizetett;
+    public void setFizetettDij(Integer fizetettDij) {
+        this.fizetettDij = fizetettDij;
     }
 
     public void setEllenorzott(boolean ellenorzott) {
         this.ellenorzott = ellenorzott;
+    }
+
+    public void setPoloMeret(String poloMeret) {
+        this.poloMeret = poloMeret;
+    }
+
+    @Override
+    public String toString() {
+        return "Versenyzo{" +
+                "id=" + id +
+                ", raceNumber='" + raceNumber + '\'' +
+                ", name='" + name + '\'' +
+                ", ferfi=" + ferfi +
+                ", szuletesiEv=" + szuletesiEv +
+                ", egyesulet='" + egyesulet + '\'' +
+                ", email='" + email + '\'' +
+                ", versenySzamId=" + versenySzamId +
+                ", versenyId=" + versenyId +
+                ", feladta=" + feladta +
+                ", ellenorzott=" + ellenorzott +
+                ", fizetettDij=" + fizetettDij +
+                ", poloMeret='" + poloMeret + '\'' +
+                ", creationTime=" + creationTime +
+                '}';
     }
 }

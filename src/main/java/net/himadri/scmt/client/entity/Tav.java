@@ -3,6 +3,7 @@ package net.himadri.scmt.client.entity;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * Created by IntelliJ IDEA.
@@ -96,5 +97,20 @@ public class Tav implements Serializable, HasCreationTime {
 
     public long getCreationTime() {
         return creationTime;
+    }
+
+    @Override
+    public String toString() {
+        return "Tav{" +
+                "id=" + id +
+                ", versenyId=" + versenyId +
+                ", megnevezes='" + megnevezes + '\'' +
+                ", korSzam=" + korSzam +
+                ", versenySzamtol=" + versenySzamtol +
+                ", versenySzamig=" + versenySzamig +
+                ", raceStartDiff=" + raceStartDiff +
+                ", creationTime=" + creationTime +
+                ", korNevArray=" + Arrays.toString(korNevArray) +
+                '}';
     }
 }

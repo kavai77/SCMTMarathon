@@ -1,4 +1,4 @@
-package net.himadri.scmt.server;
+package net.himadri.scmt.server.nevezes;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.api.datastore.QueryResultIterator;
@@ -8,8 +8,12 @@ import net.himadri.scmt.client.entity.Tav;
 import net.himadri.scmt.client.entity.Verseny;
 import net.himadri.scmt.client.entity.VersenySzam;
 import net.himadri.scmt.client.entity.Versenyzo;
+import net.himadri.scmt.server.MarathonServiceImpl;
+import net.himadri.scmt.server.UserServiceImpl;
 import net.himadri.scmt.server.dto.Nevezes;
+import net.himadri.scmt.server.dto.NevezesRequest;
 import net.himadri.scmt.server.dto.RecaptchaResponse;
+import net.himadri.scmt.server.exception.NevezesException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -19,6 +23,10 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -27,36 +35,38 @@ import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class NevezesServlet extends HttpServlet {
-    private static final Logger LOG = Logger.getLogger(NevezesServlet.class.getName());
+import static com.google.appengine.api.search.checkers.Preconditions.checkArgument;
+
+@RestController
+@RequestMapping(value = "/nevezes")
+public class NevezesController {
+    private static final Logger LOG = Logger.getLogger(NevezesController.class.getName());
 
     private static final String RECAPTHA_SECRET_KEY = "RECAPTHA_SECRET";
-
-    private final ObjectMapper mapper = new ObjectMapper();
-    private final MarathonService marathonService = new MarathonServiceImpl();
-    private static final Objectify ofy = ObjectifyUtils.beginObjectify();
     private static final long MILLIS_IN_DAY = 24 * 60 * 60 * 1000;
+    private static final String GOOGLE_RECAPTCHA_SITEVERIFY = "https://www.google.com/recaptcha/api/siteverify";
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
-        final PrintWriter writer = resp.getWriter();
+    @Autowired
+    private ObjectMapper mapper;
+
+    @Autowired
+    private Objectify ofy;
+
+    @Autowired
+    private MarathonService marathonService;
+
+    @RequestMapping(value = "/get", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public Nevezes getNevezes() throws IOException {
         final Verseny verseny = findCurrentVerseny();
         final Nevezes nevezes;
         if (verseny == null) {
-            nevezes = new Nevezes(null, false, null);
+            return new Nevezes(null, false, null, null);
         } else {
             final List<Tav> tavList = ofy.query(Tav.class).filter("versenyId", verseny.getId()).list();
             Collections.sort(tavList, new Comparator<Tav>() {
@@ -71,21 +81,32 @@ public class NevezesServlet extends HttpServlet {
             for (final Tav tav: tavList) {
                 tavMap.put(tav.getId().toString(), tav.getMegnevezes());
             }
-            nevezes = new Nevezes(verseny.getNev(), true, tavMap);
+            return new Nevezes(verseny.getNev(), true, tavMap, verseny.getNevezesEmailText());
         }
-
-        mapper.writeValue(resp.getWriter(), nevezes);
-        writer.close();
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        verifyRecaptcha(req);
-        Versenyzo versenyzo = saveVersenyzo(req);
+    @RequestMapping(value = "/store", method = RequestMethod.POST)
+    public void storeNevezes(@RequestBody NevezesRequest nevezesRequest, HttpServletRequest req) throws IOException, NevezesException {
+        verifyRecaptcha(nevezesRequest, req);
+        Versenyzo versenyzo = saveVersenyzo(nevezesRequest);
         sendEmail(versenyzo);
     }
 
-    private void sendEmail(Versenyzo versenyzo) throws ServletException, IOException {
+    @ExceptionHandler(NevezesException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public void handleNevezesException(Exception e) {
+        LOG.log(Level.WARNING, e.getMessage());
+        alertSuperUser(e);
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public void handleException(Exception e) {
+        LOG.log(Level.SEVERE, e.getMessage());
+        alertSuperUser(e);
+    }
+
+    private void sendEmail(Versenyzo versenyzo) throws IOException, NevezesException {
         Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
         Verseny verseny = ofy.get(Verseny.class, versenyzo.getVersenyId());
@@ -98,33 +119,32 @@ public class NevezesServlet extends HttpServlet {
             msg.setText(verseny.getNevezesEmailText());
             Transport.send(msg);
         } catch (AddressException e) {
-            throw new ServletException("Rossz email cím!");
+            throw new NevezesException("Rossz email cím! " + versenyzo.toString());
         } catch (MessagingException | UnsupportedEncodingException e) {
             throw new IOException("Email szolgáltató hiba", e);
         }
     }
 
-    private Versenyzo saveVersenyzo(HttpServletRequest req) throws ServletException {
-        Tav tav = parseTav(req);
-        String nev = req.getParameter("nev");
-        boolean isFerfi = parseNem(req);
-        int szuletesiEv  = parseSzuletesiEv(req);
-        String egyesulet = req.getParameter("egyesulet");
-        String email = req.getParameter("email");
+    private Versenyzo saveVersenyzo(NevezesRequest nevezes) throws NevezesException, IOException {
+        Tav tav = ofy.get(Tav.class, nevezes.getTav());
+        boolean isFerfi = parseNem(nevezes.getNem());
         String raceNumber = Integer.toString(getNextRaceNumber(tav));
-        Long versenySzamId = getVersenySzamId(tav, szuletesiEv, isFerfi);
-        Versenyzo versenyzo = new Versenyzo(raceNumber, nev, isFerfi, szuletesiEv, egyesulet, email, versenySzamId,
-                tav.getVersenyId());
+        Long versenySzamId = getVersenySzamId(tav, nevezes.getEv(), isFerfi);
+        checkArgument(nevezes.getEv() >= 1900 && nevezes.getEv() < Calendar.getInstance().get(Calendar.YEAR),
+                "Rossz év: " + nevezes.getEv());
+        Versenyzo versenyzo = new Versenyzo(raceNumber, nevezes.getNev(), isFerfi, nevezes.getEv(),
+                nevezes.getEgyesulet(), nevezes.getEmail(), versenySzamId, tav.getVersenyId());
+        versenyzo.setPoloMeret(nevezes.getPoloMeret());
         ofy.put(versenyzo);
         return versenyzo;
     }
 
-    private void verifyRecaptcha(HttpServletRequest req) throws IOException, ServletException {
+    private void verifyRecaptcha(NevezesRequest nevezesRequest, HttpServletRequest req) throws NevezesException, IOException {
         CloseableHttpClient httpclient = HttpClients.createDefault();
-        HttpPost httppost = new HttpPost("https://www.google.com/recaptcha/api/siteverify");
+        HttpPost httppost = new HttpPost(GOOGLE_RECAPTCHA_SITEVERIFY);
         List<NameValuePair> params = new ArrayList<>(3);
-        params.add(new BasicNameValuePair("secret", marathonService.getConfiguration(RECAPTHA_SECRET_KEY)));
-        params.add(new BasicNameValuePair("response", req.getParameter("recaptcha")));
+        params.add(new BasicNameValuePair("secret", MarathonServiceImpl.getConfigurationStatic(RECAPTHA_SECRET_KEY)));
+        params.add(new BasicNameValuePair("response", nevezesRequest.getRecaptcha()));
         params.add(new BasicNameValuePair("remoteip", req.getRemoteHost()));
         httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
         HttpResponse response = httpclient.execute(httppost);
@@ -135,7 +155,7 @@ public class NevezesServlet extends HttpServlet {
             String responseJson = IOUtils.toString(instream, "UTF-8");
             RecaptchaResponse value = mapper.readerFor(RecaptchaResponse.class).readValue(responseJson);
             if (!value.isSuccess()) {
-                throw new ServletException("Recaptcha validation failed: " + value);
+                throw new NevezesException("Recaptcha ellenőrzés hibát adott: " + value + " " + nevezesRequest.toString());
             }
         } finally {
             instream.close();
@@ -143,7 +163,7 @@ public class NevezesServlet extends HttpServlet {
 
     }
 
-    private Long getVersenySzamId(Tav tav, int szuletesiEv, boolean isFerfi) throws ServletException {
+    private Long getVersenySzamId(Tav tav, int szuletesiEv, boolean isFerfi) throws IOException {
         QueryResultIterator<VersenySzam> versenySzamIterator = ofy.query(VersenySzam.class).filter("tavId",
                 tav.getId()).iterator();
         int eletEv = Calendar.getInstance().get(Calendar.YEAR) - szuletesiEv;
@@ -155,10 +175,10 @@ public class NevezesServlet extends HttpServlet {
                 return versenySzam.getId();
             }
         }
-        throw new ServletException("Could not find versenyszam: " + tav.getMegnevezes() + " " + szuletesiEv + " " + isFerfi);
+        throw new IOException("Nem található versenyszám: " + tav.getMegnevezes() + " " + szuletesiEv + " " + isFerfi);
     }
 
-    private int getNextRaceNumber(Tav tav) throws ServletException {
+    private int getNextRaceNumber(Tav tav) throws NevezesException {
         QueryResultIterator<VersenySzam> versenySzamIterator = ofy.query(VersenySzam.class).filter("tavId", tav.getId()).iterator();
         Set<Long> versenySzamIdSet = new HashSet<>();
         while (versenySzamIterator.hasNext()) {
@@ -181,24 +201,10 @@ public class NevezesServlet extends HttpServlet {
                 return i;
             }
         }
-        throw new ServletException("Nevezés betelt");
+        throw new NevezesException("Nevezés betelt. " + tav.toString());
     }
 
-    private Tav parseTav(HttpServletRequest req) {
-        long tavId = Long.parseLong(req.getParameter("tav"));
-        return ofy.get(Tav.class, tavId);
-    }
-
-    private int parseSzuletesiEv(HttpServletRequest req) {
-        int ev = Integer.parseInt(req.getParameter("ev"));
-        if (ev < 1900 || ev > Calendar.getInstance().get(Calendar.YEAR)) {
-            throw new IllegalArgumentException("Rossz év: " + ev);
-        }
-        return ev;
-    }
-
-    private boolean parseNem(HttpServletRequest req) {
-        String nem = req.getParameter("nem");
+    private boolean parseNem(String nem) {
         switch (nem.toLowerCase()) {
             case "ferfi":
                 return true;
@@ -222,5 +228,28 @@ public class NevezesServlet extends HttpServlet {
             }
         }
         return null;
+    }
+
+    private void alertSuperUser(Exception exception) {
+        String superUserEmail = marathonService.getConfiguration(UserServiceImpl.SUPER_USER_KEY);
+        Properties props = new Properties();
+        Session session = Session.getDefaultInstance(props, null);
+
+        try {
+            Message msg = new MimeMessage(session);
+            msg.setFrom(new InternetAddress("noreply@scmtmarathon.appspot.com", "Sri Chinmoy Marathon Team"));
+            msg.addRecipient(Message.RecipientType.TO, new InternetAddress(superUserEmail));
+            msg.setSubject("SCMT Nevezés Hiba");
+            msg.setText(getStackTraceAsString(exception));
+            Transport.send(msg);
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            LOG.log(Level.SEVERE, "Alert küldés hiba", e);
+        }
+    }
+
+    private String getStackTraceAsString(Exception exception) {
+        StringWriter buffer  = new StringWriter();
+        exception.printStackTrace(new PrintWriter(buffer));
+        return buffer.toString();
     }
 }
