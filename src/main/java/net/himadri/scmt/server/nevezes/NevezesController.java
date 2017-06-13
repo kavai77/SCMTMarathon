@@ -90,6 +90,7 @@ public class NevezesController {
         verifyRecaptcha(nevezesRequest, req);
         Versenyzo versenyzo = saveVersenyzo(nevezesRequest);
         sendEmail(versenyzo);
+        emailSuperUser("Sikeres nevezés", versenyzo.toString());
     }
 
     @ExceptionHandler(NevezesException.class)
@@ -231,6 +232,10 @@ public class NevezesController {
     }
 
     private void alertSuperUser(Exception exception) {
+        emailSuperUser("SCMT Nevezés Hiba", getStackTraceAsString(exception));
+    }
+
+    private void emailSuperUser(String subject, String text) {
         String superUserEmail = marathonService.getConfiguration(UserServiceImpl.SUPER_USER_KEY);
         Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
@@ -239,8 +244,8 @@ public class NevezesController {
             Message msg = new MimeMessage(session);
             msg.setFrom(new InternetAddress("noreply@scmtmarathon.appspot.com", "Sri Chinmoy Marathon Team"));
             msg.addRecipient(Message.RecipientType.TO, new InternetAddress(superUserEmail));
-            msg.setSubject("SCMT Nevezés Hiba");
-            msg.setText(getStackTraceAsString(exception));
+            msg.setSubject(subject);
+            msg.setText(text);
             Transport.send(msg);
         } catch (MessagingException | UnsupportedEncodingException e) {
             LOG.log(Level.SEVERE, "Alert küldés hiba", e);
