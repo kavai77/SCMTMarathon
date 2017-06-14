@@ -51,6 +51,7 @@ public class NevezesController {
     private static final String RECAPTHA_SECRET_KEY = "RECAPTHA_SECRET";
     private static final long MILLIS_IN_DAY = 24 * 60 * 60 * 1000;
     private static final String GOOGLE_RECAPTCHA_SITEVERIFY = "https://www.google.com/recaptcha/api/siteverify";
+    private static final InternetAddress EMAIL_FROM_ADDRESS = new InternetAddress("noreply@scmtmarathon.appspotmail.com", "Sri Chinmoy Marathon Team");
 
     @Autowired
     private ObjectMapper mapper;
@@ -114,7 +115,7 @@ public class NevezesController {
 
         try {
             Message msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress("noreply@scmtmarathon.appspot.com", "Sri Chinmoy Marathon Team"));
+            msg.setFrom(EMAIL_FROM_ADDRESS);
             msg.addRecipient(Message.RecipientType.TO, new InternetAddress(versenyzo.getEmail(), versenyzo.getName()));
             msg.setSubject(verseny.getNevezesEmailSubject());
             msg.setText(verseny.getNevezesEmailText());
@@ -242,7 +243,7 @@ public class NevezesController {
 
         try {
             Message msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress("noreply@scmtmarathon.appspot.com", "Sri Chinmoy Marathon Team"));
+            msg.setFrom(EMAIL_FROM_ADDRESS);
             msg.addRecipient(Message.RecipientType.TO, new InternetAddress(superUserEmail));
             msg.setSubject(subject);
             msg.setText(text);
