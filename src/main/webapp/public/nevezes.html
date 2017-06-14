@@ -28,8 +28,8 @@
 
 <ng-include src="'header.html'"></ng-include>
 <div class="container">
-    <div ng-show="!nevezes.$resolved">
-        <p><img src="image/ajax-loader.gif" class="center-block"></p>
+    <div class="jumbotron" ng-show="!nevezes.$resolved">
+        <p><img src="/images/ajax-loader.gif" class="center-block"></p>
     </div>
     <div class="jumbotron" ng-show="nevezes.$resolved">
         <img src="/images/header.jpg" class="img-responsive center-block" alt="SCMT Logo">
@@ -104,7 +104,17 @@
                         <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
                         Nevezés
                     </button>
+
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="loadingDialog" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <img src="/images/ajax-loader.gif" class="center-block">
             </div>
         </div>
     </div>

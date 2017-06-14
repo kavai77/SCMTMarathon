@@ -53,6 +53,7 @@ app.controller('ctrl', function ($scope, $resource) {
             $scope.errorMessages.push("Bizonyítsd be, hogy nem vagy robot!");
         }
         if ($scope.errorMessages.length == 0) {
+            $('#loadingDialog').modal('show');
             var sendData = new Object();
             sendData.tav = $scope.tav;
             sendData.nev = $scope.nev;
@@ -63,7 +64,10 @@ app.controller('ctrl', function ($scope, $resource) {
             sendData.poloMeret = $scope.poloMeret;
             sendData.recaptcha = recaptcha;
             res.NevezesService.store(sendData, function() {
+                $('#loadingDialog').modal('hide');
                 $scope.nevezett = true;
+            }, function(response) {
+                $('#loadingDialog').modal('hide');
             });
         }
     };

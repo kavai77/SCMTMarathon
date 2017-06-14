@@ -28,10 +28,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
+import javax.mail.*;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -51,7 +48,16 @@ public class NevezesController {
     private static final String RECAPTHA_SECRET_KEY = "RECAPTHA_SECRET";
     private static final long MILLIS_IN_DAY = 24 * 60 * 60 * 1000;
     private static final String GOOGLE_RECAPTCHA_SITEVERIFY = "https://www.google.com/recaptcha/api/siteverify";
-    private static final InternetAddress EMAIL_FROM_ADDRESS = new InternetAddress("noreply@scmtmarathon.appspotmail.com", "Sri Chinmoy Marathon Team");
+    private static InternetAddress EMAIL_FROM_ADDRESS;
+    private static InternetAddress EMAIL_REPLY_TO_ADDRESS;
+    static {
+        try {
+            EMAIL_FROM_ADDRESS = new InternetAddress("noreply@scmtmarathon.appspotmail.com", "Sri Chinmoy Marathon Team");
+            EMAIL_REPLY_TO_ADDRESS = new InternetAddress("hungary@srichinmoyraces.org");
+        } catch (UnsupportedEncodingException | AddressException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Autowired
     private ObjectMapper mapper;
@@ -114,11 +120,12 @@ public class NevezesController {
         Verseny verseny = ofy.get(Verseny.class, versenyzo.getVersenyId());
 
         try {
-            Message msg = new MimeMessage(session);
+            MimeMessage msg = new MimeMessage(session);
             msg.setFrom(EMAIL_FROM_ADDRESS);
+            msg.setReplyTo(new Address[]{EMAIL_REPLY_TO_ADDRESS});
             msg.addRecipient(Message.RecipientType.TO, new InternetAddress(versenyzo.getEmail(), versenyzo.getName()));
-            msg.setSubject(verseny.getNevezesEmailSubject());
-            msg.setText(verseny.getNevezesEmailText());
+            msg.setSubject(verseny.getNevezesEmailSubject(), "UTF-8");
+            msg.setText(verseny.getNevezesEmailText(), "UTF-8");
             Transport.send(msg);
         } catch (AddressException e) {
             throw new NevezesException("Rossz email cím! " + versenyzo.toString());
@@ -242,13 +249,13 @@ public class NevezesController {
         Session session = Session.getDefaultInstance(props, null);
 
         try {
-            Message msg = new MimeMessage(session);
+            MimeMessage msg = new MimeMessage(session);
             msg.setFrom(EMAIL_FROM_ADDRESS);
             msg.addRecipient(Message.RecipientType.TO, new InternetAddress(superUserEmail));
-            msg.setSubject(subject);
-            msg.setText(text);
+            msg.setSubject(subject, "UTF-8");
+            msg.setText(text, "UTF-8");
             Transport.send(msg);
-        } catch (MessagingException | UnsupportedEncodingException e) {
+        } catch (MessagingException e) {
             LOG.log(Level.SEVERE, "Alert küldés hiba", e);
         }
     }

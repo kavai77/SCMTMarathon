@@ -1,12 +1,10 @@
 package net.himadri.scmt.server;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.BaseFont;
-import com.itextpdf.text.pdf.ColumnText;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.PageSize;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
-import net.himadri.scmt.client.entity.PageProfile;
-import net.himadri.scmt.client.entity.PageProfileId;
 import net.himadri.scmt.client.entity.VersenySzam;
 import net.himadri.scmt.client.entity.Versenyzo;
 import net.himadri.scmt.client.serializable.PdfServiceType;
@@ -15,8 +13,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
 
 /**
  * Created by IntelliJ IDEA.
@@ -51,7 +47,7 @@ public class PrePrintedPDFService extends AbstractPDFService {
                     if (count > 0) {
                         printVersenySzam(canvas, document, versenySzam, false);
                     } else {
-                        printEmptyPage(canvas, "Ebben a versenysz·mban nem indult versenyzı.");
+                        printEmptyPage(canvas, "Ebben a versenysz√°mban nem indult versenyz≈ë.");
                     }
                     break;
                 case VERSENYZO:
@@ -60,7 +56,7 @@ public class PrePrintedPDFService extends AbstractPDFService {
                     if (versenyzo != null) {
                         printVersenyzo(canvas, versenyzo);
                     } else {
-                        printEmptyPage(canvas, "Nem tal·lhatÛ ilyen rajtsz·mmal versenyzı");
+                        printEmptyPage(canvas, "Nem tal√°lhat√≥ ilyen rajtsz√°mmal versenyz≈ë");
                     }
                     break;
                     
