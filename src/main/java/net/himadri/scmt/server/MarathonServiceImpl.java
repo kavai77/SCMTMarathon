@@ -409,6 +409,18 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         }
     }
 
+    @Override
+    public void updateNevezesiDij(Long id, Integer dij) throws NotExistingEntityException {
+        try {
+            Versenyzo versenyzo = ofy.get(Versenyzo.class, id);
+            versenyzo.setFizetettDij(dij);
+            ofy.put(versenyzo);
+            // az NevezesiDij csak adminisztrációs jellegű, és egy gépen zajlik, ezt nem broadcast-oljuk
+        } catch (NotFoundException e) {
+            throw new NotExistingEntityException();
+        }
+    }
+
     private boolean isSuperUserAuthorized() {
         String superUser = getConfiguration(UserServiceImpl.SUPER_USER_KEY);
         return superUser.equals(UserServiceFactory.getUserService().getCurrentUser().getEmail());

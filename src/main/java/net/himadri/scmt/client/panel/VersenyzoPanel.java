@@ -2,6 +2,7 @@ package net.himadri.scmt.client.panel;
 
 import com.google.gwt.cell.client.ActionCell;
 import com.google.gwt.cell.client.CheckboxCell;
+import com.google.gwt.cell.client.EditTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -128,6 +129,43 @@ public class VersenyzoPanel extends Composite {
                 return versenyzo.getEgyesulet();
             }
         }, "Egyesület");
+
+        final EditTextCell dijEditCell = new EditTextCell();
+        Column<Versenyzo, String> dijColumn = new Column<Versenyzo, String>(dijEditCell) {
+            @Override
+            public String getValue(Versenyzo versenyzo) {
+                return versenyzo.getFizetettDij() != null ? versenyzo.getFizetettDij().toString() : "";
+            }
+        };
+        dijColumn.setFieldUpdater(new FieldUpdater<Versenyzo, String>() {
+            @Override
+            public void update(int i, final Versenyzo versenyzo, final String dijString) {
+                try {
+                    final Integer dij = !dijString.isEmpty() ? Integer.parseInt(dijString) : null;
+                    marathonService.updateNevezesiDij(versenyzo.getId(), dij, new AsyncCallback<Void>() {
+                        @Override
+                        public void onFailure(Throwable throwable) {
+                            SCMTMarathon.commonFailureHandling(throwable);
+                            undoChanges(versenyzo);
+                        }
+
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            versenyzo.setFizetettDij(dij);
+                        }
+                    });
+                } catch (NumberFormatException e) {
+                    undoChanges(versenyzo);
+                }
+            }
+
+            private void undoChanges(Versenyzo versenyzo) {
+                dijEditCell.clearViewData(versenyzo);
+                versenyzoTable.redraw();
+            }
+        });
+        versenyzoTable.addColumn(dijColumn, "Nevezési Díj");
+
         versenyzoTable.addColumn(new SortableTextColumn<Versenyzo>(listHandler) {
             @Override
             public String getValue(Versenyzo versenyzo) {

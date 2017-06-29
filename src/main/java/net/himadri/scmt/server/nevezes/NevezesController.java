@@ -2,13 +2,15 @@ package net.himadri.scmt.server.nevezes;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.api.datastore.QueryResultIterator;
+import com.google.appengine.api.memcache.Expiration;
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.googlecode.objectify.Objectify;
 import net.himadri.scmt.client.MarathonService;
 import net.himadri.scmt.client.entity.Tav;
 import net.himadri.scmt.client.entity.Verseny;
 import net.himadri.scmt.client.entity.VersenySzam;
 import net.himadri.scmt.client.entity.Versenyzo;
-import net.himadri.scmt.server.MarathonServiceImpl;
 import net.himadri.scmt.server.UserServiceImpl;
 import net.himadri.scmt.server.dto.Nevezes;
 import net.himadri.scmt.server.dto.NevezesRequest;
@@ -48,12 +50,13 @@ public class NevezesController {
     private static final String RECAPTHA_SECRET_KEY = "RECAPTHA_SECRET";
     private static final long MILLIS_IN_DAY = 24 * 60 * 60 * 1000;
     private static final String GOOGLE_RECAPTCHA_SITEVERIFY = "https://www.google.com/recaptcha/api/siteverify";
+    private static final int RECAPCTHA_EXPIRATION_SECONDS = 300;
     private static InternetAddress EMAIL_FROM_ADDRESS;
     private static InternetAddress EMAIL_REPLY_TO_ADDRESS;
     static {
         try {
             EMAIL_FROM_ADDRESS = new InternetAddress("noreply@scmtmarathon.appspotmail.com", "Sri Chinmoy Marathon Team");
-            EMAIL_REPLY_TO_ADDRESS = new InternetAddress("hungary@srichinmoyraces.org");
+            EMAIL_REPLY_TO_ADDRESS = new InternetAddress("info@srichinmoyversenyek.hu");
         } catch (UnsupportedEncodingException | AddressException e) {
             throw new RuntimeException(e);
         }
@@ -67,6 +70,8 @@ public class NevezesController {
 
     @Autowired
     private MarathonService marathonService;
+
+    private static MemcacheService recaptchaMemcacheService = MemcacheServiceFactory.getMemcacheService("recaptcha");
 
     @RequestMapping(value = "/get", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Nevezes getNevezes() throws IOException {
@@ -149,11 +154,19 @@ public class NevezesController {
     }
 
     private void verifyRecaptcha(NevezesRequest nevezesRequest, HttpServletRequest req) throws NevezesException, IOException {
+        String recaptcha = nevezesRequest.getRecaptcha();
+        if (recaptchaMemcacheService.contains(recaptcha)) {
+            if (!(boolean) recaptchaMemcacheService.get(recaptcha)) {
+                throw new NevezesException("Recaptcha ellenőrzés hibát adott a cache-bol: " + nevezesRequest.toString());
+            }
+            return;
+        }
+
         CloseableHttpClient httpclient = HttpClients.createDefault();
         HttpPost httppost = new HttpPost(GOOGLE_RECAPTCHA_SITEVERIFY);
         List<NameValuePair> params = new ArrayList<>(3);
-        params.add(new BasicNameValuePair("secret", MarathonServiceImpl.getConfigurationStatic(RECAPTHA_SECRET_KEY)));
-        params.add(new BasicNameValuePair("response", nevezesRequest.getRecaptcha()));
+        params.add(new BasicNameValuePair("secret", marathonService.getConfiguration(RECAPTHA_SECRET_KEY)));
+        params.add(new BasicNameValuePair("response", recaptcha));
         params.add(new BasicNameValuePair("remoteip", req.getRemoteHost()));
         httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
         HttpResponse response = httpclient.execute(httppost);
@@ -163,6 +176,7 @@ public class NevezesController {
         try {
             String responseJson = IOUtils.toString(instream, "UTF-8");
             RecaptchaResponse value = mapper.readerFor(RecaptchaResponse.class).readValue(responseJson);
+            recaptchaMemcacheService.put(recaptcha, value.isSuccess(), Expiration.byDeltaSeconds(RECAPCTHA_EXPIRATION_SECONDS));
             if (!value.isSuccess()) {
                 throw new NevezesException("Recaptcha ellenőrzés hibát adott: " + value + " " + nevezesRequest.toString());
             }

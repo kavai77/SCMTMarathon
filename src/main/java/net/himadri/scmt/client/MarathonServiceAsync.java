@@ -80,4 +80,6 @@ public interface MarathonServiceAsync {
     void getConfigurations(AsyncCallback<List<Configuration>> async);
 
     void saveConfigurations(List<Configuration> configurations, AsyncCallback<Void> async);
+
+    void updateNevezesiDij(Long id, Integer dij, AsyncCallback<Void> asyncCallback);
 }

@@ -86,4 +86,6 @@ public interface MarathonService extends RemoteService {
     List<Configuration> getConfigurations();
 
     void saveConfigurations(List<Configuration> configurations);
+
+    void updateNevezesiDij(Long id, Integer dij) throws NotExistingEntityException;
 }
