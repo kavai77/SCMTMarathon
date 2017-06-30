@@ -7,11 +7,13 @@ import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.googlecode.objectify.Objectify;
 import net.himadri.scmt.client.MarathonService;
+import net.himadri.scmt.client.Utils;
 import net.himadri.scmt.client.entity.Tav;
 import net.himadri.scmt.client.entity.Verseny;
 import net.himadri.scmt.client.entity.VersenySzam;
 import net.himadri.scmt.client.entity.Versenyzo;
 import net.himadri.scmt.server.UserServiceImpl;
+import net.himadri.scmt.server.dto.ListOfAthletes;
 import net.himadri.scmt.server.dto.Nevezes;
 import net.himadri.scmt.server.dto.NevezesRequest;
 import net.himadri.scmt.server.dto.RecaptchaResponse;
@@ -76,7 +78,6 @@ public class NevezesController {
     @RequestMapping(value = "/get", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Nevezes getNevezes() throws IOException {
         final Verseny verseny = findCurrentVerseny();
-        final Nevezes nevezes;
         if (verseny == null) {
             return new Nevezes(null, false, null, null);
         } else {
@@ -103,6 +104,42 @@ public class NevezesController {
         Versenyzo versenyzo = saveVersenyzo(nevezesRequest);
         sendEmail(versenyzo);
         emailSuperUser("Sikeres nevezés", versenyzo.toString());
+    }
+
+    @RequestMapping(value = "/getListOfAthletes", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ListOfAthletes getListOfAthletes() throws IOException {
+        final Verseny verseny = findCurrentVerseny();
+        if (verseny == null) {
+            return new ListOfAthletes(null, false, null);
+        } else {
+            Map<Long, String> versenySzamMap = getVersenySzamMap(verseny);
+            List<Versenyzo> versenyzoList = ofy.query(Versenyzo.class)
+                    .filter("versenyId", verseny.getId())
+                    .order("name")
+                    .list();
+            List<ListOfAthletes.Athlete> athleteList = new ArrayList<>(versenyzoList.size());
+            for (Versenyzo versenyzo: versenyzoList) {
+                ListOfAthletes.Athlete athlete = new ListOfAthletes.Athlete(versenyzo.getRaceNumber(), versenyzo.getName(),
+                        versenyzo.getEgyesulet(), versenySzamMap.get(versenyzo.getVersenySzamId()));
+                athleteList.add(athlete);
+            }
+            return new ListOfAthletes(verseny.getNev(), true, athleteList);
+        }
+    }
+
+    private Map<Long, String> getVersenySzamMap(Verseny verseny) {
+        List<VersenySzam> versenySzamList = ofy.query(VersenySzam.class).filter("versenyId", verseny.getId()).list();
+        Map<Long, Tav> tavMap = new HashMap<>();
+        Map<Long, String> versenySzamMap = new HashMap<>();
+        for (VersenySzam versenySzam: versenySzamList) {
+            Tav tav = tavMap.get(versenySzam.getTavId());
+            if (tav == null) {
+                tav = ofy.get(Tav.class, versenySzam.getTavId());
+                tavMap.put(tav.getId(), tav);
+            }
+            versenySzamMap.put(versenySzam.getId(), Utils.getVersenySzamMegnevezes(tav, versenySzam));
+        }
+        return versenySzamMap;
     }
 
     @ExceptionHandler(NevezesException.class)

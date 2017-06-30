@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nevezők listája - Sri Chinmoy Marathon Team</title>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script type="text/javascript" src="js/angular.min.js"></script>
+    <script type="text/javascript" src="js/angular-resource.min.js"></script>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/resources.js"></script>
+    <script type="text/javascript" src="js/nevezoklistaja-controller.js"></script>
+
+</head>
+<body ng-controller="ctrl">
+
+<ng-include src="'header.html'"></ng-include>
+<div class="container">
+    <div class="jumbotron" ng-show="!athletesList.$resolved">
+        <p><img src="/images/ajax-loader.gif" class="center-block"></p>
+    </div>
+    <div class="jumbotron" ng-show="athletesList.$resolved">
+        <img src="/images/header.jpg" class="img-responsive center-block" alt="SCMT Logo">
+        <div ng-repeat="errorMessage in errorMessages">
+            <div class="alert alert-danger" role="alert">
+                {{errorMessage}}
+            </div>
+        </div>
+        <div ng-show="!athletesList.active">
+            <h1>Jelenleg nincs aktív nevezésünk</h1>
+        </div>
+        <div ng-show="athletesList.active">
+            <h1>{{athletesList.raceName}}</h1>
+            <h2>Nevezettek Listája</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Rajtszám</th>
+                        <th>Név</th>
+                        <th>Egyesület</th>
+                        <th>Korcsoport</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="athlete in athletesList.athleteList">
+                        <td>{{athlete.raceNumber}}</td>
+                        <td>{{athlete.name}}</td>
+                        <td>{{athlete.egyesulet}}</td>
+                        <td>{{athlete.korcsoport}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div id="loadingDialog" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <img src="/images/ajax-loader.gif" class="center-block">
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
