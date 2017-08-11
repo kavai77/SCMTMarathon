@@ -17,6 +17,7 @@ app.controller('ctrl', function ($scope, $resource) {
         $scope.nemClass=null;
         $scope.evClass=null;
         $scope.emailClass=null;
+        $scope.licenszClass=null;
         $scope.poloClass=null;
         $scope.checkClass=null;
         if (isBlank($scope.tav)) {
@@ -40,6 +41,10 @@ app.controller('ctrl', function ($scope, $resource) {
             $scope.emailClass='has-error';
             $scope.errorMessages.push("Az email cím kitöltése kötelező!");
         }
+        if (isBlank($scope.licenszSzam)) {
+            $scope.licenszClass='has-error';
+            $scope.errorMessages.push("A Magyar Triatlon Szövetség által kiadott licensz megadása kötelező!");
+        }
         if (isBlank($scope.poloMeret)) {
             $scope.poloClass='has-error';
             $scope.errorMessages.push("Válaszd ki a pólómértedet!");
@@ -62,6 +67,7 @@ app.controller('ctrl', function ($scope, $resource) {
             sendData.egyesulet = emptyForBlank($scope.egyesulet);
             sendData.email = $scope.email;
             sendData.poloMeret = $scope.poloMeret;
+            sendData.licenszSzam = $scope.licenszSzam;
             sendData.recaptcha = recaptcha;
             res.NevezesService.store(sendData, function() {
                 $('#loadingDialog').modal('hide');

@@ -10,6 +10,7 @@ public class NevezesRequest {
     private int ev;
     private String egyesulet;
     private String email;
+    private String licenszSzam;
     private String poloMeret;
     private String recaptcha;
 
@@ -53,6 +54,14 @@ public class NevezesRequest {
         this.egyesulet = egyesulet;
     }
 
+    public String getLicenszSzam() {
+        return licenszSzam;
+    }
+
+    public void setLicenszSzam(String licenszSzam) {
+        this.licenszSzam = licenszSzam;
+    }
+
     public String getEmail() {
         return email;
     }
@@ -86,6 +95,7 @@ public class NevezesRequest {
                 ", ev=" + ev +
                 ", egyesulet='" + egyesulet + '\'' +
                 ", email='" + email + '\'' +
+                ", licenszSzam='" + licenszSzam + '\'' +
                 ", poloMeret='" + poloMeret + '\'' +
                 ", recaptcha='" + recaptcha + '\'' +
                 '}';

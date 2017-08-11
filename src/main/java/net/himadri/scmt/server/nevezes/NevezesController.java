@@ -186,6 +186,7 @@ public class NevezesController {
         Versenyzo versenyzo = new Versenyzo(raceNumber, nevezes.getNev(), isFerfi, nevezes.getEv(),
                 nevezes.getEgyesulet(), nevezes.getEmail(), versenySzamId, tav.getVersenyId());
         versenyzo.setPoloMeret(nevezes.getPoloMeret());
+        versenyzo.setLicenszSzam(nevezes.getLicenszSzam());
         ofy.put(versenyzo);
         return versenyzo;
     }

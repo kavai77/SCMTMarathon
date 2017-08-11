@@ -28,6 +28,7 @@ public class Versenyzo implements Serializable, HasCreationTime {
     private boolean ellenorzott;
     private Integer fizetettDij;
     private String poloMeret;
+    private String licenszSzam;
     private long creationTime;
 
     @SuppressWarnings({"UnusedDeclaration"})
@@ -102,6 +103,10 @@ public class Versenyzo implements Serializable, HasCreationTime {
         return poloMeret;
     }
 
+    public String getLicenszSzam() {
+        return licenszSzam;
+    }
+
     public long getCreationTime() {
         return creationTime;
     }
@@ -156,6 +161,10 @@ public class Versenyzo implements Serializable, HasCreationTime {
 
     public void setPoloMeret(String poloMeret) {
         this.poloMeret = poloMeret;
+    }
+
+    public void setLicenszSzam(String licenszSzam) {
+        this.licenszSzam = licenszSzam;
     }
 
     @Override
