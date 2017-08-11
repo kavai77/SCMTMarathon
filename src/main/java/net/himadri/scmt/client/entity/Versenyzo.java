@@ -183,6 +183,7 @@ public class Versenyzo implements Serializable, HasCreationTime {
                 ", ellenorzott=" + ellenorzott +
                 ", fizetettDij=" + fizetettDij +
                 ", poloMeret='" + poloMeret + '\'' +
+                ", licenszSzam='" + licenszSzam + '\'' +
                 ", creationTime=" + creationTime +
                 '}';
     }
