@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import static net.himadri.scmt.client.Utils.defaultString;
+import static net.himadri.scmt.client.Utils.isEmpty;
 
 public class VersenyzoEntryDialog extends DialogBox {
     private MarathonServiceAsync service = GWT.create(MarathonService.class);
@@ -393,7 +394,7 @@ public class VersenyzoEntryDialog extends DialogBox {
             return "Helytelen email cím!";
         }
         try {
-            if (nevezesiDijTextBox.getValueOrThrow() < 0) {
+            if (!isEmpty(nevezesiDijTextBox.getText()) && nevezesiDijTextBox.getValueOrThrow() < 0) {
                 return "A nevezési díj nem lehet negatív!";
             }
         } catch (ParseException e) {
@@ -409,7 +410,7 @@ public class VersenyzoEntryDialog extends DialogBox {
         versenyzo.setSzuletesiEv(szuletesiEvText.getValue());
         versenyzo.setEgyesulet(egyesuletText.getText().trim());
         versenyzo.setEmail(emailTextBox.getText().trim());
-        versenyzo.setFizetettDij(nevezesiDijTextBox.getValue());
+        versenyzo.setFizetettDij(!isEmpty(nevezesiDijTextBox.getText()) ? nevezesiDijTextBox.getValue() : null);
         versenyzo.setLicenszSzam(licenszTextBox.getText().trim());
         versenyzo.setPoloMeret(poloTextBox.getText().trim());
         versenyzo.setVersenySzamId(getSelectedVersenySzamId());
