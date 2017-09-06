@@ -30,12 +30,14 @@ public class ListOfAthletes {
         private final String name;
         private final String egyesulet;
         private final String korcsoport;
+        private final boolean fizetett;
 
-        public Athlete(String raceNumber, String name, String egyesulet, String korcsoport) {
+        public Athlete(String raceNumber, String name, String egyesulet, String korcsoport, boolean fizetett) {
             this.raceNumber = raceNumber;
             this.name = name;
             this.egyesulet = egyesulet;
             this.korcsoport = korcsoport;
+            this.fizetett = fizetett;
         }
 
         public String getRaceNumber() {
@@ -52,6 +54,10 @@ public class ListOfAthletes {
 
         public String getKorcsoport() {
             return korcsoport;
+        }
+
+        public boolean isFizetett() {
+            return fizetett;
         }
     }
 }

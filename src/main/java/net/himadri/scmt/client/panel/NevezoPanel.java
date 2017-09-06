@@ -24,7 +24,7 @@ public class NevezoPanel extends Composite {
 
     public NevezoPanel(final SCMTMarathon scmtMarathon) {
         AbsolutePanel nevezoPanel = new AbsolutePanel();
-        nevezoPanel.setSize("900px", "500px");
+        nevezoPanel.setSize("900px", "540px");
         nevezoPanel.add(new Label("Nevezés kezdete"), 10, 10);
         final DatePicker startDatePicker = new DatePicker();
         nevezoPanel.add(startDatePicker, 10, 30);
@@ -41,12 +41,16 @@ public class NevezoPanel extends Composite {
         final TextArea emailBodyText = new TextArea();
         emailBodyText.setSize("500px", "130px");
         nevezoPanel.add(emailBodyText, 10, 305);
+        nevezoPanel.add(new Label("Helyszíni nevezési díj"), 10, 460);
+        final IntegerBox helysziniNevezes = new IntegerBox();
+        helysziniNevezes.setWidth("350px");
+        nevezoPanel.add(helysziniNevezes, 150, 460);
         Button elkuldButton = new Button("Mentés", new ClickHandler() {
             @Override
             public void onClick(ClickEvent clickEvent) {
                 marathonService.setNevezesDatum(scmtMarathon.getVerseny().getId(),
                         startDatePicker.getValue().getTime(), endDatePicker.getValue().getTime(),
-                        emailSubjectText.getText(), emailBodyText.getText(),
+                        emailSubjectText.getText(), emailBodyText.getText(), helysziniNevezes.getValue(),
                         new CommonAsyncCallback<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
@@ -55,7 +59,7 @@ public class NevezoPanel extends Composite {
                         });
             }
         });
-        nevezoPanel.add(elkuldButton, 10, 460);
+        nevezoPanel.add(elkuldButton, 10, 500);
         scmtMarathon.getVersenySyncSupport().addMarathonActionListener(
                 new MarathonActionListener<Verseny>() {
             @Override
@@ -80,6 +84,7 @@ public class NevezoPanel extends Composite {
                 }
                 emailSubjectText.setText(verseny.getNevezesEmailSubject());
                 emailBodyText.setText(verseny.getNevezesEmailText());
+                helysziniNevezes.setValue(verseny.getHelysziniNevezesOsszeg());
             }
         });
         initWidget(nevezoPanel);

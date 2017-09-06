@@ -11,8 +11,9 @@ import net.himadri.scmt.client.callback.CommonAsyncCallback;
 import net.himadri.scmt.client.entity.Verseny;
 import net.himadri.scmt.client.exception.NotAuthorizedException;
 import net.himadri.scmt.client.panel.MainRootPanel;
-import net.himadri.scmt.client.panel.PrintAllRunnersRootPanel;
+import net.himadri.scmt.client.panel.PrintPreRegistrationRootPanel;
 import net.himadri.scmt.client.panel.PrintResultRootPanel;
+import net.himadri.scmt.client.panel.PrintStartListRootPanel;
 import net.himadri.scmt.client.serializable.MarathonActionListener;
 import net.himadri.scmt.client.token.TavVersenySzamToken;
 import net.himadri.scmt.client.token.VersenyToken;
@@ -39,7 +40,8 @@ public class SCMTMarathon implements EntryPoint {
         final RootPanel rootPanel = RootPanel.get();
         mainRootPanel = new MainRootPanel(this);
         final PrintResultRootPanel printResultRootPanel = new PrintResultRootPanel(this);
-        final PrintAllRunnersRootPanel printAllRunnersRootPanel = new PrintAllRunnersRootPanel(this);
+        final PrintStartListRootPanel printStartListRootPanel = new PrintStartListRootPanel(this);
+        final PrintPreRegistrationRootPanel printPreRegistrationRootPanel = new PrintPreRegistrationRootPanel(this);
 
         History.addValueChangeHandler(new ValueChangeHandler<String>() {
             @Override
@@ -50,9 +52,12 @@ public class SCMTMarathon implements EntryPoint {
                     TavVersenySzam tavVersenySzam = TavVersenySzamToken.decode(historyToken);
                     printResultRootPanel.showResultPanel(tavVersenySzam);
                     rootPanel.add(printResultRootPanel);
-                } else if (PrintAllRunnersRootPanel.HISTORY_TOKEN.equals(historyToken)) {
-                    printAllRunnersRootPanel.showAllRunnersPanel();
-                    rootPanel.add(printAllRunnersRootPanel);
+                } else if (PrintStartListRootPanel.HISTORY_TOKEN.equals(historyToken)) {
+                    printStartListRootPanel.showAllRunnersPanel();
+                    rootPanel.add(printStartListRootPanel);
+                } else if (PrintPreRegistrationRootPanel.HISTORY_TOKEN.equals(historyToken)) {
+                    printPreRegistrationRootPanel.showAllRunnersPanel();
+                    rootPanel.add(printPreRegistrationRootPanel);
                 } else if (VersenyToken.isHistoryMatches(historyToken)) {
                     rootPanel.add(mainRootPanel);
                     Long versenyId = VersenyToken.decode(historyToken);

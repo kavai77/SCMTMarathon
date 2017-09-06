@@ -71,19 +71,28 @@ public class VersenyzoPanel extends Composite {
         Button rajtlistaButton = new ImageButton("view_text.png", "Rajtlista", new ClickHandler() {
             @Override
             public void onClick(ClickEvent clickEvent) {
-                History.newItem(PrintAllRunnersRootPanel.HISTORY_TOKEN);
+                History.newItem(PrintStartListRootPanel.HISTORY_TOKEN);
             }
         });
         rajtlistaButton.setWidth("150px");
-        versenyzoPanel.add(rajtlistaButton, 810, 65);
+        versenyzoPanel.add(rajtlistaButton, 810, 45);
 
-        versenyzoPanel.add(new Label("Szűrés"), 810, 113);
+        Button preRegistrationButton = new ImageButton("view_text.png", "Nevezések", new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent clickEvent) {
+                History.newItem(PrintPreRegistrationRootPanel.HISTORY_TOKEN);
+            }
+        });
+        preRegistrationButton.setWidth("150px");
+        versenyzoPanel.add(preRegistrationButton, 810, 90);
+
+        versenyzoPanel.add(new Label("Szűrés"), 810, 133);
         versenySzamFilter.setSize("150px", "23px");
-        versenyzoPanel.add(versenySzamFilter, 810, 135);
+        versenyzoPanel.add(versenySzamFilter, 810, 155);
         versenySzamFilter.addItem("Összes versenyző", "");
         versenySzamFilter.addChangeHandler(new VersenySzamFilterChangeHandler());
 
-        versenyzoPanel.add(szuroSzamLabel, 810, 170);
+        versenyzoPanel.add(szuroSzamLabel, 810, 190);
 
         ScrollPanel tableScroll = new ScrollPanel();
         versenyzoPanel.add(tableScroll);

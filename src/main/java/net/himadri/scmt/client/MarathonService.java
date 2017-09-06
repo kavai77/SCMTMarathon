@@ -23,7 +23,8 @@ public interface MarathonService extends RemoteService {
 
     void restartRace(Long versenyId);
 
-    void setNevezesDatum(Long versenyId, Long nevezesBegin, Long nevezesEnd, String emailSubject, String emailText);
+    void setNevezesDatum(Long versenyId, Long nevezesBegin, Long nevezesEnd, String emailSubject, String emailText,
+                         Integer helysziniNevezesOsszeg);
 
     void deleteRace(Long versenyId);
 
@@ -51,7 +52,9 @@ public interface MarathonService extends RemoteService {
 
     void removeTav(Long tavId);
 
-    void addVersenyzo(String raceNumber, String name, Boolean ferfi, Integer eletkor, String egyesulet, String email, Long versenySzamId, Long versenyId) throws AlreadyExistingEntityException;
+    void addVersenyzo(String raceNumber, String name, Boolean ferfi, Integer eletkor, String egyesulet, String email,
+                      Long versenySzamId, Long versenyId, String poloMeret, String licenszSzam,
+                      Integer fizetettDij) throws AlreadyExistingEntityException;
 
     void modifyVersenyzo(Versenyzo versenyzo) throws AlreadyExistingEntityException;
 

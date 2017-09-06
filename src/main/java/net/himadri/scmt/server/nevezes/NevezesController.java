@@ -120,7 +120,8 @@ public class NevezesController {
             List<ListOfAthletes.Athlete> athleteList = new ArrayList<>(versenyzoList.size());
             for (Versenyzo versenyzo: versenyzoList) {
                 ListOfAthletes.Athlete athlete = new ListOfAthletes.Athlete(versenyzo.getRaceNumber(), versenyzo.getName(),
-                        versenyzo.getEgyesulet(), versenySzamMap.get(versenyzo.getVersenySzamId()));
+                        versenyzo.getEgyesulet(), versenySzamMap.get(versenyzo.getVersenySzamId()),
+                        versenyzo.getFizetettDij() != null);
                 athleteList.add(athlete);
             }
             return new ListOfAthletes(verseny.getNev(), true, athleteList);
@@ -184,9 +185,8 @@ public class NevezesController {
         checkArgument(nevezes.getEv() >= 1900 && nevezes.getEv() < Calendar.getInstance().get(Calendar.YEAR),
                 "Rossz év: " + nevezes.getEv());
         Versenyzo versenyzo = new Versenyzo(raceNumber, nevezes.getNev(), isFerfi, nevezes.getEv(),
-                nevezes.getEgyesulet(), nevezes.getEmail(), versenySzamId, tav.getVersenyId());
-        versenyzo.setPoloMeret(nevezes.getPoloMeret());
-        versenyzo.setLicenszSzam(nevezes.getLicenszSzam());
+                nevezes.getEgyesulet(), nevezes.getEmail(), versenySzamId, tav.getVersenyId(),
+                nevezes.getPoloMeret(), nevezes.getLicenszSzam(), null);
         ofy.put(versenyzo);
         return versenyzo;
     }

@@ -26,6 +26,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import static net.himadri.scmt.client.Utils.defaultString;
+
 public class VersenyzoEntryDialog extends DialogBox {
     private MarathonServiceAsync service = GWT.create(MarathonService.class);
 
@@ -35,6 +37,9 @@ public class VersenyzoEntryDialog extends DialogBox {
     private TextBox nevTextBox = new TextBox();
     private SuggestBox egyesuletText = new SuggestBox(egyesuletOracle);
     private TextBox emailTextBox = new TextBox();
+    private IntegerBox nevezesiDijTextBox = new IntegerBox();
+    private TextBox licenszTextBox = new TextBox();
+    private TextBox poloTextBox = new TextBox();
     private IntegerBox szuletesiEvText = new IntegerBox();
     private RadioButton ferfiRadio = new RadioButton("nemRadio", "Férfi");
     private RadioButton noRadio = new RadioButton("nemRadio", "Nő");
@@ -60,9 +65,7 @@ public class VersenyzoEntryDialog extends DialogBox {
         setWidget(absolutePanel);
         absolutePanel.setSize("275px", "562px");
 
-        Label lblRajtszm = new Label("Rajtszám *");
-        absolutePanel.add(lblRajtszm, 10, 10);
-
+        absolutePanel.add(new Label("Rajtszám *"), 10, 10);
         absolutePanel.add(rajtszamText, 10, 34);
         rajtszamText.setSize("96px", "18px");
         rajtszamText.addBlurHandler(new BlurHandler() {
@@ -86,9 +89,7 @@ public class VersenyzoEntryDialog extends DialogBox {
             }
         });
 
-        Label lblNv = new Label("Név *");
-        absolutePanel.add(lblNv, 10, 74);
-
+        absolutePanel.add(new Label("Név *"), 10, 74);
         absolutePanel.add(nevTextBox, 10, 98);
         nevTextBox.setSize("240px", "18px");
         nevTextBox.addBlurHandler(new BlurHandler() {
@@ -117,7 +118,7 @@ public class VersenyzoEntryDialog extends DialogBox {
         });
 
         Label lblNem = new Label("Nem *");
-        absolutePanel.add(lblNem, 10, 153);
+        absolutePanel.add(lblNem, 10, 143);
 
         ClickHandler nemRadioClickHandler = new ClickHandler() {
             @Override
@@ -126,35 +127,28 @@ public class VersenyzoEntryDialog extends DialogBox {
             }
         };
 
-        absolutePanel.add(ferfiRadio, 52, 153);
+        absolutePanel.add(ferfiRadio, 52, 143);
         ferfiRadio.addClickHandler(nemRadioClickHandler);
 
-        absolutePanel.add(noRadio, 109, 153);
+        absolutePanel.add(noRadio, 109, 143);
         noRadio.addClickHandler(nemRadioClickHandler);
 
-        Label lblletkoraVerseny = new Label("Születési év");
-        absolutePanel.add(lblletkoraVerseny, 10, 192);
-
-        absolutePanel.add(szuletesiEvText, 10, 216);
+        absolutePanel.add(new Label("Születési év"), 10, 172);
+        absolutePanel.add(szuletesiEvText, 100, 172);
         szuletesiEvText.setSize("100px", "18px");
         szuletesiEvText.addBlurHandler(filterVersenySzamBlurHandler);
 
-        Label lblEgyeslet = new Label("Egyesület");
-        absolutePanel.add(lblEgyeslet, 10, 259);
-
-        absolutePanel.add(egyesuletText, 10, 283);
+        absolutePanel.add(new Label("Egyesület"), 10, 199);
+        absolutePanel.add(egyesuletText, 10, 223);
         egyesuletText.setSize("240px", "18px");
 
-        Label lblEmail = new Label("Email");
-        absolutePanel.add(lblEmail, 10, 335);
-
-        absolutePanel.add(emailTextBox, 10, 362);
+        absolutePanel.add(new Label("Email"), 10, 265);
+        absolutePanel.add(emailTextBox, 10, 289);
         emailTextBox.setSize("240px", "18px");
 
-        Label lblVersenyszm = new Label("Versenyszám *");
-        absolutePanel.add(lblVersenyszm, 10, 411);
+        absolutePanel.add(new Label("Korcsoport *"), 10, 326);
 
-        absolutePanel.add(versenySzamComboBox, 10, 440);
+        absolutePanel.add(versenySzamComboBox, 10, 350);
         versenySzamComboBox.setSize("250px", "22px");
 
         versenyszamSzuresKikapcs.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
@@ -163,7 +157,19 @@ public class VersenyzoEntryDialog extends DialogBox {
                 filterVersenySzam();
             }
         });
-        absolutePanel.add(versenyszamSzuresKikapcs, 10, 472);
+        absolutePanel.add(versenyszamSzuresKikapcs, 10, 374);
+
+        absolutePanel.add(new Label("Nevezesi Díj"), 10, 397);
+        absolutePanel.add(nevezesiDijTextBox, 10, 421);
+        nevezesiDijTextBox.setSize("240px", "18px");
+
+        absolutePanel.add(new Label("Licensz"), 10, 458);
+        absolutePanel.add(licenszTextBox, 10, 482);
+        licenszTextBox.setSize("100px", "18px");
+
+        absolutePanel.add(new Label("Póló méret"), 135, 458);
+        absolutePanel.add(poloTextBox, 135, 482);
+        poloTextBox.setSize("100px", "18px");
 
         Button btnOk = new ImageButton("button_ok.png", "OK");
         absolutePanel.add(btnOk, 27, 519);
@@ -277,7 +283,8 @@ public class VersenyzoEntryDialog extends DialogBox {
             service.addVersenyzo(versenyzo.getRaceNumber(),
                     versenyzo.getName(), versenyzo.getFerfi(), versenyzo.getSzuletesiEv(),
                     versenyzo.getEgyesulet(), versenyzo.getEmail(), versenyzo.getVersenySzamId(),
-                    versenyzo.getVersenyId(), new AsyncCallback<Void>() {
+                    versenyzo.getVersenyId(), versenyzo.getPoloMeret(), versenyzo.getLicenszSzam(),
+                    versenyzo.getFizetettDij(), new AsyncCallback<Void>() {
                 @Override
                 public void onFailure(Throwable throwable) {
                     if (throwable instanceof AlreadyExistingEntityException) {
@@ -325,6 +332,9 @@ public class VersenyzoEntryDialog extends DialogBox {
             szuletesiEvText.setText(null);
             egyesuletText.setText(null);
             emailTextBox.setText(null);
+            nevezesiDijTextBox.setValue(scmtMarathon.getVerseny().getHelysziniNevezesOsszeg());
+            licenszTextBox.setText(null);
+            poloTextBox.setText(null);
             filterVersenySzam();
             versenySzamComboBox.setSelectedIndex(0);
         } else {
@@ -332,9 +342,12 @@ public class VersenyzoEntryDialog extends DialogBox {
             nevTextBox.setText(versenyzo.getName());
             ferfiRadio.setValue(versenyzo.getFerfi() != null && versenyzo.getFerfi());
             noRadio.setValue(versenyzo.getFerfi() != null && !versenyzo.getFerfi());
-            szuletesiEvText.setText(versenyzo.getSzuletesiEv() != null ? versenyzo.getSzuletesiEv().toString() : null);
+            szuletesiEvText.setText(defaultString(versenyzo.getSzuletesiEv()));
             egyesuletText.setText(versenyzo.getEgyesulet());
             emailTextBox.setText(versenyzo.getEmail());
+            nevezesiDijTextBox.setText(defaultString(versenyzo.getFizetettDij()));
+            licenszTextBox.setText(versenyzo.getLicenszSzam());
+            poloTextBox.setText(versenyzo.getPoloMeret());
             filterVersenySzam();
             versenySzamComboBox.setSelectedIndex(getVersenySzamComboIndex(versenyzo.getVersenySzamId()));
         }
@@ -379,6 +392,13 @@ public class VersenyzoEntryDialog extends DialogBox {
         if (!emailTextBox.getText().trim().isEmpty() && !emailTextBox.getText().contains("@")) {
             return "Helytelen email cím!";
         }
+        try {
+            if (nevezesiDijTextBox.getValueOrThrow() < 0) {
+                return "A nevezési díj nem lehet negatív!";
+            }
+        } catch (ParseException e) {
+            return "A nevezési díjnak számot kell megadni!";
+        }
         return null;
     }
 
@@ -389,6 +409,9 @@ public class VersenyzoEntryDialog extends DialogBox {
         versenyzo.setSzuletesiEv(szuletesiEvText.getValue());
         versenyzo.setEgyesulet(egyesuletText.getText().trim());
         versenyzo.setEmail(emailTextBox.getText().trim());
+        versenyzo.setFizetettDij(nevezesiDijTextBox.getValue());
+        versenyzo.setLicenszSzam(licenszTextBox.getText().trim());
+        versenyzo.setPoloMeret(poloTextBox.getText().trim());
         versenyzo.setVersenySzamId(getSelectedVersenySzamId());
         versenyzo.setVersenyId(scmtMarathon.getVerseny().getId());
     }

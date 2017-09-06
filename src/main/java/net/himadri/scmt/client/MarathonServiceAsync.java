@@ -19,7 +19,8 @@ public interface MarathonServiceAsync {
 
     void addPersonLap(Long versenyId, String raceNumber, long raceTime, boolean withThresholdValidation, AsyncCallback<Void> async);
 
-    void setNevezesDatum(Long versenyId, Long nevezesBegin, Long nevezesEnd, String emailSubject, String emailText, AsyncCallback<Void> async);
+    void setNevezesDatum(Long versenyId, Long nevezesBegin, Long nevezesEnd, String emailSubject, String emailText,
+                         Integer helysziniNevezesOsszeg, AsyncCallback<Void> async);
 
     void updateRaceNumber(Long personLapId, String raceNumber, AsyncCallback<Void> async);
 
@@ -31,7 +32,9 @@ public interface MarathonServiceAsync {
 
     void removeVersenySzam(Long versenySzamId, AsyncCallback<Void> async);
 
-    void addVersenyzo(String raceNumber, String name, Boolean ferfi, Integer szuletesiEv, String egyesulet, String email, Long versenySzamId, Long versenyId, AsyncCallback<Void> async);
+    void addVersenyzo(String raceNumber, String name, Boolean ferfi, Integer szuletesiEv, String egyesulet, String email,
+                      Long versenySzamId, Long versenyId, String poloMeret, String licenszSzam,
+                      Integer fizetettDij, AsyncCallback<Void> async);
 
     void modifyVersenyzo(Versenyzo versenyzo, AsyncCallback<Void> async);
 

@@ -26,6 +26,7 @@ public class Verseny implements Serializable {
     private Long nevezesEnd;
     private String nevezesEmailSubject;
     private String nevezesEmailText;
+    private Integer helysziniNevezesOsszeg;
 
     @SuppressWarnings({"UnusedDeclaration"})
     public Verseny() {
@@ -129,6 +130,14 @@ public class Verseny implements Serializable {
 
     public String getNevezesEmailText() {
         return nevezesEmailText;
+    }
+
+    public Integer getHelysziniNevezesOsszeg() {
+        return helysziniNevezesOsszeg;
+    }
+
+    public void setHelysziniNevezesOsszeg(Integer helysziniNevezesOsszeg) {
+        this.helysziniNevezesOsszeg = helysziniNevezesOsszeg;
     }
 
     public void setNevezesEmailText(String nevezesEmailText) {

@@ -50,6 +50,7 @@
                         <th>Név</th>
                         <th>Egyesület</th>
                         <th>Korcsoport</th>
+                        <th>Nevezési díj</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -58,6 +59,7 @@
                         <td>{{athlete.name}}</td>
                         <td>{{athlete.egyesulet}}</td>
                         <td>{{athlete.korcsoport}}</td>
+                        <td><img ng-src="/images/{{athlete.fizetett ? 'button_ok.png' : 'button_cancel.png'}}" width="24"></td>
                     </tr>
                 </tbody>
             </table>

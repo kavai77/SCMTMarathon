@@ -43,7 +43,8 @@ public class Versenyzo implements Serializable, HasCreationTime {
     }
 
 
-    public Versenyzo(String raceNumber, String name, Boolean ferfi, Integer szuletesiEv, String egyesulet, String email, Long versenySzamId, Long versenyId) {
+    public Versenyzo(String raceNumber, String name, Boolean ferfi, Integer szuletesiEv, String egyesulet, String email,
+                     Long versenySzamId, Long versenyId, String poloMeret, String licenszSzam, Integer fizetettDij) {
         this.raceNumber = raceNumber;
         this.name = name;
         this.ferfi = ferfi;
@@ -52,6 +53,9 @@ public class Versenyzo implements Serializable, HasCreationTime {
         this.email = email;
         this.versenySzamId = versenySzamId;
         this.versenyId = versenyId;
+        this.poloMeret = poloMeret;
+        this.licenszSzam = licenszSzam;
+        this.fizetettDij = fizetettDij;
         creationTime = System.currentTimeMillis();
     }
 

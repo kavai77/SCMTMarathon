@@ -53,7 +53,7 @@ public class VersenyzoCSVUploadServiceImpl extends RemoteServiceServlet implemen
                     boolean ferfi = getFerfi(name);
                     int szuletesiEv = getSzuletesiEv(nextLine);
                     Versenyzo versenyzo = new Versenyzo(raceNumber, name, ferfi, getSzuletesiEv(nextLine), getEgyesulet(nextLine), getEmail(nextLine),
-                            getVersenySzamId(versenyId, getTavId(raceNumber, versenyId), ferfi, szuletesiEv), versenyId);
+                            getVersenySzamId(versenyId, getTavId(raceNumber, versenyId), ferfi, szuletesiEv), versenyId, null, null,null);
                     ofy.put(versenyzo);
                     sikeres++;
                 } catch (HibasSorException e) {
