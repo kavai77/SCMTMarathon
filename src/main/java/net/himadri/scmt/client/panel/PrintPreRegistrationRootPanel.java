@@ -1,5 +1,6 @@
 package net.himadri.scmt.client.panel;
 
+import net.himadri.scmt.client.LocaleCollator;
 import net.himadri.scmt.client.SCMTMarathon;
 import net.himadri.scmt.client.Utils;
 import net.himadri.scmt.client.entity.Versenyzo;
@@ -29,7 +30,7 @@ public class PrintPreRegistrationRootPanel extends AbstractPrintPeopleRootPanel 
         return new Comparator<Versenyzo>() {
             @Override
             public int compare(Versenyzo o1, Versenyzo o2) {
-                return o1.getName().toUpperCase().compareTo(o2.getName().toUpperCase());
+                return LocaleCollator.getInstance().compare(o1.getName(), o2.getName());
             }
         };
     }

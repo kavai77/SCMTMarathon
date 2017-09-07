@@ -27,6 +27,7 @@ import java.util.*;
  * Date: 2012.07.16. 21:44
  */
 public class StatisticsPanel extends Composite implements TabChangeHandler {
+    private enum AwardCeremony {OK, NOT_OK, NOT_APPLICABLE}
     private CellTable<StatisticsTableRow> statisticsCellTable;
     private SCMTMarathon scmtMarathon;
     private StatisticsOverview statisticsOverview = new StatisticsOverview();
@@ -130,19 +131,23 @@ public class StatisticsPanel extends Composite implements TabChangeHandler {
 
 
         for (StatisticsTableRow row: versenySzamStatisticsTableRowMap.values()) {
-            row.first3Finished = row.finished.size() >= 3 || row.racing.size() == 0;
+            if (row.racing.size() + row.finished.size() == 0) {
+                row.awardCeremony = AwardCeremony.NOT_APPLICABLE;
+            } else {
+                row.awardCeremony = row.finished.size() >= 3 || row.racing.size() == 0 ? AwardCeremony.OK : AwardCeremony.NOT_OK;
+            }
         }
 
         for (Tav tav: tavok) {
             boolean isEveryCategoryFinished = true;
             for (VersenySzam versenySzam: versenySzamok) {
-                if (versenySzam.getTavId().equals(tav.getId()) &&
-                        !versenySzamStatisticsTableRowMap.get(versenySzam.getId()).first3Finished) {
+                final AwardCeremony versenySzamAwardCeremony = versenySzamStatisticsTableRowMap.get(versenySzam.getId()).awardCeremony;
+                if (versenySzam.getTavId().equals(tav.getId()) && versenySzamAwardCeremony == AwardCeremony.NOT_OK) {
                     isEveryCategoryFinished = false;
                     break;
                 }
             }
-            tavStatisticsTableRowMap.get(tav.getId()).first3Finished = isEveryCategoryFinished;
+            tavStatisticsTableRowMap.get(tav.getId()).awardCeremony = isEveryCategoryFinished ? AwardCeremony.OK : AwardCeremony.NOT_OK;
         }
 
         for (Versenyzo versenyzo: scmtMarathon.getVersenyzoMapCache().getAllVersenyzo()) {
@@ -179,7 +184,7 @@ public class StatisticsPanel extends Composite implements TabChangeHandler {
         private ArrayList<String> finished = new ArrayList<String>();
         private ArrayList<String> gaveup = new ArrayList<String>();
         private ArrayList<String> notStarted = new ArrayList<String>();
-        private Boolean first3Finished;
+        private AwardCeremony awardCeremony;
 
         private StatisticsTableRow(String description) {
             this.description = description;
@@ -226,10 +231,18 @@ public class StatisticsPanel extends Composite implements TabChangeHandler {
 
         @Override
         public String getValue(StatisticsTableRow statisticsTableRow) {
-            if (statisticsTableRow.first3Finished == null) {
+            if (statisticsTableRow.awardCeremony == null) {
                 return "";
-            } else {
-                return statisticsTableRow.first3Finished ? "button_ok.png" : "button_cancel.png";
+            }
+            switch (statisticsTableRow.awardCeremony) {
+                case OK:
+                    return "button_ok.png";
+                case NOT_OK:
+                    return "button_cancel.png";
+                case NOT_APPLICABLE:
+                    return "reload3.png";
+                default:
+                    return "";
             }
         }
     }

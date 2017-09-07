@@ -38,11 +38,13 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
+import java.text.Collator;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.google.appengine.api.search.checkers.Preconditions.checkArgument;
+import static net.himadri.scmt.client.Utils.defaultString;
 
 @RestController
 @RequestMapping(value = "/nevezes")
@@ -119,11 +121,18 @@ public class NevezesController {
                     .list();
             List<ListOfAthletes.Athlete> athleteList = new ArrayList<>(versenyzoList.size());
             for (Versenyzo versenyzo: versenyzoList) {
+                final boolean fizetett = versenyzo.getFizetettDij() != null && versenyzo.getFizetettDij() > 0;
                 ListOfAthletes.Athlete athlete = new ListOfAthletes.Athlete(versenyzo.getRaceNumber(), versenyzo.getName(),
-                        versenyzo.getEgyesulet(), versenySzamMap.get(versenyzo.getVersenySzamId()),
-                        versenyzo.getFizetettDij() != null);
+                        versenyzo.getEgyesulet(), versenySzamMap.get(versenyzo.getVersenySzamId()), fizetett);
                 athleteList.add(athlete);
             }
+            final Collator collator = Collator.getInstance(new Locale("hu"));
+            Collections.sort(athleteList, new Comparator<ListOfAthletes.Athlete>() {
+                @Override
+                public int compare(ListOfAthletes.Athlete o1, ListOfAthletes.Athlete o2) {
+                    return collator.compare(defaultString(o1.getName()), defaultString(o2.getName()));
+                }
+            });
             return new ListOfAthletes(verseny.getNev(), true, athleteList);
         }
     }

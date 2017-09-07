@@ -2,9 +2,11 @@ package net.himadri.scmt.client.gwtextras;
 
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
-import net.himadri.scmt.client.Utils;
+import net.himadri.scmt.client.LocaleCollator;
 
 import java.util.Comparator;
+
+import static net.himadri.scmt.client.Utils.defaultString;
 
 /**
  * Created by IntelliJ IDEA.
@@ -17,7 +19,7 @@ public abstract class SortableTextColumn<T> extends TextColumn<T> {
         listHandler.setComparator(this, new Comparator<T>() {
             @Override
             public int compare(T o1, T o2) {
-                return Utils.compareString(getValue(o1), getValue(o2));
+                return LocaleCollator.getInstance().compare(defaultString(getValue(o1)), defaultString(getValue(o2)));
             }
         });
     }

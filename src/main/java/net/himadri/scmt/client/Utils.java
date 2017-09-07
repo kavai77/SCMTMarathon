@@ -98,13 +98,6 @@ public class Utils {
         return str == null || str.isEmpty();
     }
 
-    public static int compareString(String o1String, String o2String) {
-        if (o1String == null) o1String = "";
-        if (o2String == null) o2String = "";
-
-        return o1String.compareTo(o2String);
-    }
-
     public static boolean equalsIgnoreCase(String[] a, String[] a2) {
         if (a==a2)
             return true;
