@@ -24,6 +24,7 @@ public class Verseny implements Serializable {
     private int tavSyncValue = 1;
     private Long nevezesBegin;
     private Long nevezesEnd;
+    private Long raceDate;
     private String nevezesEmailSubject;
     private String nevezesEmailText;
     private Integer helysziniNevezesOsszeg;
@@ -96,6 +97,10 @@ public class Verseny implements Serializable {
         return nevezesEnd;
     }
 
+    public Long getRaceDate() {
+        return raceDate;
+    }
+
     public void setPersonLapSyncValue(int personLapSyncValue) {
         this.personLapSyncValue = personLapSyncValue;
     }
@@ -118,6 +123,10 @@ public class Verseny implements Serializable {
 
     public void setNevezesEnd(Long nevezesEnd) {
         this.nevezesEnd = nevezesEnd;
+    }
+
+    public void setRaceDate(Long raceDate) {
+        this.raceDate = raceDate;
     }
 
     public String getNevezesEmailSubject() {

@@ -33,6 +33,12 @@ public class NevezoPanel extends Composite {
         final DatePicker endDatePicker = new DatePicker();
         endDatePicker.removeStyleFromDates("datePickerDayIsToday", new Date());
         nevezoPanel.add(endDatePicker, 270, 30);
+
+        nevezoPanel.add(new Label("Verseny napja"), 530, 10);
+        final DatePicker raceDatePicker = new DatePicker();
+        raceDatePicker.removeStyleFromDates("datePickerDayIsToday", new Date());
+        nevezoPanel.add(raceDatePicker, 530, 30);
+
         nevezoPanel.add(new Label("Email tárgy"), 10, 230);
         final TextBox emailSubjectText = new TextBox();
         emailSubjectText.setWidth("500px");
@@ -50,6 +56,7 @@ public class NevezoPanel extends Composite {
             public void onClick(ClickEvent clickEvent) {
                 marathonService.setNevezesDatum(scmtMarathon.getVerseny().getId(),
                         startDatePicker.getValue().getTime(), endDatePicker.getValue().getTime(),
+                        raceDatePicker.getValue().getTime(),
                         emailSubjectText.getText(), emailBodyText.getText(), helysziniNevezes.getValue(),
                         new CommonAsyncCallback<Void>() {
                             @Override
@@ -72,6 +79,7 @@ public class NevezoPanel extends Composite {
                 Verseny verseny = scmtMarathon.getVerseny();
                 Long nevezesBegin = verseny.getNevezesBegin();
                 Long nevezesEnd = verseny.getNevezesEnd();
+                Long raceDate = verseny.getRaceDate();
                 if (nevezesBegin != null) {
                     Date date = new Date(nevezesBegin);
                     startDatePicker.setValue(date);
@@ -81,6 +89,11 @@ public class NevezoPanel extends Composite {
                     Date date = new Date(nevezesEnd);
                     endDatePicker.setValue(date);
                     endDatePicker.setCurrentMonth(date);
+                }
+                if (raceDate != null) {
+                    Date date = new Date(raceDate);
+                    raceDatePicker.setValue(date);
+                    raceDatePicker.setCurrentMonth(date);
                 }
                 emailSubjectText.setText(verseny.getNevezesEmailSubject());
                 emailBodyText.setText(verseny.getNevezesEmailText());

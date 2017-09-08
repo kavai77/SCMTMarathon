@@ -8,12 +8,14 @@ import java.util.Map;
 public class Nevezes {
     private final String nev;
     private final boolean aktiv;
+    private final boolean nyitva;
     private final Map<String, String> tavok;
     private final String emailText;
 
-    public Nevezes(String nev, boolean aktiv, Map<String, String> tavok, String emailText) {
+    public Nevezes(String nev, boolean aktiv, boolean nyitva, Map<String, String> tavok, String emailText) {
         this.nev = nev;
         this.aktiv = aktiv;
+        this.nyitva = nyitva;
         this.tavok = tavok;
         this.emailText = emailText;
     }
@@ -24,6 +26,10 @@ public class Nevezes {
 
     public boolean isAktiv() {
         return aktiv;
+    }
+
+    public boolean isNyitva() {
+        return nyitva;
     }
 
     public Map<String, String> getTavok() {

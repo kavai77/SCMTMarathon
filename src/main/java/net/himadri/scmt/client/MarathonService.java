@@ -23,8 +23,8 @@ public interface MarathonService extends RemoteService {
 
     void restartRace(Long versenyId);
 
-    void setNevezesDatum(Long versenyId, Long nevezesBegin, Long nevezesEnd, String emailSubject, String emailText,
-                         Integer helysziniNevezesOsszeg);
+    void setNevezesDatum(Long versenyId, Long nevezesBegin, Long nevezesEnd, Long raceDate, String emailSubject,
+                         String emailText, Integer helysziniNevezesOsszeg);
 
     void deleteRace(Long versenyId);
 

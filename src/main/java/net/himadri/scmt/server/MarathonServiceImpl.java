@@ -89,11 +89,12 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
     }
 
     @Override
-    public void setNevezesDatum(Long versenyId, Long nevezesBegin, Long nevezesEnd, String emailSubject, String emailText,
-                                Integer helysziniNevezesOsszeg) {
+    public void setNevezesDatum(Long versenyId, Long nevezesBegin, Long nevezesEnd, Long raceDate, String emailSubject,
+                                String emailText, Integer helysziniNevezesOsszeg) {
         Verseny verseny = getVersenyFromCache(versenyId);
         verseny.setNevezesBegin(nevezesBegin);
         verseny.setNevezesEnd(nevezesEnd);
+        verseny.setRaceDate(raceDate);
         verseny.setNevezesEmailSubject(emailSubject);
         verseny.setNevezesEmailText(emailText);
         verseny.setHelysziniNevezesOsszeg(helysziniNevezesOsszeg);
