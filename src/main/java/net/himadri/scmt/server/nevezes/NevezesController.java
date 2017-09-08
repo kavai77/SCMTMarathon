@@ -255,7 +255,7 @@ public class NevezesController {
             versenySzamIdSet.add(versenySzamIterator.next().getId());
         }
         QueryResultIterator<Versenyzo> versenyzoIterator = ofy.query(Versenyzo.class).filter("versenyId", tav.getVersenyId()).iterator();
-        Set<Integer> raceNumberSet = new HashSet<>();
+        SortedSet<Integer> raceNumberSet = new TreeSet<>();
         while (versenyzoIterator.hasNext()) {
             Versenyzo versenyzo = versenyzoIterator.next();
             if (versenySzamIdSet.contains(versenyzo.getVersenySzamId())) {
@@ -266,9 +266,13 @@ public class NevezesController {
                 }
             }
         }
-        for (int i = tav.getVersenySzamtol(); i <= tav.getVersenySzamig(); i++) {
-            if (!raceNumberSet.contains(i)) {
-                return i;
+        if (raceNumberSet.last() + 1 <= tav.getVersenySzamig()) {
+            return raceNumberSet.last() + 1;
+        } else {
+            for (int i = tav.getVersenySzamtol(); i <= tav.getVersenySzamig(); i++) {
+                if (!raceNumberSet.contains(i)) {
+                    return i;
+                }
             }
         }
         throw new NevezesException("Nevezés betelt. " + tav.toString());
@@ -287,7 +291,7 @@ public class NevezesController {
 
     private Verseny findCurrentVerseny() {
         QueryResultIterator<Verseny> iterator = ofy.query(Verseny.class).iterator();
-        long timeInMillis = Calendar.getInstance(TimeZone.getTimeZone("Europe/Budapest")).getTimeInMillis();
+        long timeInMillis = System.currentTimeMillis();
         while (iterator.hasNext()) {
             Verseny currentVerseny = iterator.next();
             if (currentVerseny.getNevezesBegin() != null &&
