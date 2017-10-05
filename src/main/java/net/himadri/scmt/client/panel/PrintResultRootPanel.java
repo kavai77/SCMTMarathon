@@ -104,6 +104,19 @@ public class PrintResultRootPanel extends Composite
 
     private FlexTable createFlexTable(Boolean ferfi)
     {
+        List<RaceStatusRow> acceptedRows = new ArrayList<>();
+        boolean licenseNecessary = false;
+        for (RaceStatusRow raceStatusRow : scmtMarathon.getRaceStatusRowCache().getAllRaceStatusRows())
+        {
+            if (TavVersenyszamFilter.isAccepted(filter, raceStatusRow) && isKorSzamFinished(raceStatusRow)
+                    && isNemAccepted(raceStatusRow, ferfi))
+            {
+                acceptedRows.add(raceStatusRow);
+                licenseNecessary |= !Utils.isEmpty(raceStatusRow.getVersenyzo().getLicenszSzam());
+            }
+        }
+
+
         FlexTable flexTable = new FlexTable();
         int colIndex = 0;
 
@@ -115,22 +128,16 @@ public class PrintResultRootPanel extends Composite
         flexTable.setText(0, colIndex++, "Név");
         flexTable.setText(0, colIndex++, "Szül.év");
         flexTable.setText(0, colIndex++, "Egyesület");
+        if (licenseNecessary) {
+            flexTable.setText(0, colIndex++, "Licensz");
+        }
         if (filter.getMode() == TavVersenySzam.Mode.TAV) {
             flexTable.setText(0, colIndex++, "Korcsoport");
             flexTable.setText(0, colIndex++, "KCS. hely");
         }
         flexTable.setText(0, colIndex++, "Idő");
         addKorNevek(flexTable, colIndex++);
-        ArrayList<RaceStatusRow> acceptedRows = new ArrayList<>();
 
-        for (RaceStatusRow raceStatusRow : scmtMarathon.getRaceStatusRowCache().getAllRaceStatusRows())
-        {
-            if (TavVersenyszamFilter.isAccepted(filter, raceStatusRow) && isKorSzamFinished(raceStatusRow)
-                  && isNemAccepted(raceStatusRow, ferfi))
-            {
-                acceptedRows.add(raceStatusRow);
-            }
-        }
 
         Map<Long, Integer> tavHelyCounter = new HashMap<>();
         Map<Long, Integer> kategoriaHelyCounter = new HashMap<>();
@@ -149,6 +156,9 @@ public class PrintResultRootPanel extends Composite
                 flexTable.setText(rowIndex, colIndex++, raceStatusRow.getVersenyzo().getName());
                 flexTable.setText(rowIndex, colIndex++, raceStatusRow.getVersenyzo().getSzuletesiEv().toString());
                 flexTable.setText(rowIndex, colIndex++, raceStatusRow.getVersenyzo().getEgyesulet());
+                if (licenseNecessary) {
+                    flexTable.setText(rowIndex, colIndex++, raceStatusRow.getVersenyzo().getLicenszSzam());
+                }
             } else colIndex += 3;
 
             if (raceStatusRow.getVersenySzam() != null)
