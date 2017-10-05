@@ -38,10 +38,6 @@
     </servlet>
 
     <servlet>
-        <servlet-name>ChannelConnectedServlet</servlet-name>
-        <servlet-class>net.himadri.scmt.server.ChannelConnectedServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>net.himadri.scmt.SCMTMarathon UserService</servlet-name>
         <servlet-class>net.himadri.scmt.server.UserServiceImpl</servlet-class>
     </servlet>
@@ -79,15 +75,6 @@
         <url-pattern>/scmtmarathon/marathon</url-pattern>
     </servlet-mapping>
 
-    <servlet-mapping>
-        <servlet-name>ChannelConnectedServlet</servlet-name>
-        <url-pattern>/_ah/channel/connected/</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>ChannelConnectedServlet</servlet-name>
-        <url-pattern>/_ah/channel/disconnected/</url-pattern>
-    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>net.himadri.scmt.SCMTMarathon UserService</servlet-name>
         <url-pattern>/scmtmarathon/UserService</url-pattern>

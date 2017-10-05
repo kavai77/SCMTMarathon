@@ -3,7 +3,4 @@
     <application>scmtmarathon</application>
     <version>6</version>
     <threadsafe>false</threadsafe>
-    <inbound-services>
-        <service>channel_presence</service>
-    </inbound-services>
 </appengine-web-app>

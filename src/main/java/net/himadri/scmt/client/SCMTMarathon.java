@@ -5,6 +5,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import net.himadri.scmt.client.callback.CommonAsyncCallback;
@@ -35,6 +36,8 @@ public class SCMTMarathon implements EntryPoint {
 
     private Verseny verseny;
     private MainRootPanel mainRootPanel;
+
+    private Timer pollingTimer;
 
     public void onModuleLoad() {
         final RootPanel rootPanel = RootPanel.get();
@@ -83,10 +86,14 @@ public class SCMTMarathon implements EntryPoint {
             @Override
             public void itemRefreshed(List<Verseny> items) {
                 verseny = items.get(0);
-                if (verseny.getRaceStatus().isActive()) {
-                    pollingService.establishChannelConnection();
-                } else {
-                    pollingService.makeRequest();
+                if (pollingTimer == null) {
+                    pollingTimer = new Timer() {
+                        @Override
+                        public void run() {
+                            pollingService.makeRequest();
+                        }
+                    };
+                    pollingTimer.scheduleRepeating(3000);
                 }
             }
         });

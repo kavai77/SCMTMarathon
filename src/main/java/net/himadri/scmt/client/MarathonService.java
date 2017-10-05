@@ -66,8 +66,6 @@ public interface MarathonService extends RemoteService {
 
     PollingResult getPollingResult(Long versenyId, PollingRequest pollingRequest);
 
-    String createChannelToken();
-
     Verseny addVerseny(String versenyMegnevezes);
 
     Verseny getVerseny(Long id);

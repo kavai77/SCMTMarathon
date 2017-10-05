@@ -7,7 +7,6 @@
     <!--<inherits name='com.google.gwt.user.theme.dark.Dark'/>-->
 
     <inherits name="com.googlecode.objectify.Objectify"/>
-    <inherits name="com.google.gwt.appengine.channel.Channel"/>
     <inherits name="com.google.gwt.logging.Logging"/>
 
     <set-configuration-property name="devModeRedirectEnabled" value="true"/>

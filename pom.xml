@@ -54,13 +54,6 @@
             <version>2.3</version>
         </dependency>
         <dependency>
-            <groupId>com.google.gwt.appengine</groupId>
-            <artifactId>gwt-gae-channel</artifactId>
-            <version>0.4-alpha</version>
-			<systemPath>${project.basedir}/lib/gwt-gae-channel-0.4-alpha.jar</systemPath>
-            <scope>system</scope>
-        </dependency>
-        <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
             <artifactId>hibernate-jpa-2.0-api</artifactId>
             <version>1.0.0.Final</version>

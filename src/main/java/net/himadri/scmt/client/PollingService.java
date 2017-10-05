@@ -1,9 +1,5 @@
 package net.himadri.scmt.client;
 
-import com.google.gwt.appengine.channel.client.Channel;
-import com.google.gwt.appengine.channel.client.ChannelFactory;
-import com.google.gwt.appengine.channel.client.SocketError;
-import com.google.gwt.appengine.channel.client.SocketListener;
 import com.google.gwt.core.client.GWT;
 import net.himadri.scmt.client.callback.CommonAsyncCallback;
 import net.himadri.scmt.client.entity.*;
@@ -36,51 +32,6 @@ public class PollingService {
 
     public PollingService(SCMTMarathon scmtMarathon) {
         this.scmtMarathon = scmtMarathon;
-    }
-
-    public void establishChannelConnection() {
-        LOGGER.info("establishChannelConnection");
-        marathonService.createChannelToken(new CommonAsyncCallback<String>() {
-            @Override
-            public void onSuccess(String token) {
-                LOGGER.info("new token: " + token);
-                connectToChannel(token);
-            }
-        });
-    }
-
-
-    private void connectToChannel(String token) {
-        ChannelFactory.createChannel(token, new ChannelFactory.ChannelCreatedCallback() {
-            @Override
-            public void onChannelCreated(Channel channel) {
-                channel.open(new SocketListener() {
-                    @Override
-                    public void onOpen() {
-                        LOGGER.info("Socket open");
-                        makeRequest();
-                    }
-
-                    @Override
-                    public void onMessage(String s) {
-                        LOGGER.info("onMessage");
-                        makeRequest();
-                    }
-
-                    @Override
-                    public void onError(SocketError socketError) {
-                        LOGGER.warning("Socket error" + socketError.getDescription());
-                        establishChannelConnection();
-                    }
-
-                    @Override
-                    public void onClose() {
-                        LOGGER.info("Socket close");
-                        establishChannelConnection();
-                    }
-                });
-            }
-        });
     }
 
     public void makeRequest() {

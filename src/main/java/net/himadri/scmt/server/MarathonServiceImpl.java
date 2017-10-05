@@ -1,8 +1,5 @@
 package net.himadri.scmt.server;
 
-import com.google.appengine.api.channel.ChannelMessage;
-import com.google.appengine.api.channel.ChannelService;
-import com.google.appengine.api.channel.ChannelServiceFactory;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.FetchOptions;
@@ -12,7 +9,6 @@ import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.googlecode.objectify.Key;
 import com.googlecode.objectify.NotFoundException;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
@@ -26,7 +22,6 @@ import net.himadri.scmt.client.serializable.PollingResult;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -37,7 +32,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         MarathonService {
 
     private static final Expiration DEFAULT_CACHE_EXPIRATION = Expiration.byDeltaSeconds(60 * 60);
-    private static final long CHANNEL_EXPIRATION = 24 * 60 * 60 * 1000;
 
     private enum SyncValueType {PERSON_LAP, VERSENYZO, VERSENYSZAM, TAV}
 
@@ -52,7 +46,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         verseny.setRaceStartTime(System.currentTimeMillis());
         verseny.setRaceStatus(RaceStatus.RACING);
         updateVerseny(verseny);
-        broadcastModification();
     }
 
     @Override
@@ -61,7 +54,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         if (verseny.getRaceStatus() == RaceStatus.RACING) {
             verseny.setRaceStartTime(verseny.getRaceStartTime() - offsetInMillis);
             updateVerseny(verseny);
-            broadcastModification();
         }
     }
 
@@ -77,7 +69,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         verseny.setRaceStatus(RaceStatus.FINISHED);
         verseny.setVersenyzoSzam(getVersenyzoSzam(versenyId));
         updateVerseny(verseny);
-        broadcastModification();
     }
 
     @Override
@@ -85,7 +76,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         Verseny verseny = getVersenyFromCache(versenyId);
         verseny.setRaceStatus(RaceStatus.RACING);
         updateVerseny(verseny);
-        broadcastModification();
     }
 
     @Override
@@ -99,7 +89,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         verseny.setNevezesEmailText(emailText);
         verseny.setHelysziniNevezesOsszeg(helysziniNevezesOsszeg);
         updateVerseny(verseny);
-        broadcastModification();
     }
 
     @Override
@@ -119,7 +108,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         ofy.put(ujVersenySzam);
         memcacheService.put(getMaxCreationTimeCacheKey(VersenySzam.class, versenyId),
                 ujVersenySzam.getCreationTime(), DEFAULT_CACHE_EXPIRATION);
-        broadcastModification();
     }
 
     @Override
@@ -131,7 +119,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         versenySzam.setKorIg(korIg);
         ofy.put(versenySzam);
         incrementSyncValue(versenySzam.getVersenyId(), SyncValueType.VERSENYSZAM);
-        broadcastModification();
     }
 
     @Override
@@ -139,7 +126,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         VersenySzam versenySzam = ofy.get(VersenySzam.class, id);
         ofy.delete(VersenySzam.class, id);
         incrementSyncValue(versenySzam.getVersenyId(), SyncValueType.VERSENYSZAM);
-        broadcastModification();
     }
 
     @Override
@@ -148,7 +134,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         ofy.put(tav);
         memcacheService.put(getMaxCreationTimeCacheKey(Tav.class, versenyId),
                 tav.getCreationTime(), DEFAULT_CACHE_EXPIRATION);
-        broadcastModification();
     }
 
     @Override
@@ -158,7 +143,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         tav.setRaceStartDiff(System.currentTimeMillis() - verseny.getRaceStartTime());
         ofy.put(tav);
         incrementSyncValue(tav.getVersenyId(), SyncValueType.TAV);
-        broadcastModification();
         return tav.getRaceStartDiff();
     }
 
@@ -174,7 +158,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         tav.setKorNevArray(korNevArray);
         ofy.put(tav);
         incrementSyncValue(tav.getVersenyId(), SyncValueType.TAV);
-        broadcastModification();
     }
 
     @Override
@@ -182,7 +165,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         Tav tav = ofy.get(Tav.class, tavId);
         ofy.delete(Tav.class, tavId);
         incrementSyncValue(tav.getVersenyId(), SyncValueType.TAV);
-        broadcastModification();
     }
 
     @Override
@@ -200,7 +182,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         ofy.put(versenyzo);
         memcacheService.put(getMaxCreationTimeCacheKey(Versenyzo.class, versenyId),
                 versenyzo.getCreationTime(), DEFAULT_CACHE_EXPIRATION);
-        broadcastModification();
     }
 
     @Override
@@ -214,7 +195,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
 
         ofy.put(versenyzo);
         incrementSyncValue(versenyzo.getVersenyId(), SyncValueType.VERSENYZO);
-        broadcastModification();
     }
 
     @Override
@@ -223,7 +203,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
             Versenyzo versenyzo = ofy.get(Versenyzo.class, id);
             ofy.delete(Versenyzo.class, id);
             incrementSyncValue(versenyzo.getVersenyId(), SyncValueType.VERSENYZO);
-            broadcastModification();
         } catch (NotFoundException e) {
             throw new NotExistingEntityException();
         }
@@ -236,7 +215,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
             versenyzo.setFeladta(feladta);
             ofy.put(versenyzo);
             incrementSyncValue(versenyzo.getVersenyId(), SyncValueType.VERSENYZO);
-            broadcastModification();
         } catch (NotFoundException e) {
             throw new NotExistingEntityException();
         }
@@ -270,7 +248,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         if (!withThresholdValidation) {
             incrementSyncValue(versenyId, SyncValueType.PERSON_LAP);
         }
-        broadcastModification();
     }
 
     @Override
@@ -283,7 +260,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
             memcacheService.delete(getPersonLapListKey(versenyId));
         } finally {
             incrementSyncValue(versenyId, SyncValueType.PERSON_LAP);
-            broadcastModification();
         }
 
     }
@@ -294,7 +270,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         personLap.setRaceNumber(raceNumber);
         addPersonLap(personLap);
         incrementSyncValue(personLap.getVersenyId(), SyncValueType.PERSON_LAP);
-        broadcastModification();
     }
 
     @Override
@@ -304,7 +279,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         personLap.setTime(lapTime);
         addPersonLap(personLap);
         incrementSyncValue(personLap.getVersenyId(), SyncValueType.PERSON_LAP);
-        broadcastModification();
     }
 
     @Override
@@ -318,14 +292,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         pollingResult.setRaceStatus(verseny.getRaceStatus());
         return pollingResult;
     }
-
-    @Override
-    public String createChannelToken() {
-        ChannelService channelService = ChannelServiceFactory.getChannelService();
-        Key<ClientChannel> key = ofy.put(new ClientChannel(new Date()));
-        return channelService.createChannel(Long.toString(key.getId()));
-    }
-
 
     @Override
     public Verseny addVerseny(String versenyMegnevezes) {
@@ -442,20 +408,6 @@ public class MarathonServiceImpl extends RemoteServiceServlet implements
         return datastore.prepare(query).countEntities(FetchOptions.Builder.withDefaults());
     }
     
-    
-
-    private void broadcastModification() {
-        ChannelService channelService = ChannelServiceFactory.getChannelService();
-        long creationDeadline = System.currentTimeMillis() - CHANNEL_EXPIRATION;
-        for (ClientChannel channel: ofy.query(ClientChannel.class).list()) {
-            if (channel.getCreationDate().getTime() < creationDeadline) {
-                ofy.delete(channel);
-            } else if (channel.isConnected()) {
-                channelService.sendMessage(new ChannelMessage(channel.getChannelId().toString(), "modifiedContent"));
-            }
-        }
-    }
-
     private <T> PollingResult.Entity<T> createPollingResultEntity(Class<T> clazz, Long versenyId,
                                                                   PollingRequest.Entity pollingRequestEntity,
                                                                   int syncValue) {

@@ -42,8 +42,6 @@ public interface MarathonServiceAsync {
 
     void getPollingResult(Long versenyId, PollingRequest pollingRequest, AsyncCallback<PollingResult> async);
 
-    void createChannelToken(AsyncCallback<String> async);
-
     void getVersenyek(AsyncCallback<List<Verseny>> async);
 
     void getAllPersonLapList(Long versenyId, AsyncCallback<List<PersonLap>> async);
