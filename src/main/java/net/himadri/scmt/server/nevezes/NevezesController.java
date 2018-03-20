@@ -267,7 +267,7 @@ public class NevezesController {
                 }
             }
         }
-        if (raceNumberSet.last() + 1 <= tav.getVersenySzamig()) {
+        if (!raceNumberSet.isEmpty() && raceNumberSet.last() + 1 <= tav.getVersenySzamig()) {
             return raceNumberSet.last() + 1;
         } else {
             for (int i = tav.getVersenySzamtol(); i <= tav.getVersenySzamig(); i++) {
