@@ -8,7 +8,8 @@ function initResources($scope, $resource) {
     resource.NevezesService = $resource('/public/nevezes/:action', {}, {
         get: {params: {action: 'get'}, interceptor: {responseError : defaultServerError}},
         getListOfAthletes: {params: {action: 'getListOfAthletes'}, interceptor: {responseError : defaultServerError}},
-        store: {method: 'POST', params: {action: 'store'}, interceptor: {responseError : defaultServerError}}
+        store: {method: 'POST', params: {action: 'store'}, interceptor: {responseError : defaultServerError}},
+        subscribe: {method: 'POST', params: {action: 'subscribe'}, interceptor: {responseError : defaultServerError}}
     });
 
     return resource;

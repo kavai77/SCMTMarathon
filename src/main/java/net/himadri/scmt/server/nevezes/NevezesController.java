@@ -8,15 +8,9 @@ import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.googlecode.objectify.Objectify;
 import net.himadri.scmt.client.MarathonService;
 import net.himadri.scmt.client.Utils;
-import net.himadri.scmt.client.entity.Tav;
-import net.himadri.scmt.client.entity.Verseny;
-import net.himadri.scmt.client.entity.VersenySzam;
-import net.himadri.scmt.client.entity.Versenyzo;
+import net.himadri.scmt.client.entity.*;
 import net.himadri.scmt.server.UserServiceImpl;
-import net.himadri.scmt.server.dto.ListOfAthletes;
-import net.himadri.scmt.server.dto.Nevezes;
-import net.himadri.scmt.server.dto.NevezesRequest;
-import net.himadri.scmt.server.dto.RecaptchaResponse;
+import net.himadri.scmt.server.dto.*;
 import net.himadri.scmt.server.exception.NevezesException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -103,10 +97,18 @@ public class NevezesController {
 
     @RequestMapping(value = "/store", method = RequestMethod.POST)
     public void storeNevezes(@RequestBody NevezesRequest nevezesRequest, HttpServletRequest req) throws IOException, NevezesException {
-        verifyRecaptcha(nevezesRequest, req);
+        verifyRecaptcha(nevezesRequest.getRecaptcha(), req);
         Versenyzo versenyzo = saveVersenyzo(nevezesRequest);
         sendEmail(versenyzo);
         emailSuperUser("Sikeres nevezés", versenyzo.toString());
+    }
+
+    @PostMapping(value = "/subscribe")
+    public void subscribe(@RequestBody SubscribeRequest subscribeRequest, HttpServletRequest req) throws IOException, NevezesException {
+        verifyRecaptcha(subscribeRequest.getRecaptcha(), req);
+        GdprEmail gdprEmail = new GdprEmail();
+        gdprEmail.setEmail(subscribeRequest.getEmail());
+        ofy.put(gdprEmail);
     }
 
     @RequestMapping(value = "/getListOfAthletes", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -201,11 +203,10 @@ public class NevezesController {
         return versenyzo;
     }
 
-    private void verifyRecaptcha(NevezesRequest nevezesRequest, HttpServletRequest req) throws NevezesException, IOException {
-        String recaptcha = nevezesRequest.getRecaptcha();
+    private void verifyRecaptcha(String recaptcha, HttpServletRequest req) throws NevezesException, IOException {
         if (recaptchaMemcacheService.contains(recaptcha)) {
             if (!(boolean) recaptchaMemcacheService.get(recaptcha)) {
-                throw new NevezesException("Recaptcha ellenőrzés hibát adott a cache-bol: " + nevezesRequest.toString());
+                throw new NevezesException("Recaptcha ellenőrzés hibát adott a cache-bol: " + recaptcha);
             }
             return;
         }
@@ -226,7 +227,7 @@ public class NevezesController {
             RecaptchaResponse value = mapper.readerFor(RecaptchaResponse.class).readValue(responseJson);
             recaptchaMemcacheService.put(recaptcha, value.isSuccess(), Expiration.byDeltaSeconds(RECAPCTHA_EXPIRATION_SECONDS));
             if (!value.isSuccess()) {
-                throw new NevezesException("Recaptcha ellenőrzés hibát adott: " + value + " " + nevezesRequest.toString());
+                throw new NevezesException("Recaptcha ellenőrzés hibát adott: " + value + " " + recaptcha);
             }
         } finally {
             instream.close();

@@ -22,6 +22,7 @@ public class ObjectifyUtils {
         ObjectifyService.register(OklevelPdfBlob.class);
         ObjectifyService.register(PrintOklevelLog.class);
         ObjectifyService.register(Configuration.class);
+        ObjectifyService.register(GdprEmail.class);
     }
     
     public static Objectify beginObjectify() {
