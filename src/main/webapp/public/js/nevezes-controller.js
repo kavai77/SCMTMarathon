@@ -41,10 +41,10 @@ app.controller('ctrl', function ($scope, $resource) {
             $scope.emailClass='has-error';
             $scope.errorMessages.push("Az email cím kitöltése kötelező!");
         }
-//        if (isBlank($scope.licenszSzam)) {
-//            $scope.licenszClass='has-error';
-//            $scope.errorMessages.push("A Magyar Triatlon Szövetség által kiadott licensz megadása kötelező!");
-//        }
+        if ($scope.nevezes.triatlonLicensz && isBlank($scope.licenszSzam)) {
+            $scope.licenszClass='has-error';
+            $scope.errorMessages.push("A Magyar Triatlon Szövetség által kiadott licensz megadása kötelező!");
+        }
         if (isBlank($scope.poloMeret)) {
             $scope.poloClass='has-error';
             $scope.errorMessages.push("Válaszd ki a pólómértedet!");

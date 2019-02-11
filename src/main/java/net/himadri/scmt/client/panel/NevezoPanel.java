@@ -24,7 +24,7 @@ public class NevezoPanel extends Composite {
 
     public NevezoPanel(final SCMTMarathon scmtMarathon) {
         AbsolutePanel nevezoPanel = new AbsolutePanel();
-        nevezoPanel.setSize("900px", "540px");
+        nevezoPanel.setSize("900px", "580px");
         nevezoPanel.add(new Label("Nevezés kezdete"), 10, 10);
         final DatePicker startDatePicker = new DatePicker();
         nevezoPanel.add(startDatePicker, 10, 30);
@@ -51,6 +51,8 @@ public class NevezoPanel extends Composite {
         final IntegerBox helysziniNevezes = new IntegerBox();
         helysziniNevezes.setWidth("350px");
         nevezoPanel.add(helysziniNevezes, 150, 460);
+        final CheckBox triatlonLicensz = new CheckBox("Triatlon Licensz Kötelező");
+        nevezoPanel.add(triatlonLicensz, 10, 500);
         Button elkuldButton = new Button("Mentés", new ClickHandler() {
             @Override
             public void onClick(ClickEvent clickEvent) {
@@ -58,6 +60,7 @@ public class NevezoPanel extends Composite {
                         startDatePicker.getValue().getTime(), endDatePicker.getValue().getTime(),
                         raceDatePicker.getValue().getTime(),
                         emailSubjectText.getText(), emailBodyText.getText(), helysziniNevezes.getValue(),
+                        triatlonLicensz.getValue(),
                         new CommonAsyncCallback<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
@@ -66,7 +69,7 @@ public class NevezoPanel extends Composite {
                         });
             }
         });
-        nevezoPanel.add(elkuldButton, 10, 500);
+        nevezoPanel.add(elkuldButton, 10, 540);
         scmtMarathon.getVersenySyncSupport().addMarathonActionListener(
                 new MarathonActionListener<Verseny>() {
             @Override

@@ -87,15 +87,15 @@
                             <label for="email">Email cím *</label>
                             <input type="email" class="form-control" id="email" placeholder="Email" ng-model="email">
                         </div>
-                        <div class="form-group" ng-class="licenszClass" style="display: none">
+                        <div class="form-group" ng-class="licenszClass" ng-show="nevezes.triatlonLicensz">
                             <label for="licenszszam">Licenszszám *</label>
                             <input type="text" class="form-control" id="licenszszam" placeholder="A Magyar Triatlonszövetség Által kiadott licencszám" ng-model="licenszSzam">
                         </div>
                         <div class="form-group" ng-class="poloClass">
-                            <label for="polo">Pólóméret * (ha kérsz pólót +1500ft)</label>
+                            <label for="polo">Pólóméret *</label>
                             <select id="polo" class="form-control" ng-model="poloMeret">
                                 <option value="">(válassz)</option>
-                                <option value="Nem kér">Nem kérek pólót</option>
+                                <!--option value="Nem kér">Nem kérek pólót</option-->
                                 <option value="S">S</option>
                                 <option value="M">M</option>
                                 <option value="L">L</option>

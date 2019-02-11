@@ -75,7 +75,7 @@ public class NevezesController {
     public Nevezes getNevezes() throws IOException {
         final Verseny verseny = findCurrentVerseny();
         if (verseny == null) {
-            return new Nevezes(null, false, false, null, null);
+            return new Nevezes(null, false, false, null, null, false);
         } else {
             final List<Tav> tavList = ofy.query(Tav.class).filter("versenyId", verseny.getId()).list();
             Collections.sort(tavList, new Comparator<Tav>() {
@@ -91,7 +91,8 @@ public class NevezesController {
                 tavMap.put(tav.getId().toString(), tav.getMegnevezes());
             }
             boolean nyitva = verseny.getNevezesEnd() != null && System.currentTimeMillis() <= verseny.getNevezesEnd() + MILLIS_IN_DAY;
-            return new Nevezes(verseny.getNev(), true, nyitva, tavMap, verseny.getNevezesEmailText());
+            return new Nevezes(verseny.getNev(), true, nyitva, tavMap, verseny.getNevezesEmailText(),
+                    Boolean.TRUE.equals(verseny.getTriatlonLicensz()));
         }
     }
 
