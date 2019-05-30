@@ -13,7 +13,7 @@
     <properties>
         <!-- Convenience property to set the GWT version -->
         <gwtVersion>2.7.0</gwtVersion>
-        <appEngineVersion>1.9.71</appEngineVersion>
+        <appEngineVersion>1.9.74</appEngineVersion>
         <appEngineSdk>
             ${settings.localRepository}/com/google/appengine/appengine-java-sdk/${appEngineVersion}/appengine-java-sdk/appengine-java-sdk-${appEngineVersion}
         </appEngineSdk>

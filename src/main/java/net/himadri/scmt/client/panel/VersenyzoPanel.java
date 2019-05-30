@@ -9,6 +9,7 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
@@ -31,6 +32,7 @@ import net.himadri.scmt.client.serializable.MarathonActionListener;
 import net.himadri.scmt.client.token.TavVersenySzamToken;
 
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -39,6 +41,7 @@ import java.util.List;
  * Date: 2012.04.10. 22:01
  */
 public class VersenyzoPanel extends Composite {
+    private static final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("yyyy.MM.dd");
     private MarathonServiceAsync marathonService = GWT.create(MarathonService.class);
 
     private CellTable<Versenyzo> versenyzoTable = new CellTable<Versenyzo>();
@@ -188,6 +191,13 @@ public class VersenyzoPanel extends Composite {
                 return Utils.getVersenySzamMegnevezes(scmtMarathon, versenySzam);
             }
         }, "Versenyszám");
+
+        versenyzoTable.addColumn(new SortableTextColumn<Versenyzo>(listHandler) {
+            @Override
+            public String getValue(Versenyzo versenyzo) {
+                return dateTimeFormat.format(new Date(versenyzo.getCreationTime()));
+            }
+        }, "Nevezési dátum");
 
         final CheckboxCell checkboxCell = new CheckboxCell(false, false);
         feladtaColumn = new Column<Versenyzo, Boolean>(checkboxCell) {

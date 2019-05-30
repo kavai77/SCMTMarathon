@@ -59,9 +59,8 @@ public class VersenyPanel extends Composite {
                 Map<Integer, ListDataProvider<Verseny>> evVersenyMap =
                         new TreeMap<Integer, ListDataProvider<Verseny>>();
                 for (Verseny verseny: versenyek) {
-                    int year = verseny.getRaceStartTime() != null ?
-                            new Date(verseny.getRaceStartTime()).getYear() :
-                            currentYear;
+                    Date raceDate = getRaceEffectiveDate(verseny);
+                    int year = raceDate != null ? raceDate.getYear() : currentYear;
                     ListDataProvider<Verseny> versenyListDataProvider = evVersenyMap.get(year);
                     if (versenyListDataProvider == null) {
                         if (year == currentYear) {
@@ -118,6 +117,16 @@ public class VersenyPanel extends Composite {
         rootPanel.add(horizontalPanel);
     }
 
+    private Date getRaceEffectiveDate(Verseny verseny) {
+        if (verseny.getRaceStartTime() != null) {
+            return new Date(verseny.getRaceStartTime());
+        } else if (verseny.getRaceDate() != null) {
+            return new Date(verseny.getRaceDate());
+        } else {
+            return null;
+        }
+    }
+
     private CellTable<Verseny> createVersenyTable(final ListDataProvider<Verseny> versenyList) {
         final CellTable<Verseny> versenyTable = new CellTable<Verseny>();
         versenyTable.setSize("100%", "100%");
@@ -132,9 +141,8 @@ public class VersenyPanel extends Composite {
         versenyTable.addColumn(new VersenyTextColumn() {
             @Override
             public String getValue(Verseny verseny) {
-                return verseny.getRaceStartTime() != null ?
-                        dateTimeFormat.format(new Date(verseny.getRaceStartTime()))
-                        : null;
+                Date raceDate = getRaceEffectiveDate(verseny);
+                return raceDate != null ? dateTimeFormat.format(raceDate) : null;
             }
         }, "Dátum");
         versenyTable.addColumn(new VersenyTextColumn() {
