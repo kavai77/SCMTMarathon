@@ -7,6 +7,7 @@ import net.himadri.scmt.client.entity.Versenyzo;
 
 import java.util.Comparator;
 
+import static net.himadri.scmt.client.Utils.defaultBoolean;
 import static net.himadri.scmt.client.Utils.defaultString;
 
 public class PrintPreRegistrationRootPanel extends AbstractPrintPeopleRootPanel {
@@ -14,7 +15,7 @@ public class PrintPreRegistrationRootPanel extends AbstractPrintPeopleRootPanel 
 
     private static final String[] COLUMN_LIST = new String[]{
             "Rajtszám", "Név", "Nem", "Szül.év", "Korcsoport", "Egyesület", "Fizetett Díj", "Licensz",
-            "Pólóméret", "Email"};
+            "Pólóméret", "Email", "Hírlevél"};
 
     public PrintPreRegistrationRootPanel(SCMTMarathon scmtMarathon) {
         super(scmtMarathon, "Regisztrációs lista", HISTORY_TOKEN);
@@ -48,6 +49,7 @@ public class PrintPreRegistrationRootPanel extends AbstractPrintPeopleRootPanel 
             defaultString(versenyzo.getLicenszSzam()),
             defaultString(versenyzo.getPoloMeret()),
             defaultString(versenyzo.getEmail()),
+            defaultBoolean(versenyzo.getHirlevel()),
         };
     }
 }

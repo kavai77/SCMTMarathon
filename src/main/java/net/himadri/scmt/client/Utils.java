@@ -94,6 +94,16 @@ public class Utils {
         return o == null ? "" : o.toString();
     }
 
+    public static String defaultBoolean(Boolean o) {
+        if (o == null) {
+            return "";
+        } else if (o.equals(Boolean.FALSE)) {
+            return "Nem";
+        } else {
+            return "Igen";
+        }
+    }
+
     public static boolean isEmpty(String str) {
         return str == null || str.isEmpty();
     }

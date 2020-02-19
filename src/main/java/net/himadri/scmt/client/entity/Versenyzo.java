@@ -29,6 +29,7 @@ public class Versenyzo implements Serializable, HasCreationTime {
     private Integer fizetettDij;
     private String poloMeret;
     private String licenszSzam;
+    private Boolean hirlevel;
     private long creationTime;
 
     @SuppressWarnings({"UnusedDeclaration"})
@@ -44,7 +45,7 @@ public class Versenyzo implements Serializable, HasCreationTime {
 
 
     public Versenyzo(String raceNumber, String name, Boolean ferfi, Integer szuletesiEv, String egyesulet, String email,
-                     Long versenySzamId, Long versenyId, String poloMeret, String licenszSzam, Integer fizetettDij) {
+                     Long versenySzamId, Long versenyId, String poloMeret, String licenszSzam, Integer fizetettDij, Boolean hirlevel) {
         this.raceNumber = raceNumber;
         this.name = name;
         this.ferfi = ferfi;
@@ -56,6 +57,7 @@ public class Versenyzo implements Serializable, HasCreationTime {
         this.poloMeret = poloMeret;
         this.licenszSzam = licenszSzam;
         this.fizetettDij = fizetettDij;
+        this.hirlevel = hirlevel;
         creationTime = System.currentTimeMillis();
     }
 
@@ -109,6 +111,11 @@ public class Versenyzo implements Serializable, HasCreationTime {
 
     public String getLicenszSzam() {
         return licenszSzam;
+    }
+
+
+    public Boolean getHirlevel() {
+        return hirlevel;
     }
 
     public long getCreationTime() {
@@ -171,6 +178,10 @@ public class Versenyzo implements Serializable, HasCreationTime {
         this.licenszSzam = licenszSzam;
     }
 
+    public void setHirlevel(Boolean hirlevel) {
+        this.hirlevel = hirlevel;
+    }
+
     @Override
     public String toString() {
         return "Versenyzo{" +
@@ -188,6 +199,7 @@ public class Versenyzo implements Serializable, HasCreationTime {
                 ", fizetettDij=" + fizetettDij +
                 ", poloMeret='" + poloMeret + '\'' +
                 ", licenszSzam='" + licenszSzam + '\'' +
+                ", hirlevel='" + hirlevel + '\'' +
                 ", creationTime=" + creationTime +
                 '}';
     }

@@ -285,7 +285,7 @@ public class VersenyzoEntryDialog extends DialogBox {
                     versenyzo.getName(), versenyzo.getFerfi(), versenyzo.getSzuletesiEv(),
                     versenyzo.getEgyesulet(), versenyzo.getEmail(), versenyzo.getVersenySzamId(),
                     versenyzo.getVersenyId(), versenyzo.getPoloMeret(), versenyzo.getLicenszSzam(),
-                    versenyzo.getFizetettDij(), new AsyncCallback<Void>() {
+                    versenyzo.getFizetettDij(), true, new AsyncCallback<Void>() {
                 @Override
                 public void onFailure(Throwable throwable) {
                     if (throwable instanceof AlreadyExistingEntityException) {

@@ -199,7 +199,7 @@ public class NevezesController {
                 "Rossz év: " + nevezes.getEv());
         Versenyzo versenyzo = new Versenyzo(raceNumber, nevezes.getNev(), isFerfi, nevezes.getEv(),
                 nevezes.getEgyesulet(), nevezes.getEmail(), versenySzamId, tav.getVersenyId(),
-                nevezes.getPoloMeret(), nevezes.getLicenszSzam(), null);
+                nevezes.getPoloMeret(), nevezes.getLicenszSzam(), null, nevezes.isHirlevel());
         ofy.put(versenyzo);
         return versenyzo;
     }

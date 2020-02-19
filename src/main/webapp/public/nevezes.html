@@ -95,18 +95,24 @@
                             <label for="polo">Pólóméret *</label>
                             <select id="polo" class="form-control" ng-model="poloMeret">
                                 <option value="">(válassz)</option>
-                                <!--option value="Nem kér">Nem kérek pólót</option-->
-                                <option value="S">S</option>
-                                <option value="M">M</option>
-                                <option value="L">L</option>
-                                <option value="XL">XL</option>
-                                <option value="XXL">XXL</option>
+                                <option value="Nem kér">Nem kérek pólót</option>
+                                <option value="S">S (+500ft)</option>
+                                <option value="M">M (+500ft)</option>
+                                <option value="L">L (+500ft)</option>
+                                <option value="XL">XL (+500ft)</option>
+                                <option value="XXL">XXL (+500ft)</option>
                             </select>
                         </div>
                         <div class="form-group" ng-class="checkClass">
                             <label>
                                 <input type="checkbox" ng-model="check">
-                                Elolvastam és megértettem a versenyszabályzatot. A versenyen felkészült fizikummal indulok.
+                                Elolvastam és megértettem a <a href="https://hu.srichinmoyraces.org" target="_blank">versenyszabályzatot</a>.
+                            </label>
+                        </div>
+                        <div class="form-group" ng-class="checkClass">
+                            <label>
+                                <input type="checkbox" ng-model="hirlevel">
+                                Feliratkozom a Sri Chinmoy Marathon Team hírlevelére. (évente max. 5)
                             </label>
                         </div>
                         <div class="g-recaptcha" data-sitekey="6LfODiMUAAAAAIdzUqTi0tEopIgeqILqG3GKj2nb" hl="hu"></div>

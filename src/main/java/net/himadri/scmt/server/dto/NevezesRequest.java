@@ -13,6 +13,7 @@ public class NevezesRequest {
     private String licenszSzam;
     private String poloMeret;
     private String recaptcha;
+    private boolean hirlevel;
 
     public long getTav() {
         return tav;
@@ -86,6 +87,14 @@ public class NevezesRequest {
         this.recaptcha = recaptcha;
     }
 
+    public boolean isHirlevel() {
+        return hirlevel;
+    }
+
+    public void setHirlevel(boolean hirlevel) {
+        this.hirlevel = hirlevel;
+    }
+
     @Override
     public String toString() {
         return "NevezesRequest{" +
@@ -98,6 +107,7 @@ public class NevezesRequest {
                 ", licenszSzam='" + licenszSzam + '\'' +
                 ", poloMeret='" + poloMeret + '\'' +
                 ", recaptcha='" + recaptcha + '\'' +
+                ", hirlevel='" + hirlevel + '\'' +
                 '}';
     }
 }

@@ -9,6 +9,7 @@ app.controller('ctrl', function ($scope, $resource) {
 
     $scope.nevezes = res.NevezesService.get();
     $scope.nevezett = false;
+    $scope.hirlevel = false;
 
     $scope.nevezesDone = function () {
         $scope.errorMessages = new Array();
@@ -69,6 +70,7 @@ app.controller('ctrl', function ($scope, $resource) {
             sendData.poloMeret = $scope.poloMeret;
             sendData.licenszSzam = $scope.licenszSzam;
             sendData.recaptcha = recaptcha;
+            sendData.hirlevel = $scope.hirlevel;
             res.NevezesService.store(sendData, function() {
                 $('#loadingDialog').modal('hide');
                 $scope.nevezett = true;

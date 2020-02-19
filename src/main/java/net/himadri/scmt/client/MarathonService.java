@@ -54,7 +54,7 @@ public interface MarathonService extends RemoteService {
 
     void addVersenyzo(String raceNumber, String name, Boolean ferfi, Integer eletkor, String egyesulet, String email,
                       Long versenySzamId, Long versenyId, String poloMeret, String licenszSzam,
-                      Integer fizetettDij) throws AlreadyExistingEntityException;
+                      Integer fizetettDij, Boolean hirlevel) throws AlreadyExistingEntityException;
 
     void modifyVersenyzo(Versenyzo versenyzo) throws AlreadyExistingEntityException;
 
