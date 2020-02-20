@@ -49,10 +49,15 @@ public class NevezoPanel extends Composite {
         nevezoPanel.add(emailBodyText, 10, 305);
         nevezoPanel.add(new Label("Helyszíni nevezési díj"), 10, 460);
         final IntegerBox helysziniNevezes = new IntegerBox();
-        helysziniNevezes.setWidth("350px");
+        helysziniNevezes.setWidth("50px");
         nevezoPanel.add(helysziniNevezes, 150, 460);
+        nevezoPanel.add(new Label("Versenyszabályzat URL"), 10, 490);
+        final TextBox versenySzabalyzat = new TextBox();
+        versenySzabalyzat.setWidth("500px");
+        versenySzabalyzat.setHeight("10px");
+        nevezoPanel.add(versenySzabalyzat, 150, 490);
         final CheckBox triatlonLicensz = new CheckBox("Triatlon Licensz Kötelező");
-        nevezoPanel.add(triatlonLicensz, 10, 500);
+        nevezoPanel.add(triatlonLicensz, 10, 520);
         Button elkuldButton = new Button("Mentés", new ClickHandler() {
             @Override
             public void onClick(ClickEvent clickEvent) {
@@ -60,7 +65,7 @@ public class NevezoPanel extends Composite {
                         startDatePicker.getValue().getTime(), endDatePicker.getValue().getTime(),
                         raceDatePicker.getValue().getTime(),
                         emailSubjectText.getText(), emailBodyText.getText(), helysziniNevezes.getValue(),
-                        triatlonLicensz.getValue(),
+                        versenySzabalyzat.getText(), triatlonLicensz.getValue(),
                         new CommonAsyncCallback<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
@@ -69,7 +74,7 @@ public class NevezoPanel extends Composite {
                         });
             }
         });
-        nevezoPanel.add(elkuldButton, 10, 540);
+        nevezoPanel.add(elkuldButton, 10, 550);
         scmtMarathon.getVersenySyncSupport().addMarathonActionListener(
                 new MarathonActionListener<Verseny>() {
             @Override
@@ -101,6 +106,8 @@ public class NevezoPanel extends Composite {
                 emailSubjectText.setText(verseny.getNevezesEmailSubject());
                 emailBodyText.setText(verseny.getNevezesEmailText());
                 helysziniNevezes.setValue(verseny.getHelysziniNevezesOsszeg());
+                versenySzabalyzat.setText(verseny.getVersenySzabalyzat());
+                triatlonLicensz.setValue(verseny.getTriatlonLicensz());
             }
         });
         initWidget(nevezoPanel);

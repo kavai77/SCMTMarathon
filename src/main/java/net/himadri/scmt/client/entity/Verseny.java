@@ -28,6 +28,7 @@ public class Verseny implements Serializable {
     private String nevezesEmailSubject;
     private String nevezesEmailText;
     private Integer helysziniNevezesOsszeg;
+    private String versenySzabalyzat;
     private Boolean triatlonLicensz;
 
     @SuppressWarnings({"UnusedDeclaration"})
@@ -160,6 +161,14 @@ public class Verseny implements Serializable {
 
     public void setTriatlonLicensz(Boolean triatlonLicensz) {
         this.triatlonLicensz = triatlonLicensz;
+    }
+
+    public String getVersenySzabalyzat() {
+        return versenySzabalyzat;
+    }
+
+    public void setVersenySzabalyzat(String versenySzabalyzat) {
+        this.versenySzabalyzat = versenySzabalyzat;
     }
 
     @Override

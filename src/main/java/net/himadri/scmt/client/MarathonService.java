@@ -24,7 +24,7 @@ public interface MarathonService extends RemoteService {
     void restartRace(Long versenyId);
 
     void setNevezesDatum(Long versenyId, Long nevezesBegin, Long nevezesEnd, Long raceDate, String emailSubject,
-                         String emailText, Integer helysziniNevezesOsszeg, Boolean triatlonLicensz);
+                         String emailText, Integer helysziniNevezesOsszeg, String versenySzabalyzat, Boolean triatlonLicensz);
 
     void deleteRace(Long versenyId);
 

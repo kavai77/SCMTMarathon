@@ -20,7 +20,7 @@ public interface MarathonServiceAsync {
     void addPersonLap(Long versenyId, String raceNumber, long raceTime, boolean withThresholdValidation, AsyncCallback<Void> async);
 
     void setNevezesDatum(Long versenyId, Long nevezesBegin, Long nevezesEnd, Long raceDate, String emailSubject,
-                         String emailText, Integer helysziniNevezesOsszeg, Boolean triatlonLicensz, AsyncCallback<Void> async);
+                         String emailText, Integer helysziniNevezesOsszeg, String versenySzabalyzat, Boolean triatlonLicensz, AsyncCallback<Void> async);
 
     void updateRaceNumber(Long personLapId, String raceNumber, AsyncCallback<Void> async);
 
