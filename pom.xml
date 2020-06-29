@@ -165,7 +165,7 @@
                 <version>2.2.0</version>
                 <configuration>
                     <deploy.projectId>scmtmarathon</deploy.projectId>
-                    <deploy.version>8</deploy.version>
+                    <deploy.version>9</deploy.version>
                 </configuration>
             </plugin>
         </plugins>

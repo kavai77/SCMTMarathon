@@ -5,6 +5,7 @@ import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.memcache.Expiration;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
+import com.googlecode.objectify.NotFoundException;
 import com.googlecode.objectify.Objectify;
 import net.himadri.scmt.client.MarathonService;
 import net.himadri.scmt.client.Utils;
@@ -24,6 +25,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.*;
@@ -72,10 +74,10 @@ public class NevezesController {
     private static MemcacheService recaptchaMemcacheService = MemcacheServiceFactory.getMemcacheService("recaptcha");
 
     @RequestMapping(value = "/get", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Nevezes getNevezes() throws IOException {
-        final Verseny verseny = findCurrentVerseny();
+    public Nevezes getNevezes(@RequestParam(required = false, name = "id") String versenyId) throws IOException {
+        final Verseny verseny = findCurrentVerseny(versenyId);
         if (verseny == null) {
-            return new Nevezes(null, false, false, null, null, false, null);
+            return new Nevezes(versenyId, null, false, false, null, null, false, null);
         } else {
             final List<Tav> tavList = ofy.query(Tav.class).filter("versenyId", verseny.getId()).list();
             Collections.sort(tavList, new Comparator<Tav>() {
@@ -91,7 +93,7 @@ public class NevezesController {
                 tavMap.put(tav.getId().toString(), tav.getMegnevezes());
             }
             boolean nyitva = verseny.getNevezesEnd() != null && System.currentTimeMillis() <= verseny.getNevezesEnd() + MILLIS_IN_DAY;
-            return new Nevezes(verseny.getNev(), true, nyitva, tavMap, verseny.getNevezesEmailText(),
+            return new Nevezes(versenyId, verseny.getNev(), true, nyitva, tavMap, verseny.getNevezesEmailText(),
                     Boolean.TRUE.equals(verseny.getTriatlonLicensz()), verseny.getVersenySzabalyzat());
         }
     }
@@ -113,8 +115,8 @@ public class NevezesController {
     }
 
     @RequestMapping(value = "/getListOfAthletes", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ListOfAthletes getListOfAthletes() throws IOException {
-        final Verseny verseny = findCurrentVerseny();
+    public ListOfAthletes getListOfAthletes(@RequestParam(required = false, name = "id") String versenyId) {
+        final Verseny verseny = findCurrentVerseny(versenyId);
         if (verseny == null) {
             return new ListOfAthletes(null, false, null);
         } else {
@@ -292,7 +294,14 @@ public class NevezesController {
         }
     }
 
-    private Verseny findCurrentVerseny() {
+    private Verseny findCurrentVerseny(String versenyId) {
+        if (StringUtils.hasText(versenyId)) {
+            try {
+                return ofy.get(Verseny.class, Long.parseLong(versenyId));
+            } catch (NotFoundException e) {
+                return null;
+            }
+        }
         QueryResultIterator<Verseny> iterator = ofy.query(Verseny.class).iterator();
         long timeInMillis = System.currentTimeMillis();
         while (iterator.hasNext()) {

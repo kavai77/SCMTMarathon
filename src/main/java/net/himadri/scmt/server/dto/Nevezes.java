@@ -6,6 +6,7 @@ import java.util.Map;
  * Created by himadri on 2017. 05. 24..
  */
 public class Nevezes {
+    private final String id;
     private final String nev;
     private final boolean aktiv;
     private final boolean nyitva;
@@ -14,7 +15,8 @@ public class Nevezes {
     private final boolean triatlonLicensz;
     private final String versenySzabalyzat;
 
-    public Nevezes(String nev, boolean aktiv, boolean nyitva, Map<String, String> tavok, String emailText, boolean triatlonLicensz, String versenySzabalyzat) {
+    public Nevezes(String id, String nev, boolean aktiv, boolean nyitva, Map<String, String> tavok, String emailText, boolean triatlonLicensz, String versenySzabalyzat) {
+        this.id = id;
         this.nev = nev;
         this.aktiv = aktiv;
         this.nyitva = nyitva;
@@ -22,6 +24,10 @@ public class Nevezes {
         this.emailText = emailText;
         this.triatlonLicensz = triatlonLicensz;
         this.versenySzabalyzat = versenySzabalyzat;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getNev() {
