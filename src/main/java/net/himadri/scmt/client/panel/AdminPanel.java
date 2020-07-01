@@ -10,11 +10,9 @@ import net.himadri.scmt.client.SCMTMarathon;
  * Date: 2012.04.08. 10:51
  */
 public class AdminPanel extends Composite {
-
-
     public AdminPanel(SCMTMarathon scmtMarathon) {
         TabPanel tabPanel = new TabPanel();
-        tabPanel.setSize("100%", "600px");
+        tabPanel.setSize("100%", "620px");
         tabPanel.add(new VersenyzoPanel(scmtMarathon), "Versenyzők", false);
         tabPanel.add(new TavPanel(scmtMarathon), "Távok", false);
         tabPanel.add(new VersenySzamPanel(scmtMarathon), "Korcsoportok", false);

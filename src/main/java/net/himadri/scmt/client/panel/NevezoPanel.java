@@ -24,7 +24,7 @@ public class NevezoPanel extends Composite {
 
     public NevezoPanel(final SCMTMarathon scmtMarathon) {
         AbsolutePanel nevezoPanel = new AbsolutePanel();
-        nevezoPanel.setSize("900px", "580px");
+        nevezoPanel.setSize("900px", "600px");
         nevezoPanel.add(new Label("Nevezés kezdete"), 10, 10);
         final DatePicker startDatePicker = new DatePicker();
         nevezoPanel.add(startDatePicker, 10, 30);
@@ -58,6 +58,8 @@ public class NevezoPanel extends Composite {
         nevezoPanel.add(versenySzabalyzat, 150, 490);
         final CheckBox triatlonLicensz = new CheckBox("Triatlon Licensz Kötelező");
         nevezoPanel.add(triatlonLicensz, 10, 520);
+        final Anchor anchor = new Anchor("Link a nevezési felületre", "", "_blank");
+        nevezoPanel.add(anchor, 10, 540);
         Button elkuldButton = new Button("Mentés", new ClickHandler() {
             @Override
             public void onClick(ClickEvent clickEvent) {
@@ -74,7 +76,7 @@ public class NevezoPanel extends Composite {
                         });
             }
         });
-        nevezoPanel.add(elkuldButton, 10, 550);
+        nevezoPanel.add(elkuldButton, 10, 570);
         scmtMarathon.getVersenySyncSupport().addMarathonActionListener(
                 new MarathonActionListener<Verseny>() {
             @Override
@@ -108,6 +110,7 @@ public class NevezoPanel extends Composite {
                 helysziniNevezes.setValue(verseny.getHelysziniNevezesOsszeg());
                 versenySzabalyzat.setText(verseny.getVersenySzabalyzat());
                 triatlonLicensz.setValue(verseny.getTriatlonLicensz());
+                anchor.setHref("https://scmtmarathon.appspot.com/public/nevezes.html?id=" + verseny.getId());
             }
         });
         initWidget(nevezoPanel);

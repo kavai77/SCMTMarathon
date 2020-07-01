@@ -41,7 +41,7 @@ public class MainRootPanel extends Composite {
         UserPanel userPanel = new UserPanel();
         absolutePanel.add(userPanel);
 
-        foTabPanel.setSize("990px", "600px");
+        foTabPanel.setSize("990px", "620px");
         foTabPanel.add(new RaceDeckPanel(scmtMarathon), "Verseny", false);
         foTabPanel.add(new AdminPanel(scmtMarathon), "Adminisztráció", false);
         foTabPanel.selectTab(0);
