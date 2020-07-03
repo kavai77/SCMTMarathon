@@ -30,6 +30,7 @@ public class Verseny implements Serializable {
     private Integer helysziniNevezesOsszeg;
     private String versenySzabalyzat;
     private Boolean triatlonLicensz;
+    private Integer poloAr;
 
     @SuppressWarnings({"UnusedDeclaration"})
     public Verseny() {
@@ -169,6 +170,14 @@ public class Verseny implements Serializable {
 
     public void setVersenySzabalyzat(String versenySzabalyzat) {
         this.versenySzabalyzat = versenySzabalyzat;
+    }
+
+    public Integer getPoloAr() {
+        return poloAr;
+    }
+
+    public void setPoloAr(Integer poloAr) {
+        this.poloAr = poloAr;
     }
 
     @Override

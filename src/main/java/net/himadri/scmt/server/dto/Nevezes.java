@@ -14,8 +14,9 @@ public class Nevezes {
     private final String emailText;
     private final boolean triatlonLicensz;
     private final String versenySzabalyzat;
+    private final Integer poloAr;
 
-    public Nevezes(String id, String nev, boolean aktiv, boolean nyitva, Map<String, String> tavok, String emailText, boolean triatlonLicensz, String versenySzabalyzat) {
+    public Nevezes(String id, String nev, boolean aktiv, boolean nyitva, Map<String, String> tavok, String emailText, boolean triatlonLicensz, String versenySzabalyzat, Integer poloAr) {
         this.id = id;
         this.nev = nev;
         this.aktiv = aktiv;
@@ -24,6 +25,7 @@ public class Nevezes {
         this.emailText = emailText;
         this.triatlonLicensz = triatlonLicensz;
         this.versenySzabalyzat = versenySzabalyzat;
+        this.poloAr = poloAr;
     }
 
     public String getId() {
@@ -56,5 +58,9 @@ public class Nevezes {
 
     public String getVersenySzabalyzat() {
         return versenySzabalyzat;
+    }
+
+    public Integer getPoloAr() {
+        return poloAr;
     }
 }

@@ -8,6 +8,13 @@ app.controller('ctrl', function ($scope, $resource, $window) {
     var res = initResources($scope, $resource);
 
     $scope.nevezes = res.NevezesService.get();
+    $scope.nevezes.$promise.then(
+        function(nevezes) {
+            $scope.ingyenPolo = !nevezes.poloAr || nevezes.poloAr === 0;
+            $scope.formattedPoloAr = $scope.ingyenPolo ? "" : "(+"+ nevezes.poloAr + "ft)"
+        }
+    )
+
     $scope.nevezett = false;
     $scope.hirlevel = false;
 

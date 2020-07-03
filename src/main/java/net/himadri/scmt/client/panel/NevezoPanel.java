@@ -47,10 +47,14 @@ public class NevezoPanel extends Composite {
         final TextArea emailBodyText = new TextArea();
         emailBodyText.setSize("500px", "130px");
         nevezoPanel.add(emailBodyText, 10, 305);
-        nevezoPanel.add(new Label("Helyszíni nevezési díj"), 10, 460);
+        nevezoPanel.add(new Label("Póló ára"), 10, 460);
+        final IntegerBox poloAr = new IntegerBox();
+        poloAr.setWidth("50px");
+        nevezoPanel.add(poloAr, 150, 460);
+        nevezoPanel.add(new Label("Helyszíni nevezési díj"), 250, 460);
         final IntegerBox helysziniNevezes = new IntegerBox();
         helysziniNevezes.setWidth("50px");
-        nevezoPanel.add(helysziniNevezes, 150, 460);
+        nevezoPanel.add(helysziniNevezes, 410, 460);
         nevezoPanel.add(new Label("Versenyszabályzat URL"), 10, 490);
         final TextBox versenySzabalyzat = new TextBox();
         versenySzabalyzat.setWidth("500px");
@@ -67,7 +71,7 @@ public class NevezoPanel extends Composite {
                         startDatePicker.getValue().getTime(), endDatePicker.getValue().getTime(),
                         raceDatePicker.getValue().getTime(),
                         emailSubjectText.getText(), emailBodyText.getText(), helysziniNevezes.getValue(),
-                        versenySzabalyzat.getText(), triatlonLicensz.getValue(),
+                        versenySzabalyzat.getText(), triatlonLicensz.getValue(), poloAr.getValue(),
                         new CommonAsyncCallback<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
@@ -110,7 +114,8 @@ public class NevezoPanel extends Composite {
                 helysziniNevezes.setValue(verseny.getHelysziniNevezesOsszeg());
                 versenySzabalyzat.setText(verseny.getVersenySzabalyzat());
                 triatlonLicensz.setValue(verseny.getTriatlonLicensz());
-                anchor.setHref("https://scmtmarathon.appspot.com/public/nevezes.html?id=" + verseny.getId());
+                poloAr.setValue(verseny.getPoloAr());
+                anchor.setHref("/public/nevezes.html?id=" + verseny.getId());
             }
         });
         initWidget(nevezoPanel);

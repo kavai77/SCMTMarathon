@@ -95,12 +95,12 @@
                             <label for="polo">Pólóméret *</label>
                             <select id="polo" class="form-control" ng-model="poloMeret">
                                 <option value="">(válassz)</option>
-                                <option value="Nem kér">Nem kérek pólót</option>
-                                <option value="S">S (+500ft)</option>
-                                <option value="M">M (+500ft)</option>
-                                <option value="L">L (+500ft)</option>
-                                <option value="XL">XL (+500ft)</option>
-                                <option value="XXL">XXL (+500ft)</option>
+                                <option ng-show="!ingyenPolo" value="Nem kér">Nem kérek pólót</option>
+                                <option value="S">S {{formattedPoloAr}}</option>
+                                <option value="M">M {{formattedPoloAr}}</option>
+                                <option value="L">L {{formattedPoloAr}}</option>
+                                <option value="XL">XL {{formattedPoloAr}}</option>
+                                <option value="XXL">XXL {{formattedPoloAr}}</option>
                             </select>
                         </div>
                         <div class="form-group" ng-class="checkClass">
