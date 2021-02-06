@@ -50,7 +50,8 @@
             <div ng-show="nevezes.aktiv">
                 <h1>{{nevezes.nev}}</h1>
                 <div ng-show="!nevezes.nyitva">
-                    <h2>A nevezés erre a versenyre lezárult!</h2>
+                    <h2>Az online nevezés erre a versenyre lezárult!</h2>
+                    <p>A helyszínen még korlátozott számban lehet nevezni.</p>
                 </div>
                 <div ng-show="nevezes.nyitva">
                     <h2>Nevezés</h2>
@@ -96,11 +97,14 @@
                             <select id="polo" class="form-control" ng-model="poloMeret">
                                 <option value="">(válassz)</option>
                                 <option ng-show="!ingyenPolo" value="Nem kér">Nem kérek pólót</option>
+                                <option value="12eves">12 éves gyermek {{formattedPoloAr}}</option>
+                                <option value="16eves">16 éves gyermek {{formattedPoloAr}}</option>
                                 <option value="S">S {{formattedPoloAr}}</option>
                                 <option value="M">M {{formattedPoloAr}}</option>
                                 <option value="L">L {{formattedPoloAr}}</option>
                                 <option value="XL">XL {{formattedPoloAr}}</option>
                                 <option value="XXL">XXL {{formattedPoloAr}}</option>
+                                <option value="XXXL">XXXL {{formattedPoloAr}}</option>
                             </select>
                         </div>
                         <div class="form-group" ng-class="checkClass">
