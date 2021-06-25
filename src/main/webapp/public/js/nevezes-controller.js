@@ -11,6 +11,7 @@ app.controller('ctrl', function ($scope, $resource, $window) {
     $scope.nevezes.$promise.then(
         function(nevezes) {
             $scope.ingyenPolo = !nevezes.poloAr || nevezes.poloAr === 0;
+            $scope.vanPolo = $scope.ingyenPolo || nevezes.poloAr > 0;
             $scope.formattedPoloAr = $scope.ingyenPolo ? "" : "(+"+ nevezes.poloAr + "ft)"
         }
     )
@@ -53,7 +54,7 @@ app.controller('ctrl', function ($scope, $resource, $window) {
             $scope.licenszClass='has-error';
             $scope.errorMessages.push("A Magyar Triatlon Szövetség által kiadott licensz megadása kötelező!");
         }
-        if (isBlank($scope.poloMeret)) {
+        if ($scope.vanPolo && isBlank($scope.poloMeret)) {
             $scope.poloClass='has-error';
             $scope.errorMessages.push("Válaszd ki a pólómértedet!");
         }

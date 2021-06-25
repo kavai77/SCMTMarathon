@@ -92,7 +92,7 @@
                             <label for="licenszszam">Licenszszám * (Quadratlonosok írjonak ide 0-át)</label>
                             <input type="text" class="form-control" id="licenszszam" placeholder="A Magyar Triatlonszövetség Által kiadott licencszám" ng-model="licenszSzam">
                         </div>
-                        <div class="form-group" ng-class="poloClass">
+                        <div class="form-group" ng-class="poloClass" ng-show="nevezes.vanPolo">
                             <label for="polo">Pólóméret *</label>
                             <select id="polo" class="form-control" ng-model="poloMeret">
                                 <option value="">(válassz)</option>
