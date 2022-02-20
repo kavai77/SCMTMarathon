@@ -138,9 +138,9 @@ public class VersenyzoPanel extends Composite {
         versenyzoTable.addColumn(new SortableTextColumn<Versenyzo>(listHandler) {
             @Override
             public String getValue(Versenyzo versenyzo) {
-                return versenyzo.getEgyesulet();
+                return versenyzo.getPoloMeret();
             }
-        }, "Egyesület");
+        }, "Póló");
 
         final EditTextCell dijEditCell = new EditTextCell();
         Column<Versenyzo, String> dijColumn = new Column<Versenyzo, String>(dijEditCell) {
