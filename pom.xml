@@ -18,7 +18,7 @@
             ${settings.localRepository}/com/google/appengine/appengine-java-sdk/${appEngineVersion}/appengine-java-sdk/appengine-java-sdk-${appEngineVersion}
         </appEngineSdk>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>4.3.3.RELEASE</spring.version>
+        <spring.version>5.3.18</spring.version>
     </properties>
 
     <dependencies>
